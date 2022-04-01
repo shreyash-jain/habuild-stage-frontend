@@ -1,4 +1,11 @@
 import { useEffect, useState } from "react";
+import {
+  Dialog,
+  Disclosure,
+  Menu,
+  Popover,
+  Transition,
+} from "@headlessui/react";
 import LayoutSidebar from "../components/LayoutSidebar";
 import Table from "../components/Table";
 import FlyoutMenu from "../components/FlyoutMenu";
@@ -7,8 +14,11 @@ import {
   RefreshIcon,
   XCircleIcon,
   CheckCircleIcon,
+  ChevronDownIcon,
+  SearchIcon,
 } from "@heroicons/react/outline";
 import { format, parseISO } from "date-fns";
+import toast from "react-hot-toast";
 
 const attendance = [
   {
@@ -35,18 +45,38 @@ const attendance = [
     day: "Saturday",
     attended: false,
   },
+  {
+    day: "Sunday",
+    attended: true,
+  },
 ];
+
+function classNames(...classes) {
+  return classes.filter(Boolean).join(" ");
+}
 
 const Leads = (props) => {
   const [viewPaymentModal, setViewPaymentModal] = useState(false);
   const [viewCommsModal, setViewCommsModal] = useState(false);
-  const [viewAttendanceModal, setViewAttendanceModal] = useState(false);
+  const [viewSendWAModal, setViewSendWAModal] = useState(false);
+  const [viewStopWACommModal, setViewStopWACommModal] = useState(false);
+  const [viewAddLeadModal, setViewAddLeadModal] = useState(false);
 
   const [leads, setLeads] = useState([]);
 
   const [selectedLeads, setSelectedLeads] = useState([]);
 
   const [loading, setLoading] = useState(true);
+
+  const [selectedBatch, setSelectedBatch] = useState("All");
+
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const [demoBatches, setDemoBatches] = useState([
+    { name: "Batch 1" },
+    { name: "Batch 2" },
+    { name: "BAtch 3" },
+  ]);
 
   useEffect(async () => {
     getPaginatedLeads(1);
@@ -58,8 +88,6 @@ const Leads = (props) => {
     await fetch(`https://api.habuild.in/api/lead/?page=${pageNum}&limit=100`)
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
-
         const leads = [];
 
         for (let i = 0; i < data.leads.length; i++) {
@@ -71,7 +99,7 @@ const Leads = (props) => {
             phone: data.leads[i].mobile_number,
             leadTime: format(parseISO(data.leads[i].lead_time), "PP"),
             isSelected: {
-              identifier: data.leads[i].mobile_number,
+              identifier: data.leads[i].name,
               value: false,
             },
           });
@@ -126,20 +154,27 @@ const Leads = (props) => {
   };
 
   const handleSelect = (identifier) => {
-    const newLeads = [...leads];
     const newSelectedLeads = [...selectedLeads];
+    const newLeads = [...leads];
+    const index = newSelectedLeads.indexOf(identifier);
 
-    newLeads.find((item) => {});
+    for (let i = 0; i < newLeads.length; i++) {
+      if (newLeads[i].name === identifier) {
+        if (newLeads[i].isSelected.value == true) {
+          if (index > -1) {
+            newSelectedLeads.splice(index, 1);
+          }
 
-    // for (let i = 0; i < newLeads.length; i++) {
-    //   if (checked) {
-    //     newLeads[i].isSelected.value = true;
-    //   } else {
-    //     newLeads[i].isSelected.value = false;
-    //   }
-    // }
+          newLeads[i].isSelected.value = false;
+        } else {
+          newSelectedLeads.push(identifier);
+          newLeads[i].isSelected.value = true;
+        }
+      }
+    }
 
     setLeads(newLeads);
+    setSelectedLeads(newSelectedLeads);
   };
 
   const columns = [
@@ -249,6 +284,44 @@ const Leads = (props) => {
     },
   ];
 
+  const handleSearch = () => {
+    setLoading(true);
+    if (!searchTerm) {
+      return;
+    }
+
+    fetch(`https://api.habuild.in/api/lead/find/${searchTerm}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.message) {
+          toast.error(data.message);
+          setLoading(false);
+          return;
+        }
+
+        setLeads([
+          {
+            name: data.name,
+            status: data.status,
+            email: data.email,
+            mode: data.mode,
+            phone: data.mobile_number,
+            leadTime: format(parseISO(data.lead_time || data.created_at), "PP"),
+            isSelected: {
+              identifier: data.name,
+              value: false,
+            },
+          },
+        ]);
+        setLoading(false);
+      });
+  };
+
+  const handleSearchCancel = () => {
+    setSearchTerm("");
+    getPaginatedLeads(1);
+  };
+
   if (loading) {
     return (
       <div
@@ -264,12 +337,121 @@ const Leads = (props) => {
     <div>
       <h1 className="text-2xl font-semibold text-gray-900">Leads</h1>
 
+      <div className="min-w-0 flex-1 md:px-4 lg:px-0 xl:col-span-6">
+        <div className="flex items-center py-4 md:max-w-3xl md:mx-auto lg:max-w-none lg:mx-0 xl:px-0">
+          <div className="w-full">
+            <label htmlFor="search" className="sr-only">
+              Search
+            </label>
+            <div className="relative">
+              <div className="pointer-events-none absolute inset-y-0 left-0 pl-3 flex items-center">
+                <SearchIcon
+                  className="h-5 w-5 text-gray-400"
+                  aria-hidden="true"
+                />
+              </div>
+              <input
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                id="search"
+                name="search"
+                className="block w-full bg-white border border-gray-300 rounded-md py-2 pl-10 pr-3 text-sm placeholder-gray-500 focus:outline-none focus:text-gray-900 focus:placeholder-gray-400 focus:ring-1 focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                placeholder="Search"
+                type="search"
+              />
+            </div>
+            {searchTerm && (
+              <>
+                <button
+                  onClick={handleSearch}
+                  className="font-medium px-4 py-2 rounded-md bg-white border-2 border-green-400 hover:bg-green-400 text-green-700 hover:text-white mt-2"
+                >
+                  Search
+                </button>
+                <button
+                  onClick={handleSearchCancel}
+                  className="ml-2 font-medium px-4 py-2 rounded-md bg-white border-2 border-red-400 hover:bg-red-400 text-red-700 hover:text-white mt-2"
+                >
+                  Cancel
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-row w-full mt-8 justify-between">
+        <Menu as="div" className="relative z-10 inline-block text-left">
+          <div>
+            <Menu.Button className="group inline-flex justify-center text-lg font-medium text-gray-700 hover:text-gray-900">
+              Batch -{" "}
+              <span className="text-green-600 ml-2">{selectedBatch}</span>
+              <ChevronDownIcon
+                className="flex-shrink-0 mt-1 -mr-1 ml-1 h-5 w-5 text-gray-400 group-hover:text-gray-500"
+                aria-hidden="true"
+              />
+            </Menu.Button>
+          </div>
+
+          <Transition
+            enter="transition ease-out duration-100"
+            enterFrom="transform opacity-0 scale-95"
+            enterTo="transform opacity-100 scale-100"
+            leave="transition ease-in duration-75"
+            leaveFrom="transform opacity-100 scale-100"
+            leaveTo="transform opacity-0 scale-95"
+          >
+            <Menu.Items className="origin-top-left absolute left-0 z-10 mt-2 w-40 rounded-md shadow-2xl bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+              <div className="py-1">
+                {demoBatches.map((option) => (
+                  <Menu.Item key={option}>
+                    {({ active }) => (
+                      <button
+                        onClick={() => setSelectedBatch(option.name)}
+                        className={classNames(
+                          active ? "bg-gray-100" : "",
+                          "block px-4 py-2 text-sm font-medium text-gray-900 w-full"
+                        )}
+                      >
+                        {option.name}
+                      </button>
+                    )}
+                  </Menu.Item>
+                ))}
+              </div>
+            </Menu.Items>
+          </Transition>
+        </Menu>
+
+        <div className="flex-end space-x-2">
+          <button
+            onClick={() => setViewSendWAModal(true)}
+            className="font-medium px-4 py-2 rounded-md bg-green-300 hover:bg-green-500 text-green-700 hover:text-white "
+          >
+            Send WA Message
+          </button>
+          <button
+            onClick={() => setViewStopWACommModal(true)}
+            className="font-medium px-4 py-2 rounded-md bg-green-300 hover:bg-green-500 text-green-700 hover:text-white"
+          >
+            Stop WA Communication
+          </button>
+        </div>
+      </div>
+
       <Table
         handlePaginationClick={getPaginatedLeads}
         columns={columns}
         pagination
         dataSource={leads}
       />
+
+      <button
+        onClick={() => setViewAddLeadModal(true)}
+        className="font-medium px-4 py-2 rounded-md bg-green-300 hover:bg-green-500 text-green-700 hover:text-white fixed bottom-2 right-2"
+      >
+        Add Lead +
+      </button>
 
       <AddPaymentModal
         viewPaymentModal={viewPaymentModal}
@@ -281,11 +463,72 @@ const Leads = (props) => {
         setViewCommsModal={setViewCommsModal}
       />
 
+      <AddLeadModal
+        viewAddLeadModal={viewAddLeadModal}
+        setViewAddLeadModal={setViewAddLeadModal}
+      />
+
+      <SendWAModal
+        viewSendWAModal={viewSendWAModal}
+        setViewSendWAModal={setViewSendWAModal}
+        selectedLeadsLength={selectedLeads.length}
+      />
+
+      <StopWACommModal
+        viewStopWACommModal={viewStopWACommModal}
+        setViewStopWACommModal={setViewStopWACommModal}
+        selectedLeadsLength={selectedLeads.length}
+      />
+
       {/* <AttendanceModal
         viewAttendanceModal={viewAttendanceModal}
         setViewAttendanceModal={setViewAttendanceModal}
       /> */}
     </div>
+  );
+};
+
+const SendWAModal = (props) => {
+  return (
+    <Modal
+      modalOpen={props.viewSendWAModal}
+      setModalOpen={props.setViewSendWAModal}
+      actionText="Send"
+    >
+      <div className="flex flex-col space-y-4">
+        <div>{props.selectedLeadsLength} people selected</div>
+
+        <div>
+          <label
+            htmlFor="first-name"
+            className="block text-md font-medium text-gray-700"
+          >
+            Message
+          </label>
+          <textarea
+            rows={4}
+            name="message"
+            id="message"
+            autoComplete="message"
+            className="p-2 mt-1 block w-full shadow-sm border border-gray-200 rounded-md"
+          />
+        </div>
+      </div>
+    </Modal>
+  );
+};
+
+const StopWACommModal = (props) => {
+  return (
+    <Modal
+      modalOpen={props.viewStopWACommModal}
+      setModalOpen={props.setViewStopWACommModal}
+      actionText="Stop"
+    >
+      <div className="flex flex-col space-y-4">
+        <div>{props.selectedLeadsLength} people selected</div>
+      </div>
+    </Modal>
   );
 };
 
@@ -403,41 +646,73 @@ const CommsModal = (props) => {
   );
 };
 
-const AttendanceModal = (props) => {
-  const columns = [
-    {
-      title: "Mode",
-      dataIndex: "mode",
-      key: "mode",
-    },
-    {
-      title: "Absence",
-      dataIndex: "absence",
-      key: "absence",
-    },
-  ];
-
+const AddLeadModal = (props) => {
   return (
     <Modal
-      modalOpen={props.viewAttendanceModal}
-      setModalOpen={props.setViewAttendanceModal}
+      modalOpen={props.viewAddLeadModal}
+      setModalOpen={props.setViewAddLeadModal}
+      actionText="Add Lead"
       hideActionButtons
     >
-      <div className="flex flex-col space-y-4">
+      <form className="flex flex-col w-full space-y-5" onSubmit={(e) => {}}>
         <h2 className="text-left text-xl font-bold text-gray-900">
-          Attendance
+          Add payment Details
         </h2>
 
-        <Table
-          columns={columns}
-          dataSource={[
-            {
-              mode: "Day 1, Monday",
-              absence: "Yes",
-            },
-          ]}
-        />
-      </div>
+        <div className="col-span-6 sm:col-span-3">
+          <label
+            htmlFor="first-name"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Name
+          </label>
+          <input
+            type="text"
+            name="name"
+            id="name"
+            autoComplete="name"
+            placeholder="Name"
+            className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+          />
+        </div>
+        <div className="col-span-6 sm:col-span-3">
+          <label
+            htmlFor="first-name"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Telephone
+          </label>
+          <input
+            type="tel"
+            required
+            pattern="^[0-9]{10}$"
+            placeholder="Your WhatsApp Phone no. (10 digits)"
+            className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+          />
+        </div>
+        <div className="col-span-6 sm:col-span-3">
+          <label
+            htmlFor="first-name"
+            className="block text-sm font-medium text-gray-700"
+          >
+            E-mail
+          </label>
+          <input
+            required
+            type="email"
+            placeholder="Your E-mail"
+            className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+          />
+        </div>
+
+        <button
+          className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:col-start-2 sm:text-sm"
+          type="submit"
+        >
+          Add Lead
+          {/* {apiLoading && <Spinner sx={styles.buttonLoader} size={36} />} */}
+        </button>
+      </form>
     </Modal>
   );
 };
