@@ -258,6 +258,10 @@ const Leads = (props) => {
       title: "Paid",
       dataIndex: "paid",
       key: "paid",
+      renderHeader: true,
+      headerRender: () => {
+        
+      }
     },
     {
       title: "Mode",
