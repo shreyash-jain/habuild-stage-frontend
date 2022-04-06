@@ -80,7 +80,16 @@ const Leads = (props) => {
 
   useEffect(async () => {
     getPaginatedLeads(1);
+    getDemobatches();
   }, []);
+
+  const getDemobatches = async () => {
+    await fetch(`https://api.habuild.in/api/demobatches/`)
+      .then((res) => res.json())
+      .then((data) => {
+        setDemoBatches(data.demoBatches);
+      });
+  };
 
   const getPaginatedLeads = async (pageNum) => {
     setLoading(true);
@@ -90,16 +99,19 @@ const Leads = (props) => {
       .then((data) => {
         const leads = [];
 
-        for (let i = 0; i < data.leads.length; i++) {
+        for (let i = 0; i < data.leads.leadDataArr.length; i++) {
           leads.push({
-            name: data.leads[i].name,
-            status: data.leads[i].status,
-            email: data.leads[i].email,
-            mode: data.leads[i].mode,
-            phone: data.leads[i].mobile_number,
-            leadTime: format(parseISO(data.leads[i].lead_time), "PP"),
+            name: data.leads.leadDataArr[i].name,
+            status: data.leads.leadDataArr[i].status,
+            email: data.leads.leadDataArr[i].email,
+            source: data.leads.leadDataArr[i].source,
+            phone: data.leads.leadDataArr[i].mobile_number,
+            leadTime: format(
+              parseISO(data.leads.leadDataArr[i].lead_time),
+              "PP"
+            ),
             isSelected: {
-              identifier: data.leads[i].name,
+              identifier: data.leads.leadDataArr[i].name,
               value: false,
             },
           });
@@ -259,14 +271,12 @@ const Leads = (props) => {
       dataIndex: "paid",
       key: "paid",
       renderHeader: true,
-      headerRender: () => {
-        
-      }
+      headerRender: () => {},
     },
     {
-      title: "Mode",
-      dataIndex: "mode",
-      key: "mode",
+      title: "Source",
+      dataIndex: "source",
+      key: "source",
     },
     {
       title: "Phone No.",
@@ -308,7 +318,7 @@ const Leads = (props) => {
             name: data.name,
             status: data.status,
             email: data.email,
-            mode: data.mode,
+            source: data.source,
             phone: data.mobile_number,
             leadTime: format(parseISO(data.lead_time || data.created_at), "PP"),
             isSelected: {
@@ -360,7 +370,7 @@ const Leads = (props) => {
                 id="search"
                 name="search"
                 className="block w-full bg-white border border-gray-300 rounded-md py-2 pl-10 pr-3 text-sm placeholder-gray-500 focus:outline-none focus:text-gray-900 focus:placeholder-gray-400 focus:ring-1 focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                placeholder="Search"
+                placeholder="Search Lead by Phone number, name or email."
                 type="search"
               />
             </div>
@@ -407,8 +417,21 @@ const Leads = (props) => {
           >
             <Menu.Items className="origin-top-left absolute left-0 z-10 mt-2 w-40 rounded-md shadow-2xl bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
               <div className="py-1">
+                <Menu.Item>
+                  {({ active }) => (
+                    <button
+                      onClick={() => setSelectedBatch("All")}
+                      className={classNames(
+                        active ? "bg-gray-100" : "",
+                        "block px-4 py-2 text-sm font-medium text-gray-900 w-full"
+                      )}
+                    >
+                      All
+                    </button>
+                  )}
+                </Menu.Item>
                 {demoBatches.map((option) => (
-                  <Menu.Item key={option}>
+                  <Menu.Item key={option.id}>
                     {({ active }) => (
                       <button
                         onClick={() => setSelectedBatch(option.name)}
@@ -651,6 +674,48 @@ const CommsModal = (props) => {
 };
 
 const AddLeadModal = (props) => {
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [apiLoading, setApiLoading] = useState(false);
+
+  const formSubmit = (e) => {
+    e.preventDefault();
+    setApiLoading(true);
+
+    if (!name || !phone || !email) {
+      alert("Please enter all details.");
+      setApiLoading(false);
+      return;
+    }
+
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    var raw = JSON.stringify({
+      name,
+      email,
+      mobile_number: phone,
+    });
+    var requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+    fetch("https://api.habuild.in/api/lead?action_point=crm", requestOptions)
+      .then((response) => response.text())
+      .then((result) => {
+        setApiLoading(false);
+        toast.success("Lead Created");
+        console.log(result);
+      })
+      .catch((error) => {
+        setApiLoading(false);
+        toast.error("No lead created");
+        console.log("error", error);
+      });
+  };
+
   return (
     <Modal
       modalOpen={props.viewAddLeadModal}
@@ -658,7 +723,12 @@ const AddLeadModal = (props) => {
       actionText="Add Lead"
       hideActionButtons
     >
-      <form className="flex flex-col w-full space-y-5" onSubmit={(e) => {}}>
+      <form
+        className="flex flex-col w-full space-y-5"
+        onSubmit={(e) => {
+          formSubmit(e);
+        }}
+      >
         <h2 className="text-left text-xl font-bold text-gray-900">
           Add payment Details
         </h2>
@@ -671,6 +741,8 @@ const AddLeadModal = (props) => {
             Name
           </label>
           <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             type="text"
             name="name"
             id="name"
@@ -684,9 +756,11 @@ const AddLeadModal = (props) => {
             htmlFor="first-name"
             className="block text-sm font-medium text-gray-700"
           >
-            Telephone
+            Phone
           </label>
           <input
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
             type="tel"
             required
             pattern="^[0-9]{10}$"
@@ -702,6 +776,8 @@ const AddLeadModal = (props) => {
             E-mail
           </label>
           <input
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
             type="email"
             placeholder="Your E-mail"
@@ -714,7 +790,9 @@ const AddLeadModal = (props) => {
           type="submit"
         >
           Add Lead
-          {/* {apiLoading && <Spinner sx={styles.buttonLoader} size={36} />} */}
+          {apiLoading && (
+            <RefreshIcon className="text-white animate-spin h-6 w-6 mx-auto" />
+          )}
         </button>
       </form>
     </Modal>
