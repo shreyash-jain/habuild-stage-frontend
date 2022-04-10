@@ -32,7 +32,7 @@ export default function FlyoutMenu(props) {
           <div className="py-1">
             {props.menuItems.map((item) => {
               return (
-                <Menu.Item>
+                <Menu.Item key={item.name}>
                   <button
                     onClick={() => item.onClick(props.actionEntity)}
                     className={classNames(

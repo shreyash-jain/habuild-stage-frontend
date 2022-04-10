@@ -1,8 +1,18 @@
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/outline";
+import { useState, useEffect } from "react";
+import Pagination from "./Pagination";
 
-const paginationButtonNums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+// const paginationButtonNums = [
+//   1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
+//   23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
+// ];
 
 export default function Table(props) {
+  const handlePaginationClick = (data) => {
+    console.log("On Page Change Called");
+    props.onPaginationApi(data.currentPage);
+  };
+
   return (
     <div className=" mt-4 py-2 align-middle inline-block min-w-full ">
       <div className="shadow-lg ring-1 ring-black ring-opacity-5 md:rounded-lg">
@@ -84,46 +94,13 @@ export default function Table(props) {
                 Next
               </a>
             </div>
-            <div className="w-full hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-              <div>
-                <p className="text-sm text-gray-700">
-                  Showing <span className="font-medium">1</span> to{" "}
-                  <span className="font-medium">10</span> of{" "}
-                  <span className="font-medium">97</span> results
-                </p>
-              </div>
-              <div>
-                <nav
-                  className=" z-0 inline-flex rounded-md shadow-sm -space-x-px"
-                  aria-label="Pagination"
-                >
-                  <a
-                    href="#"
-                    className=" inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
-                  >
-                    <span className="sr-only">Previous</span>
-                    <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
-                  </a>
-                  {paginationButtonNums.map((item) => {
-                    return (
-                      <button
-                        onClick={() => props.handlePaginationClick(item)}
-                        key={item}
-                        className="hover:bg-green-50 border-gray-300 hover:text-green-600 text-gray-500  inline-flex items-center px-4 py-2 border text-sm font-medium"
-                      >
-                        {item}
-                      </button>
-                    );
-                  })}
-                  <a
-                    href="#"
-                    className=" inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
-                  >
-                    <span className="sr-only">Next</span>
-                    <ChevronRightIcon className="h-5 w-5" aria-hidden="true" />
-                  </a>
-                </nav>
-              </div>
+            <div className="flex flex-row py-4">
+              {/* <Pagination
+                totalRecords={100000}
+                pageLimit={100}
+                pageNeighbours={2}
+                onPageChanged={(data) => handlePaginationClick(data)}
+              /> */}
             </div>
           </div>
         )}

@@ -325,7 +325,7 @@ const Members = (props) => {
       </div>
 
       <Table
-        // handlePaginationClick={getPaginatedLeads}
+        onPaginationApi={() => {}}
         columns={columns}
         pagination
         dataSource={[{}]}

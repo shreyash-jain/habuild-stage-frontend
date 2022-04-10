@@ -90,7 +90,7 @@ const Leads = (props) => {
 
   const [selectedLeads, setSelectedLeads] = useState([]);
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const [selectedBatch, setSelectedBatch] = useState("All");
 
@@ -101,6 +101,8 @@ const Leads = (props) => {
   const [filterParams, setFilterParams] = useState({});
 
   const [leadForAction, setLeadForAction] = useState({});
+
+  const [totalRecords, setTotalRecords] = useState(100);
 
   useEffect(async () => {
     getPaginatedLeads(1);
@@ -118,6 +120,8 @@ const Leads = (props) => {
 
   const getPaginatedLeads = async (pageNum) => {
     setLoading(true);
+
+    console.log("Page Num!!!!", pageNum);
 
     let api = `https://api.habuild.in/api/lead/?page=${pageNum}&limit=100`;
     // let api = `http://localhost:4000/api/lead/?page=${pageNum}&limit=100`;
@@ -158,6 +162,7 @@ const Leads = (props) => {
           });
         }
 
+        setTotalRecords(leads.totalLeadsSize);
         setLeads(leads);
         setLoading(false);
       });
@@ -290,13 +295,13 @@ const Leads = (props) => {
             {attendance.map((item) => {
               if (item.attended) {
                 return (
-                  <span title={item.day}>
+                  <span key={item.day} title={item.day}>
                     <CheckCircleIcon className="text-green-400 h-6" />
                   </span>
                 );
               } else {
                 return (
-                  <span title={item.day}>
+                  <span key={item.day} title={item.day}>
                     <XCircleIcon className="text-red-400 h-6" />
                   </span>
                 );
@@ -660,7 +665,8 @@ const Leads = (props) => {
       </div>
 
       <Table
-        handlePaginationClick={getPaginatedLeads}
+        totalRecords={totalRecords}
+        onPaginationApi={getPaginatedLeads}
         columns={columns}
         pagination
         dataSource={leads}
