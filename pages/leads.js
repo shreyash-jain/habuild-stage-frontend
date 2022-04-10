@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, Fragment } from "react";
 import {
   Dialog,
   Disclosure,
@@ -16,6 +16,7 @@ import {
   CheckCircleIcon,
   ChevronDownIcon,
   SearchIcon,
+  FilterIcon,
 } from "@heroicons/react/outline";
 import { format, parseISO } from "date-fns";
 import toast from "react-hot-toast";
@@ -51,6 +52,28 @@ const attendance = [
   },
 ];
 
+const filters = {
+  status: [
+    { value: "lead", label: "Lead", checked: false },
+    { value: "prelead", label: "Pre-Lead", checked: false },
+    { value: "converted", label: "Converted", checked: false },
+  ],
+  leadDate: [
+    { value: "asc", label: "Ascending", checked: false },
+    { value: "desc", label: "Descending", checked: false },
+  ],
+  source: [
+    { value: "facebook", label: "Facebook", checked: false },
+    { value: "googleads", label: "Google Leads", checked: true },
+    { value: "crm", label: "CRM", checked: false },
+    { value: "landing", label: "Landing Page", checked: false },
+  ],
+  paid: [
+    { value: "yes", label: "Yes", checked: false },
+    { value: "no", label: "No", checked: false },
+  ],
+};
+
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
@@ -61,6 +84,7 @@ const Leads = (props) => {
   const [viewSendWAModal, setViewSendWAModal] = useState(false);
   const [viewStopWACommModal, setViewStopWACommModal] = useState(false);
   const [viewAddLeadModal, setViewAddLeadModal] = useState(false);
+  const [viewAddCommModal, setViewAddCommModal] = useState(false);
 
   const [leads, setLeads] = useState([]);
 
@@ -72,11 +96,11 @@ const Leads = (props) => {
 
   const [searchTerm, setSearchTerm] = useState("");
 
-  const [demoBatches, setDemoBatches] = useState([
-    { name: "Batch 1" },
-    { name: "Batch 2" },
-    { name: "BAtch 3" },
-  ]);
+  const [demoBatches, setDemoBatches] = useState([]);
+
+  const [filterParams, setFilterParams] = useState({});
+
+  const [leadForAction, setLeadForAction] = useState({});
 
   useEffect(async () => {
     getPaginatedLeads(1);
@@ -87,6 +111,7 @@ const Leads = (props) => {
     await fetch(`https://api.habuild.in/api/demobatches/`)
       .then((res) => res.json())
       .then((data) => {
+        console.log("Demo Batches", data.demoBatches);
         setDemoBatches(data.demoBatches);
       });
   };
@@ -94,13 +119,27 @@ const Leads = (props) => {
   const getPaginatedLeads = async (pageNum) => {
     setLoading(true);
 
-    await fetch(`https://api.habuild.in/api/lead/?page=${pageNum}&limit=100`)
+    let api = `https://api.habuild.in/api/lead/?page=${pageNum}&limit=100`;
+    // let api = `http://localhost:4000/api/lead/?page=${pageNum}&limit=100`;
+
+    if (Object.keys(filterParams).length > 0) {
+      for (var i = 0; i < Object.keys(filterParams).length; i++) {
+        api =
+          api +
+          `&${Object.keys(filterParams)[i]}=${
+            filterParams[Object.keys(filterParams)[i]]
+          }`;
+      }
+    }
+
+    await fetch(api)
       .then((res) => res.json())
       .then((data) => {
         const leads = [];
 
         for (let i = 0; i < data.leads.leadDataArr.length; i++) {
           leads.push({
+            member_id: data.leads.leadDataArr[i].member_id,
             name: data.leads.leadDataArr[i].name,
             status: data.leads.leadDataArr[i].status,
             email: data.leads.leadDataArr[i].email,
@@ -114,6 +153,8 @@ const Leads = (props) => {
               identifier: data.leads.leadDataArr[i].name,
               value: false,
             },
+            action: data.leads.leadDataArr[i],
+            wa_comm_status: data.leads.leadDataArr[i].wa_comm_status,
           });
         }
 
@@ -125,14 +166,23 @@ const Leads = (props) => {
   const menuItems = [
     {
       name: "Add Payment",
-      onClick: () => {
+      onClick: (actionEntity) => {
+        setLeadForAction(actionEntity);
         setViewPaymentModal(!viewPaymentModal);
       },
     },
     {
       name: "View Comms",
-      onClick: () => {
+      onClick: (actionEntity) => {
+        setLeadForAction(actionEntity);
         setViewCommsModal(!viewCommsModal);
+      },
+    },
+    {
+      name: "Add Comms",
+      onClick: (actionEntity) => {
+        setLeadForAction(actionEntity);
+        setViewAddCommModal(!viewAddCommModal);
       },
     },
     // {
@@ -221,6 +271,16 @@ const Leads = (props) => {
       key: "name",
     },
     {
+      title: "Member ID",
+      dataIndex: "member_id",
+      key: "member_id",
+    },
+    {
+      title: "WhatsApp Communication Status",
+      dataIndex: "wa_comm_status",
+      key: "wa_comm_status",
+    },
+    {
       title: "Attendance",
       dataIndex: "attendance",
       key: "attendance",
@@ -292,8 +352,10 @@ const Leads = (props) => {
       title: "Actions",
       dataIndex: "action",
       key: "action",
-      render: (profile) => {
-        return <FlyoutMenu menuItems={menuItems}></FlyoutMenu>;
+      render: (lead) => {
+        return (
+          <FlyoutMenu actionEntity={lead} menuItems={menuItems}></FlyoutMenu>
+        );
       },
     },
   ];
@@ -315,6 +377,7 @@ const Leads = (props) => {
 
         setLeads([
           {
+            member_id: data.member_id,
             name: data.name,
             status: data.status,
             email: data.email,
@@ -395,60 +458,190 @@ const Leads = (props) => {
       </div>
 
       <div className="flex flex-row w-full mt-8 justify-between">
-        <Menu as="div" className="relative z-10 inline-block text-left">
-          <div>
-            <Menu.Button className="group inline-flex justify-center text-lg font-medium text-gray-700 hover:text-gray-900">
-              Batch -{" "}
-              <span className="text-green-600 ml-2">{selectedBatch}</span>
-              <ChevronDownIcon
-                className="flex-shrink-0 mt-1 -mr-1 ml-1 h-5 w-5 text-gray-400 group-hover:text-gray-500"
-                aria-hidden="true"
-              />
-            </Menu.Button>
-          </div>
-
-          <Transition
-            enter="transition ease-out duration-100"
-            enterFrom="transform opacity-0 scale-95"
-            enterTo="transform opacity-100 scale-100"
-            leave="transition ease-in duration-75"
-            leaveFrom="transform opacity-100 scale-100"
-            leaveTo="transform opacity-0 scale-95"
-          >
-            <Menu.Items className="origin-top-left absolute left-0 z-10 mt-2 w-40 rounded-md shadow-2xl bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-              <div className="py-1">
-                <Menu.Item>
-                  {({ active }) => (
-                    <button
-                      onClick={() => setSelectedBatch("All")}
-                      className={classNames(
-                        active ? "bg-gray-100" : "",
-                        "block px-4 py-2 text-sm font-medium text-gray-900 w-full"
-                      )}
-                    >
-                      All
-                    </button>
-                  )}
-                </Menu.Item>
-                {demoBatches.map((option) => (
-                  <Menu.Item key={option.id}>
-                    {({ active }) => (
-                      <button
-                        onClick={() => setSelectedBatch(option.name)}
-                        className={classNames(
-                          active ? "bg-gray-100" : "",
-                          "block px-4 py-2 text-sm font-medium text-gray-900 w-full"
-                        )}
-                      >
-                        {option.name}
-                      </button>
-                    )}
-                  </Menu.Item>
-                ))}
+        <Disclosure
+          as="section"
+          aria-labelledby="filter-heading"
+          className="relative z-10  grid items-center"
+        >
+          <h2 id="filter-heading" className="sr-only">
+            Filters
+          </h2>
+          <div className="relative col-start-1 row-start-1 py-4">
+            <div className="max-w-7xl mx-auto flex space-x-6 divide-x divide-gray-200 text-sm px-4 sm:px-6 lg:px-8">
+              <div>
+                <Disclosure.Button className="group text-gray-700 font-medium flex items-center py-1">
+                  <FilterIcon
+                    className="flex-none w-5 h-5 mr-2 text-gray-400 group-hover:text-gray-500"
+                    aria-hidden="true"
+                  />
+                  {Object.keys(filterParams).length} Filters
+                </Disclosure.Button>
               </div>
-            </Menu.Items>
-          </Transition>
-        </Menu>
+              <div className="pl-6">
+                {Object.keys(filterParams).length > 0 && (
+                  <>
+                    <button
+                      onClick={() => getPaginatedLeads(1)}
+                      type="button"
+                      className="border-2 border-green-300 rounded-md px-2 py-1 hover:bg-green-300 hover:text-white text-gray-500"
+                    >
+                      Filter
+                    </button>
+                    <button
+                      onClick={() => {
+                        setFilterParams({});
+                        getPaginatedLeads(1);
+                      }}
+                      type="button"
+                      className="ml-2 hover:text-gray-700 text-gray-500"
+                    >
+                      Clear all
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+          <Disclosure.Panel className="border-t border-gray-200 py-10">
+            <div className="max-w-7xl mx-auto grid grid-cols-2 gap-x-4 px-4 text-sm sm:px-6 md:gap-x-6 lg:px-8">
+              <div className="grid grid-cols-1 gap-y-10 auto-rows-min md:grid-cols-2 md:gap-x-6">
+                <fieldset>
+                  <legend className="block font-medium">Batch</legend>
+                  <div className="pt-6 space-y-6 sm:pt-4 sm:space-y-4">
+                    {demoBatches.map((option, optionIdx) => (
+                      <div key={option.id} className="flex items-center">
+                        <input
+                          id={option.id}
+                          name="batch"
+                          type="radio"
+                          checked={filterParams.batchId == option.id}
+                          value={option.name}
+                          onChange={() =>
+                            setFilterParams({
+                              ...filterParams,
+                              batchId: option.id,
+                            })
+                          }
+                          className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
+                        />
+                        <label
+                          htmlFor={option.id}
+                          className="ml-3 block text-sm text-gray-700"
+                        >
+                          {option.name}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </fieldset>
+                <fieldset>
+                  <legend className="block font-medium">Status</legend>
+                  <div className="pt-6 space-y-6 sm:pt-4 sm:space-y-4">
+                    {filters.status.map((option, optionIdx) => (
+                      <div key={option.value} className="flex items-center">
+                        <input
+                          id={option.value}
+                          onChange={() =>
+                            setFilterParams({
+                              ...filterParams,
+                              status: option.value,
+                            })
+                          }
+                          checked={filterParams.status == option.value}
+                          name="status"
+                          type="radio"
+                          className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
+                        />
+                        <label className="ml-3 block text-sm text-gray-700">
+                          {option.label}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </fieldset>
+              </div>
+              <div className="grid grid-cols-1 gap-y-10 auto-rows-min md:grid-cols-2 md:gap-x-6">
+                <fieldset>
+                  <legend className="block font-medium">Source</legend>
+                  <div className="pt-6 space-y-6 sm:pt-4 sm:space-y-4">
+                    {filters.source.map((option, optionIdx) => (
+                      <div key={option.value} className="flex items-center">
+                        <input
+                          id={option.value}
+                          onChange={() =>
+                            setFilterParams({
+                              ...filterParams,
+                              source: option.value,
+                            })
+                          }
+                          checked={filterParams.source == option.value}
+                          name="source"
+                          type="radio"
+                          className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
+                        />
+                        <label className="ml-3 block text-sm text-gray-700">
+                          {option.label}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </fieldset>
+                <fieldset>
+                  <legend className="block font-medium">Lead Date</legend>
+                  <div className="pt-6 space-y-6 sm:pt-4 sm:space-y-4">
+                    {filters.leadDate.map((option, optionIdx) => (
+                      <div key={option.value} className="flex items-center">
+                        <input
+                          id={option.value}
+                          onChange={() =>
+                            setFilterParams({
+                              ...filterParams,
+                              leadDate: option.value,
+                            })
+                          }
+                          checked={filterParams.leadDate == option.value}
+                          name="leadDate"
+                          type="radio"
+                          className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
+                        />
+                        <label className="ml-3 block text-sm text-gray-700">
+                          {option.label}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </fieldset>
+              </div>
+              <div className="grid grid-cols-1 gap-y-10 auto-rows-min md:grid-cols-2 md:gap-x-6">
+                <fieldset>
+                  <legend className="block font-medium">Paid</legend>
+                  <div className="pt-6 space-y-6 sm:pt-4 sm:space-y-4">
+                    {filters.paid.map((option, optionIdx) => (
+                      <div key={option.value} className="flex items-center">
+                        <input
+                          id={option.value}
+                          onChange={() =>
+                            setFilterParams({
+                              ...filterParams,
+                              paid: option.value,
+                            })
+                          }
+                          checked={filterParams.paid == option.value}
+                          name="paid"
+                          type="radio"
+                          className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
+                        />
+                        <label className="ml-3 block text-sm text-gray-700">
+                          {option.label}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </fieldset>
+              </div>
+            </div>
+          </Disclosure.Panel>
+        </Disclosure>
 
         <div className="flex-end space-x-2">
           <button
@@ -461,7 +654,7 @@ const Leads = (props) => {
             onClick={() => setViewStopWACommModal(true)}
             className="font-medium px-4 py-2 rounded-md bg-green-300 hover:bg-green-500 text-green-700 hover:text-white"
           >
-            Stop WA Communication
+            Start/Stop WA Communication
           </button>
         </div>
       </div>
@@ -502,9 +695,16 @@ const Leads = (props) => {
       />
 
       <StopWACommModal
+        selectedLeads={selectedLeads}
         viewStopWACommModal={viewStopWACommModal}
         setViewStopWACommModal={setViewStopWACommModal}
         selectedLeadsLength={selectedLeads.length}
+      />
+
+      <AddCommModal
+        leadForAction={leadForAction}
+        modalOpen={viewAddCommModal}
+        setModalOpen={setViewAddCommModal}
       />
 
       {/* <AttendanceModal
@@ -512,6 +712,142 @@ const Leads = (props) => {
         setViewAttendanceModal={setViewAttendanceModal}
       /> */}
     </div>
+  );
+};
+
+const AddCommModal = (props) => {
+  // const [type, setType] = useState("lead_query");
+  // const [status, setStatus] = useState("success");
+
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [mode, setMode] = useState("");
+  const [apiLoading, setApiLoading] = useState(false);
+
+  const formSubmit = (e) => {
+    e.preventDefault();
+    setApiLoading(true);
+
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    var raw = JSON.stringify({
+      member_id: props.leadForAction.member_id,
+      date: new Date(),
+      name,
+      email,
+      type: "lead_query",
+      status: "success",
+    });
+    var requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+    fetch("https://api.habuild.in/api/lead/communication", requestOptions)
+      // fetch("http://localhost:4000/api/lead/communication", requestOptions)
+      .then((response) => response.text())
+      .then((result) => {
+        setApiLoading(false);
+        toast.success("Lead Created");
+        console.log(result);
+      })
+      .catch((error) => {
+        setApiLoading(false);
+        toast.error("No lead created");
+        console.log("error", error);
+      });
+  };
+
+  return (
+    <Modal
+      apiLoading={apiLoading}
+      modalOpen={props.modalOpen}
+      setModalOpen={props.setModalOpen}
+      actionText="Add"
+      hideActionButtons
+    >
+      <div className="flex flex-col space-y-4">
+        <h2 className="text-left text-xl font-bold text-gray-900">
+          Add Communication Details
+        </h2>
+
+        <form
+          className="flex flex-col w-full space-y-5"
+          onSubmit={(e) => {
+            formSubmit(e);
+          }}
+        >
+          <div className="col-span-6 sm:col-span-3">
+            <label
+              htmlFor="first-name"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Agent Name
+            </label>
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              type="text"
+              name="name"
+              id="name"
+              autoComplete="name"
+              placeholder="Name"
+              className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="mode"
+              className="block text-md font-medium text-gray-700"
+            >
+              Mode
+            </label>
+
+            <select
+              name="mode"
+              onChange={(e) => setMode(e.target.value)}
+              className="p-2 mt-1 block w-full shadow-sm border border-gray-200 rounded-md"
+            >
+              <option value="phone">Phone</option>
+              <option value="wa">WhatsApp</option>
+              <option value="sms">SMS</option>
+              <option value="email">Email</option>
+            </select>
+          </div>
+
+          <div className="col-span-6 sm:col-span-3">
+            <label
+              htmlFor="first-name"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Comm Summary
+            </label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              type="text"
+              rows={5}
+              name="description"
+              id="description"
+              placeholder="Communication Summary"
+              className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+            />
+          </div>
+
+          <button
+            className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:col-start-2 sm:text-sm"
+            type="submit"
+          >
+            Add Comm
+            {apiLoading && (
+              <RefreshIcon className="text-white animate-spin h-6 w-6 mx-auto" />
+            )}
+          </button>
+        </form>
+      </div>
+    </Modal>
   );
 };
 
@@ -546,14 +882,73 @@ const SendWAModal = (props) => {
 };
 
 const StopWACommModal = (props) => {
+  const [apiLoading, setApiLoading] = useState();
+
+  const apiCall = (status) => {
+    setApiLoading(true);
+
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    var raw = JSON.stringify({
+      lead_member_ids: props.selectedLeads,
+      status,
+    });
+    var requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+    // fetch("http://localhost:4000/api/lead/updateLeadCommStatus", requestOptions)
+    fetch(
+      "https://api.habuild.in/api/lead/updateLeadCommStatus",
+      requestOptions
+    )
+      .then((response) => response.text())
+      .then((result) => {
+        setApiLoading(false);
+        toast.success("Updated Lead WA Comm Status");
+        console.log(result);
+      })
+      .catch((error) => {
+        setApiLoading(false);
+        toast.error("Error");
+        console.log("error", error);
+      });
+  };
+
   return (
     <Modal
+      apiLoading={apiLoading}
       modalOpen={props.viewStopWACommModal}
       setModalOpen={props.setViewStopWACommModal}
-      actionText="Stop"
+      hideActionButtons
     >
       <div className="flex flex-col space-y-4">
         <div>{props.selectedLeadsLength} people selected</div>
+
+        <button
+          disabled={apiLoading}
+          onClick={() => apiCall("paused")}
+          className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:col-start-2 sm:text-sm"
+          type="submit"
+        >
+          Stop WA Communication
+          {apiLoading && (
+            <RefreshIcon className="text-white animate-spin h-6 w-6 mx-auto" />
+          )}
+        </button>
+        <button
+          disabled={apiLoading}
+          onClick={() => apiCall("active")}
+          className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:col-start-2 sm:text-sm"
+          type="submit"
+        >
+          Start WA Communication
+          {apiLoading && (
+            <RefreshIcon className="text-white animate-spin h-6 w-6 mx-auto" />
+          )}
+        </button>
       </div>
     </Modal>
   );
@@ -718,6 +1113,7 @@ const AddLeadModal = (props) => {
 
   return (
     <Modal
+      apiLoading={apiLoading}
       modalOpen={props.viewAddLeadModal}
       setModalOpen={props.setViewAddLeadModal}
       actionText="Add Lead"
@@ -729,9 +1125,7 @@ const AddLeadModal = (props) => {
           formSubmit(e);
         }}
       >
-        <h2 className="text-left text-xl font-bold text-gray-900">
-          Add payment Details
-        </h2>
+        <h2 className="text-left text-xl font-bold text-gray-900">Add Lead</h2>
 
         <div className="col-span-6 sm:col-span-3">
           <label

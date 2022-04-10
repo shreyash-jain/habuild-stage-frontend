@@ -34,7 +34,7 @@ export default function FlyoutMenu(props) {
               return (
                 <Menu.Item>
                   <button
-                    onClick={item.onClick}
+                    onClick={() => item.onClick(props.actionEntity)}
                     className={classNames(
                       item.active
                         ? "bg-gray-100 text-gray-900"

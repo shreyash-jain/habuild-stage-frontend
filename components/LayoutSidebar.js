@@ -19,6 +19,7 @@ import { loadGetInitialProps } from "next/dist/shared/lib/utils";
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: HomeIcon },
   { name: "Leads", href: "/leads", icon: UsersIcon },
+  { name: "Members", href: "/members", icon: UsersIcon },
   {
     name: "Lead Analytics",
     href: "/leadAnalytics",
