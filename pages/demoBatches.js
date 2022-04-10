@@ -12,7 +12,7 @@ const DemoBatches = () => {
   }, []);
 
   const getAllPrograms = async () => {
-    await fetch(`https://api.habuild.in:4000/api/program/`)
+    await fetch(`https://api.habuild.in/api/program/`)
       .then((res) => res.json())
       .then((data) => {
         console.log("Demo Batches", data.programs);
