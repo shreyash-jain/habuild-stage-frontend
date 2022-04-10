@@ -90,7 +90,7 @@ const Leads = (props) => {
 
   const [selectedLeads, setSelectedLeads] = useState([]);
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const [selectedBatch, setSelectedBatch] = useState("All");
 
