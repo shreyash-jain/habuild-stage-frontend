@@ -137,7 +137,11 @@ const AddDemoBatchModal = (props) => {
           >
             <option></option>
             {props.programs.map((item) => {
-              return <option value={item.id}>{item.title}</option>;
+              return (
+                <option key={item.id} value={item.id}>
+                  {item.title}
+                </option>
+              );
             })}
           </select>
         </div>
