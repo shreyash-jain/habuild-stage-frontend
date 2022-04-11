@@ -30,7 +30,6 @@ const Pagination = (props) => {
 
   const [pages, setPages] = useState([]);
 
-  console.log("TOtal Records", totalRecords);
 
   // constructor(props) {
   //   super(props);

@@ -7,7 +7,7 @@ import { RefreshIcon } from "@heroicons/react/outline";
 
 export default function Table(props) {
   const handlePaginationClick = (data) => {
-    console.log("On Page Change Called");
+    // console.log("On Page Change Called");
     props.onPaginationApi(data.currentPage);
   };
 

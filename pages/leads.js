@@ -113,7 +113,7 @@ const Leads = (props) => {
     await fetch(`https://api.habuild.in/api/demobatches/`)
       .then((res) => res.json())
       .then((data) => {
-        console.log("Demo Batches", data.demoBatches);
+        // console.log("Demo Batches", data.demoBatches);
         setDemoBatches(data.demoBatches);
       });
   };
@@ -121,7 +121,7 @@ const Leads = (props) => {
   const getPaginatedLeads = async (pageNum) => {
     setLoading(true);
 
-    console.log("Page Num!!!!", pageNum);
+    // console.log("Page Num!!!!", pageNum);
 
     let api = `https://api.habuild.in/api/lead/?page=${pageNum}&limit=100`;
     // let api = `http://localhost:4000/api/lead/?page=${pageNum}&limit=100`;
@@ -758,12 +758,12 @@ const AddCommModal = (props) => {
       .then((result) => {
         setApiLoading(false);
         toast.success("Lead Created");
-        console.log(result);
+        // console.log(result);
       })
       .catch((error) => {
         setApiLoading(false);
         toast.error("No lead created");
-        console.log("error", error);
+        // console.log("error", error);
       });
   };
 
@@ -916,12 +916,12 @@ const StopWACommModal = (props) => {
       .then((result) => {
         setApiLoading(false);
         toast.success("Updated Lead WA Comm Status");
-        console.log(result);
+        // console.log(result);
       })
       .catch((error) => {
         setApiLoading(false);
         toast.error("Error");
-        console.log("error", error);
+        // console.log("error", error);
       });
   };
 
@@ -1110,12 +1110,12 @@ const AddLeadModal = (props) => {
       .then((result) => {
         setApiLoading(false);
         toast.success("Lead Created");
-        console.log(result);
+        // console.log(result);
       })
       .catch((error) => {
         setApiLoading(false);
         toast.error("No lead created");
-        console.log("error", error);
+        // console.log("error", error);
       });
   };
 
