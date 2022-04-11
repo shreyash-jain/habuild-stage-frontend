@@ -1,7 +1,5 @@
-import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/outline";
-import { useState, useEffect } from "react";
-// import Pagination from "./Pagination";
-
+import Pagination from "./Pagination";
+import { RefreshIcon } from "@heroicons/react/outline";
 // const paginationButtonNums = [
 //   1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
 //   23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
@@ -44,38 +42,42 @@ export default function Table(props) {
               })}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200 bg-white overflow-scroll">
-            {props.dataSource.map((dataSource, index) => {
-              return (
-                <tr key={index} className={`duration-200 hover:bg-gray-100 `}>
-                  {props.columns.map((column, index) => {
-                    if (column.render) {
-                      return (
-                        <td
-                          key={index}
-                          className="sm:pl-6 pl-4 py-4 whitespace-nowrap"
-                        >
-                          {column.render(dataSource[column.dataIndex])}
-                        </td>
-                      );
-                    } else {
-                      return (
-                        <td
-                          key={index}
-                          className="sm:pl-6 pl-4 py-4 whitespace-nowrap"
-                        >
-                          <div className="flex text-left">
-                            <div className="text-sm font-medium text-gray-900">
-                              {dataSource[column.dataIndex]}
+          <tbody className="divide-y divide-gray-200 bg-white overflow-scroll w-full">
+            {props.dataLoading ? (
+              <RefreshIcon className="text-green-300 animate-spin h-12 w-12 mx-auto" />
+            ) : (
+              props.dataSource.map((dataSource, index) => {
+                return (
+                  <tr key={index} className={`duration-200 hover:bg-gray-100 `}>
+                    {props.columns.map((column, index) => {
+                      if (column.render) {
+                        return (
+                          <td
+                            key={index}
+                            className="sm:pl-6 pl-4 py-4 whitespace-nowrap"
+                          >
+                            {column.render(dataSource[column.dataIndex])}
+                          </td>
+                        );
+                      } else {
+                        return (
+                          <td
+                            key={index}
+                            className="sm:pl-6 pl-4 py-4 whitespace-nowrap"
+                          >
+                            <div className="flex text-left">
+                              <div className="text-sm font-medium text-gray-900">
+                                {dataSource[column.dataIndex]}
+                              </div>
                             </div>
-                          </div>
-                        </td>
-                      );
-                    }
-                  })}
-                </tr>
-              );
-            })}
+                          </td>
+                        );
+                      }
+                    })}
+                  </tr>
+                );
+              })
+            )}
           </tbody>
         </table>
         {props.pagination && (
@@ -95,12 +97,12 @@ export default function Table(props) {
               </a>
             </div>
             <div className="flex flex-row py-4">
-              {/* <Pagination
-                totalRecords={100000}
+              <Pagination
+                totalRecords={props.totalRecords}
                 pageLimit={100}
-                pageNeighbours={2}
+                pageNeighbours={4}
                 onPageChanged={(data) => handlePaginationClick(data)}
-              /> */}
+              />
             </div>
           </div>
         )}

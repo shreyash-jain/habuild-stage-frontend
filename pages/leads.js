@@ -139,6 +139,7 @@ const Leads = (props) => {
     await fetch(api)
       .then((res) => res.json())
       .then((data) => {
+        // console.log("DATA", data);
         const leads = [];
 
         for (let i = 0; i < data.leads.leadDataArr.length; i++) {
@@ -162,7 +163,7 @@ const Leads = (props) => {
           });
         }
 
-        setTotalRecords(leads.totalLeadsSize);
+        setTotalRecords(data.leads.totalLeadsSize);
         setLeads(leads);
         setLoading(false);
       });
@@ -404,16 +405,16 @@ const Leads = (props) => {
     getPaginatedLeads(1);
   };
 
-  if (loading) {
-    return (
-      <div
-        style={{ height: "100vh", width: "100%" }}
-        className="flex items-center"
-      >
-        <RefreshIcon className="text-green-300 animate-spin h-12 w-12 mx-auto" />
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div
+  //       style={{ height: "100vh", width: "100%" }}
+  //       className="flex items-center"
+  //     >
+  //       <RefreshIcon className="text-green-300 animate-spin h-12 w-12 mx-auto" />
+  //     </div>
+  //   );
+  // }
 
   return (
     <div>
@@ -665,6 +666,7 @@ const Leads = (props) => {
       </div>
 
       <Table
+        dataLoading={loading}
         totalRecords={totalRecords}
         onPaginationApi={getPaginatedLeads}
         columns={columns}
