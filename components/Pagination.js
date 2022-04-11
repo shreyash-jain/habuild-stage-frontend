@@ -20,7 +20,9 @@ const range = (from, to, step = 1) => {
 };
 
 const Pagination = (props) => {
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(
+    props.currentPagePagination || 1
+  );
   const [totalRecords, setTotalRecords] = useState(Number(props.totalRecords));
   const [pageLimit, setPageLimit] = useState(props.pageLimit);
   const [pageNeighbours, setPageNeighbours] = useState(props.pageNeighbours);
@@ -29,7 +31,6 @@ const Pagination = (props) => {
   );
 
   const [pages, setPages] = useState([]);
-
 
   // constructor(props) {
   //   super(props);
@@ -49,9 +50,10 @@ const Pagination = (props) => {
   // }
 
   useEffect(() => {
+    setCurrentPage(props.currentPagePagination);
     setTotalRecords(Number(props.totalRecords));
     setTotalPages(Math.ceil(Number(props.totalRecords) / pageLimit));
-  }, [props.totalRecords]);
+  }, [props.totalRecords, props.currentPagePagination]);
 
   useEffect(() => {
     const pages = fetchPageNumbers();

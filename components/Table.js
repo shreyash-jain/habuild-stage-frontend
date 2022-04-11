@@ -98,6 +98,7 @@ export default function Table(props) {
             </div>
             <div className="flex flex-row py-4">
               <Pagination
+                currentPagePagination={props.currentPagePagination}
                 totalRecords={props.totalRecords}
                 pageLimit={100}
                 pageNeighbours={4}

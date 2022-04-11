@@ -103,6 +103,9 @@ const Leads = (props) => {
   const [leadForAction, setLeadForAction] = useState({});
 
   const [totalRecords, setTotalRecords] = useState(100);
+  const [currentPagePagination, setCurrentPagePagination] = useState(1);
+
+  const [memberComms, setMemberComms] = useState([]);
 
   useEffect(async () => {
     getPaginatedLeads(1);
@@ -120,7 +123,7 @@ const Leads = (props) => {
 
   const getPaginatedLeads = async (pageNum) => {
     setLoading(true);
-
+    setCurrentPagePagination(pageNum);
     // console.log("Page Num!!!!", pageNum);
 
     let api = `https://api.habuild.in/api/lead/?page=${pageNum}&limit=100`;
@@ -152,7 +155,7 @@ const Leads = (props) => {
             phone: data.leads.leadDataArr[i].mobile_number,
             leadTime: format(
               parseISO(data.leads.leadDataArr[i].lead_time),
-              "PP"
+              "PPpp"
             ),
             isSelected: {
               identifier: data.leads.leadDataArr[i].name,
@@ -180,8 +183,7 @@ const Leads = (props) => {
     {
       name: "View Comms",
       onClick: (actionEntity) => {
-        setLeadForAction(actionEntity);
-        setViewCommsModal(!viewCommsModal);
+        getComms(actionEntity);
       },
     },
     {
@@ -198,6 +200,24 @@ const Leads = (props) => {
     //   },
     // },
   ];
+
+  const getComms = async (actionEntity) => {
+    setLeadForAction(actionEntity);
+
+    const idToUse = actionEntity.member_id || actionEntity.id;
+    console.log("Id to Use", idToUse);
+    // await fetch(
+    //   `http://localhost:4000/api/member/getCommunicationLogs/${idToUse}`
+    // )
+    await fetch(
+      `https://api.habuild.in/api/member/getCommunicationLogs/${idToUse}`
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        setMemberComms(data);
+        setViewCommsModal(true);
+      });
+  };
 
   const handleSelectAll = (checked) => {
     const newLeads = [...leads];
@@ -389,11 +409,16 @@ const Leads = (props) => {
             email: data.email,
             source: data.source,
             phone: data.mobile_number,
-            leadTime: format(parseISO(data.lead_time || data.created_at), "PP"),
+            leadTime: format(
+              parseISO(data.lead_time || data.created_at),
+              "PPpp"
+            ),
             isSelected: {
               identifier: data.name,
               value: false,
             },
+            action: data,
+            wa_comm_status: data.wa_comm_status,
           },
         ]);
         setLoading(false);
@@ -669,10 +694,19 @@ const Leads = (props) => {
         dataLoading={loading}
         totalRecords={totalRecords}
         onPaginationApi={getPaginatedLeads}
+        currentPagePagination={currentPagePagination}
         columns={columns}
         pagination
         dataSource={leads}
       />
+
+      <button
+        title="Refresh Leads"
+        onClick={() => getPaginatedLeads(1)}
+        className="font-medium px-4 py-2 rounded-md bg-green-300 hover:bg-green-500 text-green-700 hover:text-white fixed bottom-14 right-2"
+      >
+        <RefreshIcon className="h-5 w-5" />
+      </button>
 
       <button
         onClick={() => setViewAddLeadModal(true)}
@@ -682,11 +716,14 @@ const Leads = (props) => {
       </button>
 
       <AddPaymentModal
+        leadForAction={leadForAction}
         viewPaymentModal={viewPaymentModal}
         setViewPaymentModal={setViewPaymentModal}
       />
 
       <CommsModal
+        comms={memberComms}
+        leadForAction={leadForAction}
         viewCommsModal={viewCommsModal}
         setViewCommsModal={setViewCommsModal}
       />
@@ -724,27 +761,32 @@ const Leads = (props) => {
 };
 
 const AddCommModal = (props) => {
-  // const [type, setType] = useState("lead_query");
-  // const [status, setStatus] = useState("success");
-
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [mode, setMode] = useState("");
+  const [mode, setMode] = useState("Phone");
   const [apiLoading, setApiLoading] = useState(false);
 
   const formSubmit = (e) => {
     e.preventDefault();
     setApiLoading(true);
 
+    if (!props.leadForAction) {
+      toast.error("Error!");
+      setApiLoading(false);
+      return;
+    }
+
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     var raw = JSON.stringify({
-      member_id: props.leadForAction.member_id,
+      member_id: props.leadForAction.member_id || props.leadForAction.id,
       date: new Date(),
-      name,
-      email,
-      type: "lead_query",
       status: "success",
+      type: "lead_query",
+      mode,
+      name,
+      description,
+      source: "crm",
     });
     var requestOptions = {
       method: "POST",
@@ -752,17 +794,22 @@ const AddCommModal = (props) => {
       body: raw,
       redirect: "follow",
     };
+    console.log(requestOptions);
     fetch("https://api.habuild.in/api/lead/communication", requestOptions)
       // fetch("http://localhost:4000/api/lead/communication", requestOptions)
       .then((response) => response.text())
       .then((result) => {
         setApiLoading(false);
-        toast.success("Lead Created");
+        setName("");
+        setDescription("");
+        setMode("Phone");
+        props.setModalOpen(false);
+        toast.success("Communication Log Created");
         // console.log(result);
       })
       .catch((error) => {
         setApiLoading(false);
-        toast.error("No lead created");
+        toast.error(error);
         // console.log("error", error);
       });
   };
@@ -1062,14 +1109,14 @@ const CommsModal = (props) => {
         <Table
           columns={columns}
           pagination={false}
-          dataSource={[
-            {
-              mode: "Whatsapp",
-              message: "Yoo",
-              destination: "123456",
-              time: "5 minutes ago",
-            },
-          ]}
+          dataSource={props.comms?.map((item) => {
+            return {
+              mode: item.mode,
+              message: item.description,
+              time: format(parseISO(item.created_at), "PPpp"),
+              // destination: item.d
+            };
+          })}
         />
       </div>
     </Modal>

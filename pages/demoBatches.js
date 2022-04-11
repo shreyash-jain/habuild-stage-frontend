@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import LayoutSidebar from "../components/LayoutSidebar";
 import Modal from "../components/Modal";
 import { RefreshIcon } from "@heroicons/react/outline";
+import toast from "react-hot-toast";
 
 const DemoBatches = () => {
   const [viewAddModal, setViewAddModal] = useState(false);
@@ -45,6 +46,7 @@ const AddDemoBatchModal = (props) => {
   const [programId, setProgramId] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [ad_id, setAd_id] = useState("");
   const [apiLoading, setApiLoading] = useState(false);
 
   const formSubmit = (e) => {
@@ -64,15 +66,18 @@ const AddDemoBatchModal = (props) => {
       program_id: programId,
       start_date: startDate,
       end_date: endDate,
-      // status: "ACTIVE",
+      ad_id: ad_id,
+      status: "INACTIVE",
     });
+
     var requestOptions = {
       method: "POST",
       headers: myHeaders,
       body: raw,
       redirect: "follow",
     };
-    fetch("https://api.habuild.in/api/demobatches", requestOptions)
+    // fetch("https://api.habuild.in/api/demobatches", requestOptions)
+    fetch("http://localhost:4000/api/demobatches", requestOptions)
       .then((response) => response.text())
       .then((result) => {
         setApiLoading(false);
@@ -119,6 +124,24 @@ const AddDemoBatchModal = (props) => {
             id="name"
             autoComplete="name"
             placeholder="Name"
+            className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+          />
+        </div>
+
+        <div className="col-span-6 sm:col-span-3">
+          <label
+            htmlFor="first-name"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Ad id
+          </label>
+          <input
+            value={ad_id}
+            onChange={(e) => setAd_id(e.target.value)}
+            type="text"
+            name="ad_id"
+            id="ad_id"
+            placeholder="Ad id"
             className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
           />
         </div>
