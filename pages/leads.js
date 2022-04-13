@@ -987,7 +987,9 @@ const StopWACommModal = (props) => {
   const apiCall = (status) => {
     setApiLoading(true);
 
-    if (!props.selectedLeads.length > 0) {
+    const selectedLeadsIds = props.selectedLeads.map((item) => item.member_id);
+
+    if (!selectedLeadsIds > 0) {
       setApiLoading(false);
       props.setViewStopWACommModal(false);
       toast.error("No Lead selected.");
@@ -997,7 +999,7 @@ const StopWACommModal = (props) => {
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     var raw = JSON.stringify({
-      lead_member_ids: props.selectedLeads,
+      lead_member_ids: selectedLeadsIds,
       status,
     });
     var requestOptions = {
