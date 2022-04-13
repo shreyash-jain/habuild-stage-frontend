@@ -812,8 +812,8 @@ const AddCommModal = (props) => {
       })
       .catch((error) => {
         setApiLoading(false);
-        toast.error(error);
-        // console.log("error", error);
+        // toast.error(error);
+        console.log("error", error);
       });
   };
 
@@ -961,11 +961,11 @@ const StopWACommModal = (props) => {
       body: raw,
       redirect: "follow",
     };
-    fetch("http://localhost:4000/api/lead/updateLeadCommStatus", requestOptions)
-      // fetch(
-      //   "https://api.habuild.in/api/lead/updateLeadCommStatus",
-      //   requestOptions
-      // )
+    // fetch("http://localhost:4000/api/lead/updateLeadCommStatus", requestOptions)
+    fetch(
+      "https://api.habuild.in/api/lead/updateLeadCommStatus",
+      requestOptions
+    )
       .then((response) => response.json())
       .then((result) => {
         setApiLoading(false);
@@ -980,8 +980,8 @@ const StopWACommModal = (props) => {
       })
       .catch((error) => {
         setApiLoading(false);
-        toast.error(error);
-        // console.log("error", error);
+        // toast.error(error);
+        console.log("error", error);
       });
   };
 
