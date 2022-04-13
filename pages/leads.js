@@ -206,7 +206,6 @@ const Leads = (props) => {
     setLeadForAction(actionEntity);
 
     const idToUse = actionEntity.member_id || actionEntity.id;
-    console.log("Id to Use", idToUse);
     // await fetch(
     //   `http://localhost:4000/api/member/getCommunicationLogs/${idToUse}`
     // )
@@ -226,7 +225,7 @@ const Leads = (props) => {
 
     for (let i = 0; i < newLeads.length; i++) {
       if (checked) {
-        newSelectedLeads.push(newLeads[i].member_id);
+        newSelectedLeads.push(newLeads[i]);
         newLeads[i].isSelected.value = true;
       } else {
         newLeads[i].isSelected.value = false;
@@ -243,20 +242,24 @@ const Leads = (props) => {
   };
 
   const handleSelect = (identifier) => {
-    const newSelectedLeads = [...selectedLeads];
+    let newSelectedLeads = [...selectedLeads];
     const newLeads = [...leads];
-    const index = newSelectedLeads.indexOf(identifier);
+    // const index = newSelectedLeads.indexOf(identifier);
 
     for (let i = 0; i < newLeads.length; i++) {
       if (newLeads[i].member_id === identifier) {
         if (newLeads[i].isSelected.value == true) {
-          if (index > -1) {
-            newSelectedLeads.splice(index, 1);
-          }
+          newSelectedLeads = newSelectedLeads.filter(
+            (item) => item.member_id !== identifier
+          );
+
+          // if (i > -1) {
+          //   newSelectedLeads.splice(i, 1);
+          // }
 
           newLeads[i].isSelected.value = false;
         } else {
-          newSelectedLeads.push(newLeads[i].member_id);
+          newSelectedLeads.push(newLeads[i]);
           newLeads[i].isSelected.value = true;
         }
       }
@@ -736,6 +739,7 @@ const Leads = (props) => {
       />
 
       <SendWAModal
+        selectedLeads={selectedLeads}
         viewSendWAModal={viewSendWAModal}
         setViewSendWAModal={setViewSendWAModal}
         selectedLeadsLength={selectedLeads.length}
@@ -797,7 +801,7 @@ const AddCommModal = (props) => {
       body: raw,
       redirect: "follow",
     };
-    console.log(requestOptions);
+    // console.log(requestOptions);
     fetch("https://api.habuild.in/api/lead/communication", requestOptions)
       // fetch("http://localhost:4000/api/lead/communication", requestOptions)
       .then((response) => response.text())
@@ -910,6 +914,31 @@ const AddCommModal = (props) => {
 };
 
 const SendWAModal = (props) => {
+  const [watiTemplates, setWatiTemplates] = useState([]);
+  const [apiLoading, setApiLoading] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState({});
+  const [message, setMessage] = useState("");
+
+  useEffect(async () => {
+    // if (!props.selectedLeads.length > 0) {
+    //   setApiLoading(false);
+    //   props.setViewSendWAModal(false);
+    //   toast.error("No Lead selected.");
+    //   return;
+    // }
+
+    await fetch("https://api.habuild.in/webhook/templates")
+      .then((res) => res.json())
+      .then((data) => {
+        setWatiTemplates(data.data);
+      });
+  }, []);
+
+  const templateChange = (obj) => {
+    setMessage(obj.description);
+    setSelectedTemplate(obj);
+  };
+
   return (
     <Modal
       modalOpen={props.viewSendWAModal}
@@ -920,7 +949,10 @@ const SendWAModal = (props) => {
         <div>{props.selectedLeadsLength} people selected</div>
 
         <div className="w-full">
-          <FancySelect></FancySelect>
+          <FancySelect
+            parentOnchange={templateChange}
+            templateOptions={watiTemplates}
+          ></FancySelect>
         </div>
 
         <div>
@@ -931,7 +963,9 @@ const SendWAModal = (props) => {
             Message
           </label>
           <textarea
-            rows={4}
+            disabled
+            value={message}
+            rows={20}
             name="message"
             id="message"
             autoComplete="message"
@@ -948,6 +982,13 @@ const StopWACommModal = (props) => {
 
   const apiCall = (status) => {
     setApiLoading(true);
+
+    if (!props.selectedLeads.length > 0) {
+      setApiLoading(false);
+      props.setViewStopWACommModal(false);
+      toast.error("No Lead selected.");
+      return;
+    }
 
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");

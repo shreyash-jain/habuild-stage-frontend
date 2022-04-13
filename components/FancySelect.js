@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useState, useEffect } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/solid";
 
@@ -19,15 +19,30 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function Example() {
-  const [selected, setSelected] = useState(publishingOptions[0]);
+export default function FancySelect(props) {
+  const [selected, setSelected] = useState({ title: "" });
+
+  const [publishingOptions, setPublishingOptions] = useState(
+    props.templateOptions.map((item) => {
+      return {
+        title: item.identifier,
+        description: item.body,
+        current: false,
+        dbObj: item,
+      };
+    })
+  );
+
+  useEffect(() => {
+    props.parentOnchange(selected);
+  }, [selected]);
 
   return (
     <Listbox value={selected} onChange={setSelected}>
       {({ open }) => (
         <>
           <Listbox.Label className="sr-only">
-            Change published status
+            Select Wati Template
           </Listbox.Label>
           <div className="relative">
             <div className="inline-flex shadow-sm rounded-md divide-x divide-green-600">
@@ -37,7 +52,6 @@ export default function Example() {
                   <p className="ml-2.5 text-sm font-medium">{selected.title}</p>
                 </div>
                 <Listbox.Button className="relative inline-flex items-center bg-green-500 p-2 rounded-l-none rounded-r-md text-sm font-medium text-white hover:bg-green-600 focus:outline-none focus:z-10 focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-green-500">
-                  <span className="sr-only">Change published status</span>
                   <ChevronDownIcon
                     className="h-5 w-5 text-white"
                     aria-hidden="true"
@@ -53,7 +67,7 @@ export default function Example() {
               leaveFrom="opacity-100"
               leaveTo="opacity-0"
             >
-              <Listbox.Options className="origin-top-right absolute z-10 mt-2 w-72 rounded-md shadow-lg overflow-hidden bg-white divide-y divide-gray-200 ring-1 ring-black ring-opacity-5 focus:outline-none">
+              <Listbox.Options className="origin-top-right absolute z-10 mt-2 w-72 rounded-md shadow-lg overflow-scroll h-96 bg-white divide-y divide-gray-200 ring-1 ring-black ring-opacity-5 focus:outline-none">
                 {publishingOptions.map((option) => (
                   <Listbox.Option
                     key={option.title}
