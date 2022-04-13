@@ -159,7 +159,7 @@ const Leads = (props) => {
               "PPpp"
             ),
             isSelected: {
-              identifier: data.leads.leadDataArr[i].name,
+              identifier: data.leads.leadDataArr[i].member_id,
               value: false,
             },
             action: data.leads.leadDataArr[i],
@@ -226,7 +226,7 @@ const Leads = (props) => {
 
     for (let i = 0; i < newLeads.length; i++) {
       if (checked) {
-        newSelectedLeads.push(newLeads[i].name);
+        newSelectedLeads.push(newLeads[i].member_id);
         newLeads[i].isSelected.value = true;
       } else {
         newLeads[i].isSelected.value = false;
@@ -248,7 +248,7 @@ const Leads = (props) => {
     const index = newSelectedLeads.indexOf(identifier);
 
     for (let i = 0; i < newLeads.length; i++) {
-      if (newLeads[i].name === identifier) {
+      if (newLeads[i].member_id === identifier) {
         if (newLeads[i].isSelected.value == true) {
           if (index > -1) {
             newSelectedLeads.splice(index, 1);
@@ -256,7 +256,7 @@ const Leads = (props) => {
 
           newLeads[i].isSelected.value = false;
         } else {
-          newSelectedLeads.push(identifier);
+          newSelectedLeads.push(newLeads[i].member_id);
           newLeads[i].isSelected.value = true;
         }
       }
@@ -489,6 +489,14 @@ const Leads = (props) => {
         </div>
       </div>
 
+      <button
+        title="Refresh Leads"
+        onClick={() => getPaginatedLeads(1)}
+        className="font-medium px-4 py-2 rounded-md bg-green-300 hover:bg-green-500 text-green-700 hover:text-white"
+      >
+        <RefreshIcon className="h-5 w-5" />
+      </button>
+
       <div className="flex flex-row w-full mt-8 justify-between">
         <div className="flex flex-row">
           <Disclosure
@@ -675,39 +683,6 @@ const Leads = (props) => {
               </div>
             </Disclosure.Panel>
           </Disclosure>
-          <div>
-            <label
-              htmlFor="first-name"
-              className="block text-sm  text-gray-400"
-            >
-              Start Date
-            </label>
-            <div className="mt-1">
-              <input
-                type="date"
-                name="startDate"
-                id="startDate"
-                className="text-gray-500 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-2 px-2 border-green-300 rounded-md"
-              />
-            </div>
-          </div>
-
-          <div className="ml-2">
-            <label
-              htmlFor="first-name"
-              className="block text-sm  text-gray-400"
-            >
-              End Date
-            </label>
-            <div className="mt-1">
-              <input
-                type="date"
-                name="startDate"
-                id="startDate"
-                className=" text-gray-500 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-2 px-2 border-green-300 rounded-md"
-              />
-            </div>
-          </div>
         </div>
         <div className="flex-end space-x-2">
           <button
@@ -734,14 +709,6 @@ const Leads = (props) => {
         pagination
         dataSource={leads}
       />
-
-      <button
-        title="Refresh Leads"
-        onClick={() => getPaginatedLeads(1)}
-        className="font-medium px-4 py-2 rounded-md bg-green-300 hover:bg-green-500 text-green-700 hover:text-white fixed bottom-14 right-2"
-      >
-        <RefreshIcon className="h-5 w-5" />
-      </button>
 
       <button
         onClick={() => setViewAddLeadModal(true)}
@@ -775,6 +742,7 @@ const Leads = (props) => {
       />
 
       <StopWACommModal
+        getPaginatedLeads={() => getPaginatedLeads(currentPagePagination)}
         selectedLeads={selectedLeads}
         viewStopWACommModal={viewStopWACommModal}
         setViewStopWACommModal={setViewStopWACommModal}
@@ -993,20 +961,26 @@ const StopWACommModal = (props) => {
       body: raw,
       redirect: "follow",
     };
-    // fetch("http://localhost:4000/api/lead/updateLeadCommStatus", requestOptions)
-    fetch(
-      "https://api.habuild.in/api/lead/updateLeadCommStatus",
-      requestOptions
-    )
-      .then((response) => response.text())
+    fetch("http://localhost:4000/api/lead/updateLeadCommStatus", requestOptions)
+      // fetch(
+      //   "https://api.habuild.in/api/lead/updateLeadCommStatus",
+      //   requestOptions
+      // )
+      .then((response) => response.json())
       .then((result) => {
         setApiLoading(false);
-        toast.success("Updated Lead WA Comm Status");
+        if (result.errorMessage) {
+          toast.error(result.errorMessage);
+        } else {
+          toast.success(result.message);
+        }
+        props.getPaginatedLeads();
+        props.setViewStopWACommModal(false);
         // console.log(result);
       })
       .catch((error) => {
         setApiLoading(false);
-        toast.error("Error");
+        toast.error(error);
         // console.log("error", error);
       });
   };
@@ -1023,7 +997,7 @@ const StopWACommModal = (props) => {
 
         <button
           disabled={apiLoading}
-          onClick={() => apiCall("paused")}
+          onClick={() => apiCall("PAUSED")}
           className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:col-start-2 sm:text-sm"
           type="submit"
         >
@@ -1034,7 +1008,7 @@ const StopWACommModal = (props) => {
         </button>
         <button
           disabled={apiLoading}
-          onClick={() => apiCall("active")}
+          onClick={() => apiCall("ACTIVE")}
           className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:col-start-2 sm:text-sm"
           type="submit"
         >
