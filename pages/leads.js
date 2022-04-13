@@ -934,6 +934,10 @@ const SendWAModal = (props) => {
       });
   }, []);
 
+  useEffect(() => {
+    setMessage("");
+  }, [props.viewSendWAModal]);
+
   const templateChange = (obj) => {
     setMessage(obj.description);
     setSelectedTemplate(obj);
