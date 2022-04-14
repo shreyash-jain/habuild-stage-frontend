@@ -126,6 +126,7 @@ const DemoBatches = () => {
       <Table columns={columns} dataSource={demoBatches} />
 
       <AddDemoBatchModal
+        refreshData={getDemoBatches}
         programs={programs}
         modalOpen={viewAddModal}
         setModalOpen={setViewAddModal}
@@ -169,11 +170,13 @@ const AddDemoBatchModal = (props) => {
       body: raw,
       redirect: "follow",
     };
-    // fetch("https://api.habuild.in/api/demobatches", requestOptions)
-    fetch("http://localhost:4000/api/demobatches", requestOptions)
+    fetch("https://api.habuild.in/api/demobatches", requestOptions)
+    // fetch("http://localhost:4000/api/demobatches", requestOptions)
       .then((response) => response.text())
       .then((result) => {
         setApiLoading(false);
+        props.refreshData();
+        props.setModalOpen(false);
         toast.success("Demo Batch Created");
         console.log(result);
       })
