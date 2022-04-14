@@ -11,7 +11,9 @@ import Table from "../components/Table";
 import FlyoutMenu from "../components/FlyoutMenu";
 import Modal from "../components/Modal";
 import FancySelect from "../components/FancySelect";
+import SidePannel from "../components/SidePannel";
 import {
+  MenuAlt1Icon,
   RefreshIcon,
   XCircleIcon,
   CheckCircleIcon,
@@ -82,10 +84,12 @@ function classNames(...classes) {
 const Leads = (props) => {
   const [viewPaymentModal, setViewPaymentModal] = useState(false);
   const [viewCommsModal, setViewCommsModal] = useState(false);
+  const [showMenuSidebar, setShowMenuSidebar] = useState(false);
   const [viewSendWAModal, setViewSendWAModal] = useState(false);
   const [viewStopWACommModal, setViewStopWACommModal] = useState(false);
   const [viewAddLeadModal, setViewAddLeadModal] = useState(false);
   const [viewAddCommModal, setViewAddCommModal] = useState(false);
+  const [viewFilterModal, setViewFilterModal] = useState(false);
 
   const [leads, setLeads] = useState([]);
 
@@ -500,8 +504,16 @@ const Leads = (props) => {
         <RefreshIcon className="h-5 w-5" />
       </button>
 
+      <button
+        title="Filter Leads"
+        onClick={() => setViewFilterModal(true)}
+        className="ml-2 font-medium px-8 py-2 rounded-md bg-gray-300 hover:bg-gray-500 text-gray-700 hover:text-white"
+      >
+        <FilterIcon className="h-5 w-5" />
+      </button>
+
       <div className="flex flex-row w-full mt-8 justify-between">
-        <div className="flex flex-row">
+        {/* <div className="flex flex-row">
           <Disclosure
             as="section"
             aria-labelledby="filter-heading"
@@ -686,9 +698,9 @@ const Leads = (props) => {
               </div>
             </Disclosure.Panel>
           </Disclosure>
-        </div>
-        <div className="flex-end space-x-2">
-          <button
+        </div> */}
+        <div className="fixed right-8 flex-end space-x-2">
+          {/* <button
             onClick={() => setViewSendWAModal(true)}
             className="font-medium px-4 py-2 rounded-md bg-green-300 hover:bg-green-500 text-green-700 hover:text-white "
           >
@@ -699,7 +711,7 @@ const Leads = (props) => {
             className="font-medium px-4 py-2 rounded-md bg-green-300 hover:bg-green-500 text-green-700 hover:text-white"
           >
             Start/Stop WA Communication
-          </button>
+          </button> */}
         </div>
       </div>
 
@@ -720,6 +732,13 @@ const Leads = (props) => {
         Add Lead +
       </button>
 
+      <button
+        onClick={() => setShowMenuSidebar(true)}
+        className="transition duration-300 font-medium px-4 py-2 rounded-md bg-green-300 hover:bg-green-500 text-green-700 hover:text-white fixed bottom-2 right-36"
+      >
+        <MenuAlt1Icon className="w-6 h-6" />
+      </button>
+
       <AddPaymentModal
         leadForAction={leadForAction}
         viewPaymentModal={viewPaymentModal}
@@ -738,20 +757,12 @@ const Leads = (props) => {
         setViewAddLeadModal={setViewAddLeadModal}
       />
 
-      <SendWAModal
+      {/* <SendWAModal
         selectedLeads={selectedLeads}
         viewSendWAModal={viewSendWAModal}
         setViewSendWAModal={setViewSendWAModal}
         selectedLeadsLength={selectedLeads.length}
-      />
-
-      <StopWACommModal
-        getPaginatedLeads={() => getPaginatedLeads(currentPagePagination)}
-        selectedLeads={selectedLeads}
-        viewStopWACommModal={viewStopWACommModal}
-        setViewStopWACommModal={setViewStopWACommModal}
-        selectedLeadsLength={selectedLeads.length}
-      />
+      /> */}
 
       <AddCommModal
         leadForAction={leadForAction}
@@ -763,7 +774,113 @@ const Leads = (props) => {
         viewAttendanceModal={viewAttendanceModal}
         setViewAttendanceModal={setViewAttendanceModal}
       /> */}
+
+      <MenuSidePanel
+        currentPagePagination={currentPagePagination}
+        getPaginatedLeads={getPaginatedLeads}
+        selectedLeads={selectedLeads}
+        setSelectedLeads={setSelectedLeads}
+        open={showMenuSidebar}
+        setOpen={setShowMenuSidebar}
+      />
+
+      <FiltersModal
+        modalOpen={viewFilterModal}
+        setModalOpen={setViewFilterModal}
+      />
     </div>
+  );
+};
+
+const tabs = [
+  { name: "Send WA Message", current: true },
+  { name: "Start/Stop WA Communication", current: false },
+];
+
+const MenuSidePanel = (props) => {
+  const [currentTab, setCurrentTab] = useState("Send WA Message");
+  const [watiTemplates, setWatiTemplates] = useState([]);
+
+  useEffect(async () => {
+    // if (!props.selectedLeads.length > 0) {
+    //   setApiLoading(false);
+    //   props.setViewSendWAModal(false);
+    //   toast.error("No Lead selected.");
+    //   return;
+    // }
+
+    await fetch("https://api.habuild.in/webhook/templates")
+      .then((res) => res.json())
+      .then((data) => {
+        setWatiTemplates(data.data);
+      });
+  }, []);
+
+  return (
+    <SidePannel title="Manage" isOpen={props.open} setIsOpen={props.setOpen}>
+      <div>
+        <div className="sm:hidden">
+          <label htmlFor="tabs" className="sr-only">
+            Select a tab
+          </label>
+          {/* Use an "onChange" listener to redirect the user to the selected tab URL. */}
+          <select
+            id="tabs"
+            name="tabs"
+            className="block w-full focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md"
+            defaultValue={tabs.find((tab) => tab.current).name}
+          >
+            {tabs.map((tab) => (
+              <option key={tab.name}>{tab.name}</option>
+            ))}
+          </select>
+        </div>
+        <div className="hidden sm:block">
+          <nav className="flex space-x-4" aria-label="Tabs">
+            {tabs.map((tab) => (
+              <button
+                onClick={() => {
+                  setCurrentTab(tab.name);
+                }}
+                key={tab.name}
+                className={classNames(
+                  currentTab == tab.name
+                    ? "bg-green-100 text-green-700"
+                    : "text-gray-500 hover:text-gray-700",
+                  "px-3 py-2 font-medium text-sm rounded-md"
+                )}
+                aria-current={currentTab == tab.name ? "page" : undefined}
+              >
+                {tab.name}
+              </button>
+            ))}
+          </nav>
+        </div>
+
+        {currentTab == "Start/Stop WA Communication" && (
+          <StopWACommModal
+            open={props.open}
+            setOpen={props.setOpen}
+            setSelectedLeads={props.setSelectedLeads}
+            getPaginatedLeads={() =>
+              props.getPaginatedLeads(props.currentPagePagination)
+            }
+            selectedLeads={props.selectedLeads}
+            selectedLeadsLength={props.selectedLeads.length}
+          />
+        )}
+
+        {currentTab == "Send WA Message" && (
+          <SendWAModal
+            open={props.open}
+            setOpen={props.setOpen}
+            watiTemplates={watiTemplates}
+            selectedLeads={props.selectedLeads}
+            selectedLeadsLength={props.selectedLeads.length}
+          />
+        )}
+      </div>
+    </SidePannel>
   );
 };
 
@@ -913,30 +1030,24 @@ const AddCommModal = (props) => {
   );
 };
 
+const FiltersModal = (props) => {
+  return (
+    <Modal
+      modalOpen={props.modalOpen}
+      setModalOpen={props.setModalOpen}
+      actionText="Filter"
+    ></Modal>
+  );
+};
+
 const SendWAModal = (props) => {
-  const [watiTemplates, setWatiTemplates] = useState([]);
   const [apiLoading, setApiLoading] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState({});
   const [message, setMessage] = useState("");
 
-  useEffect(async () => {
-    // if (!props.selectedLeads.length > 0) {
-    //   setApiLoading(false);
-    //   props.setViewSendWAModal(false);
-    //   toast.error("No Lead selected.");
-    //   return;
-    // }
-
-    await fetch("https://api.habuild.in/webhook/templates")
-      .then((res) => res.json())
-      .then((data) => {
-        setWatiTemplates(data.data);
-      });
-  }, []);
-
   useEffect(() => {
     setMessage("");
-  }, [props.viewSendWAModal]);
+  }, [props.open]);
 
   const templateChange = (obj) => {
     setMessage(obj.description);
@@ -944,40 +1055,44 @@ const SendWAModal = (props) => {
   };
 
   return (
-    <Modal
-      modalOpen={props.viewSendWAModal}
-      setModalOpen={props.setViewSendWAModal}
-      actionText="Send"
-    >
-      <div className="flex flex-col space-y-4">
-        <div>{props.selectedLeadsLength} people selected</div>
+    // <Modal
+    //   modalOpen={props.viewSendWAModal}
+    //   setModalOpen={props.setViewSendWAModal}
+    //   actionText="Send"
+    // >
+    <div className="bg-white overflow-hidden shadow rounded-lg mt-4">
+      <div className="px-4 py-5 sm:p-6">
+        <div className="flex flex-col space-y-4">
+          <div>{props.selectedLeadsLength} people selected</div>
 
-        <div className="w-full">
-          <FancySelect
-            parentOnchange={templateChange}
-            templateOptions={watiTemplates}
-          ></FancySelect>
-        </div>
+          <div className="w-full">
+            <FancySelect
+              parentOnchange={templateChange}
+              templateOptions={props.watiTemplates}
+            ></FancySelect>
+          </div>
 
-        <div>
-          <label
-            htmlFor="first-name"
-            className="block text-md font-medium text-gray-700"
-          >
-            Message
-          </label>
-          <textarea
-            disabled
-            value={message}
-            rows={20}
-            name="message"
-            id="message"
-            autoComplete="message"
-            className="p-2 mt-1 block w-full shadow-sm border border-gray-200 rounded-md"
-          />
+          <div>
+            <label
+              htmlFor="first-name"
+              className="block text-md font-medium text-gray-700"
+            >
+              Message
+            </label>
+            <textarea
+              disabled
+              value={message}
+              rows={20}
+              name="message"
+              id="message"
+              autoComplete="message"
+              className="p-2 mt-1 block w-full shadow-sm border border-gray-200 rounded-md"
+            />
+          </div>
         </div>
       </div>
-    </Modal>
+    </div>
+    // </Modal>
   );
 };
 
@@ -1022,7 +1137,8 @@ const StopWACommModal = (props) => {
           toast.success(result.message);
         }
         props.getPaginatedLeads();
-        props.setViewStopWACommModal(false);
+        props.setSelectedLeads([]);
+        props.setOpen(false);
         // console.log(result);
       })
       .catch((error) => {
@@ -1033,39 +1149,44 @@ const StopWACommModal = (props) => {
   };
 
   return (
-    <Modal
-      apiLoading={apiLoading}
-      modalOpen={props.viewStopWACommModal}
-      setModalOpen={props.setViewStopWACommModal}
-      hideActionButtons
-    >
-      <div className="flex flex-col space-y-4">
-        <div>{props.selectedLeadsLength} people selected</div>
+    // <Modal
+    //   apiLoading={apiLoading}
+    //   modalOpen={props.viewStopWACommModal}
+    //   setModalOpen={props.setViewStopWACommModal}
+    //   hideActionButtons
+    // >
+    <div className="bg-white overflow-hidden shadow rounded-lg mt-4">
+      <div className="px-4 py-5 sm:p-6">
+        <div className="flex flex-col space-y-4 p-4 mt-4">
+          <div>{props.selectedLeadsLength} people selected</div>
 
-        <button
-          disabled={apiLoading}
-          onClick={() => apiCall("PAUSED")}
-          className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:col-start-2 sm:text-sm"
-          type="submit"
-        >
-          Stop WA Communication
-          {apiLoading && (
-            <RefreshIcon className="text-white animate-spin h-6 w-6 mx-auto" />
-          )}
-        </button>
-        <button
-          disabled={apiLoading}
-          onClick={() => apiCall("ACTIVE")}
-          className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:col-start-2 sm:text-sm"
-          type="submit"
-        >
-          Start WA Communication
-          {apiLoading && (
-            <RefreshIcon className="text-white animate-spin h-6 w-6 mx-auto" />
-          )}
-        </button>
+          <button
+            disabled={apiLoading}
+            onClick={() => apiCall("PAUSED")}
+            className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:col-start-2 sm:text-sm"
+            type="submit"
+          >
+            Stop WA Communication
+            {apiLoading && (
+              <RefreshIcon className="text-white animate-spin h-6 w-6 mx-auto" />
+            )}
+          </button>
+          <button
+            disabled={apiLoading}
+            onClick={() => apiCall("ACTIVE")}
+            className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:col-start-2 sm:text-sm"
+            type="submit"
+          >
+            Start WA Communication
+            {apiLoading && (
+              <RefreshIcon className="text-white animate-spin h-6 w-6 mx-auto" />
+            )}
+          </button>
+        </div>
       </div>
-    </Modal>
+    </div>
+
+    // </Modal>
   );
 };
 
