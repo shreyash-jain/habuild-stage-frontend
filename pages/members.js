@@ -22,6 +22,32 @@ import { format, parseISO } from "date-fns";
 import toast from "react-hot-toast";
 
 const Members = (props) => {
+  const [members, setMembers] = useState([]);
+
+  useEffect(() => {
+    getMembers();
+  }, []);
+
+  const getMembers = async () => {
+    await fetch(`https://api.habuild.in/api/member/`)
+      .then((res) => res.json())
+      .then((data) => {
+        setMembers(
+          data.rows.map((item) => {
+            return {
+              name: item.name,
+              email: item.email,
+              phone: item.mobile_number,
+              isSelected: {
+                identifier: item.id,
+                value: false,
+              },
+            };
+          })
+        );
+      });
+  };
+
   const columns = [
     {
       title: "",
@@ -328,7 +354,7 @@ const Members = (props) => {
         onPaginationApi={() => {}}
         columns={columns}
         pagination
-        dataSource={[{}]}
+        dataSource={members}
       />
 
       <button

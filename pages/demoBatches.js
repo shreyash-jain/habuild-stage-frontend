@@ -3,23 +3,114 @@ import LayoutSidebar from "../components/LayoutSidebar";
 import Modal from "../components/Modal";
 import { RefreshIcon } from "@heroicons/react/outline";
 import toast from "react-hot-toast";
+import Table from "../components/Table";
+import FlyoutMenu from "../components/FlyoutMenu";
+
+import { format, parseISO } from "date-fns";
 
 const DemoBatches = () => {
   const [viewAddModal, setViewAddModal] = useState(false);
   const [programs, setPrograms] = useState([]);
+  const [demoBatches, setDemoBatches] = useState([]);
 
   useEffect(() => {
     getAllPrograms();
+    getDemoBatches();
   }, []);
+
+  const getDemoBatches = async () => {
+    await fetch(`https://api.habuild.in/api/demobatches`)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Data", data);
+        setDemoBatches(
+          data.demoBatches.map((item) => {
+            return {
+              name: item.name,
+              program_id: item.program_id,
+              status: item.status,
+              ad_id: item.ad_id,
+              start_date: format(parseISO(item.start_date), "PPpp"),
+              end_date: format(parseISO(item.end_date), "PPpp"),
+            };
+          })
+        );
+      });
+  };
 
   const getAllPrograms = async () => {
     await fetch(`https://api.habuild.in/api/program/`)
       .then((res) => res.json())
       .then((data) => {
-        console.log("Demo Batches", data.programs);
         setPrograms(data.programs);
       });
   };
+
+  const columns = [
+    // {
+    //   title: "",
+    //   dataIndex: "isSelected",
+    //   key: "isSelected",
+    //   renderHeader: true,
+    //   headerRender: () => {
+    //     return (
+    //       <input
+    //         onChange={(e) => handleSelectAll(e.target.checked)}
+    //         className="mt-1 h-4 w-4 rounded-md border-gray-300 "
+    //         type="checkbox"
+    //       />
+    //     );
+    //   },
+    //   render: (isSelected) => {
+    //     return (
+    //       <input
+    //         onChange={(e) => handleSelect(isSelected.identifier)}
+    //         className="mt-1 h-4 w-4 rounded-md border-gray-300 "
+    //         type="checkbox"
+    //         checked={isSelected.value}
+    //       />
+    //     );
+    //   },
+    // },
+    {
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+    },
+    {
+      title: "Program Id",
+      dataIndex: "program_id",
+      key: "program_id",
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+    },
+    {
+      title: "Ad id",
+      dataIndex: "ad_id",
+      key: "ad_id",
+    },
+    {
+      title: "Start Date",
+      dataIndex: "start_date",
+      key: "start_date",
+    },
+    {
+      title: "End Date",
+      dataIndex: "end_date",
+      key: "end_date",
+    },
+    {
+      title: "Actions",
+      dataIndex: "action",
+      key: "action",
+      render: (lead) => {
+        return <FlyoutMenu menuItems={[]}></FlyoutMenu>;
+      },
+    },
+  ];
 
   return (
     <div>
@@ -31,6 +122,8 @@ const DemoBatches = () => {
       >
         Add Demo Batch +
       </button>
+
+      <Table columns={columns} dataSource={demoBatches} />
 
       <AddDemoBatchModal
         programs={programs}

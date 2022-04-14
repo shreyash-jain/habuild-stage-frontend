@@ -13,6 +13,7 @@ import {
   UsersIcon,
   XIcon,
   UserGroupIcon,
+  CreditCardIcon,
 } from "@heroicons/react/outline";
 import { loadGetInitialProps } from "next/dist/shared/lib/utils";
 
@@ -29,6 +30,11 @@ const navigation = [
     name: "Demo Batches",
     href: "/demoBatches",
     icon: UserGroupIcon,
+  },
+  {
+    name: "Payments",
+    href: "/payments",
+    icon: CreditCardIcon,
   },
 ];
 
