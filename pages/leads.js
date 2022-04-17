@@ -436,7 +436,7 @@ const Leads = (props) => {
                 "PPpp"
               ),
               isSelected: {
-                identifier: item.name,
+                identifier: item.member_id,
                 value: false,
               },
               action: item,
@@ -1081,34 +1081,37 @@ const SendWAModal = (props) => {
       api = "https://api.habuild.in/api/notification/whatsapp";
     }
 
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    var raw = JSON.stringify(vars);
-    var requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
-    };
+    console.log(api);
+    console.log(vars);
 
-    fetch(api, requestOptions)
-      .then((response) => response.json())
-      .then((result) => {
-        setApiLoading(false);
-        // if (result.errorMessage) {
-        //   toast.error(result.errorMessage);
-        // } else {
-        //   toast.success(result.message);
-        // }
-        props.setSelectedLeads([]);
-        props.setOpen(false);
-        // console.log(result);
-      })
-      .catch((error) => {
-        setApiLoading(false);
-        // toast.error(error);
-        console.log("error", error);
-      });
+    // var myHeaders = new Headers();
+    // myHeaders.append("Content-Type", "application/json");
+    // var raw = JSON.stringify(vars);
+    // var requestOptions = {
+    //   method: "POST",
+    //   headers: myHeaders,
+    //   body: raw,
+    //   redirect: "follow",
+    // };
+
+    // fetch(api, requestOptions)
+    //   .then((response) => response.json())
+    //   .then((result) => {
+    //     setApiLoading(false);
+    //     // if (result.errorMessage) {
+    //     //   toast.error(result.errorMessage);
+    //     // } else {
+    //     //   toast.success(result.message);
+    //     // }
+    //     props.setSelectedLeads([]);
+    //     props.setOpen(false);
+    //     // console.log(result);
+    //   })
+    //   .catch((error) => {
+    //     setApiLoading(false);
+    //     // toast.error(error);
+    //     console.log("error", error);
+    //   });
   };
 
   return (
@@ -1154,7 +1157,7 @@ const SendWAModal = (props) => {
               <button
                 onClick={() => {
                   if (!apiLoading) {
-                    sendMessageApi;
+                    sendMessageApi();
                   }
                 }}
                 className="px-4 py-2 font-medium rounded-md bg-green-300 text-green-700 hover:bg-green-700 hover:text-white"
