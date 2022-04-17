@@ -1050,6 +1050,7 @@ const SendWAModal = (props) => {
   };
 
   const sendMessageApi = (mode) => {
+    setApiLoading(true);
     let vars = {};
     let api = "";
 
