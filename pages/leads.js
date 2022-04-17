@@ -428,7 +428,7 @@ const Leads = (props) => {
         setLeads(
           data.data.map((item) => {
             return {
-              member_id: item.member_id,
+              member_id: item.id,
               name: item.name,
               status: item.status,
               email: item.email,
@@ -439,7 +439,7 @@ const Leads = (props) => {
                 "PPpp"
               ),
               isSelected: {
-                identifier: item.member_id,
+                identifier: item.id,
                 value: false,
               },
               action: item,
@@ -517,6 +517,7 @@ const Leads = (props) => {
       <button
         title="Refresh Leads"
         onClick={() => {
+          setSearchTerm("");
           setFilterParams({});
           getPaginatedLeads(1);
         }}
@@ -625,6 +626,7 @@ const Leads = (props) => {
       /> */}
 
       <MenuSidePanel
+        searchTerm={searchTerm}
         currentPagePagination={currentPagePagination}
         getPaginatedLeads={getPaginatedLeads}
         selectedLeads={selectedLeads}
@@ -726,6 +728,7 @@ const MenuSidePanel = (props) => {
 
         {currentTab == "Send WA Message" && (
           <SendWAModal
+            searchTerm={props.searchTerm}
             open={props.open}
             setOpen={props.setOpen}
             watiTemplates={watiTemplates}
@@ -1079,7 +1082,9 @@ const SendWAModal = (props) => {
       };
       api = "https://api.habuild.in/api/notification/whatsapp/batch";
     } else {
-      const member_ids = props.selectedLeads.map((item) => item.member_id);
+      const member_ids = props.selectedLeads.map((item) => {
+        return item.member_id;
+      });
       vars = {
         member_ids,
         template_name: selectedTemplate.title,
@@ -1101,6 +1106,7 @@ const SendWAModal = (props) => {
       .then((response) => response.json())
       .then((result) => {
         setApiLoading(false);
+        toast.success("Message sent successfully!");
         // if (result.errorMessage) {
         //   toast.error(result.errorMessage);
         // } else {
