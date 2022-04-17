@@ -409,6 +409,7 @@ const Leads = (props) => {
 
   const handleSearch = () => {
     setLoading(true);
+    setSelectedLeads([]);
     if (!searchTerm) {
       return;
     }
@@ -421,6 +422,8 @@ const Leads = (props) => {
           setLoading(false);
           return;
         }
+
+        console.log("Search Data", data);
 
         setLeads(
           data.data.map((item) => {
@@ -631,6 +634,7 @@ const Leads = (props) => {
       />
 
       <FiltersModal
+        setSelectedLeads={setSelectedLeads}
         getPaginatedLeads={getPaginatedLeads}
         demoBatches={demoBatches}
         filterParams={filterParams}
@@ -884,6 +888,7 @@ const FiltersModal = (props) => {
   return (
     <Modal
       onActionButtonClick={() => {
+        props.setSelectedLeads([]);
         props.getPaginatedLeads(1);
         props.setModalOpen(false);
       }}
