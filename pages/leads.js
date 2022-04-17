@@ -1157,7 +1157,7 @@ const SendWAModal = (props) => {
                     sendMessageApi;
                   }
                 }}
-                className="px-4 py-2 rounded-md bg-green-300 text-green-700 hover:bg-green-700 hover:text-white"
+                className="px-4 py-2 font-medium rounded-md bg-green-300 text-green-700 hover:bg-green-700 hover:text-white"
               >
                 Send Message to Selected People
               </button>
@@ -1168,7 +1168,7 @@ const SendWAModal = (props) => {
                     sendMessageApi("all");
                   }
                 }}
-                className="px-4 py-2 rounded-md bg-green-300 text-green-700 hover:bg-green-700 hover:text-white"
+                className="px-4 py-2 font-medium rounded-md bg-green-300 text-green-700 hover:bg-green-700 hover:text-white"
               >
                 Send Message to All Leads
               </button>
