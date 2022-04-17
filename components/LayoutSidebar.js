@@ -14,6 +14,7 @@ import {
   XIcon,
   UserGroupIcon,
   CreditCardIcon,
+  ChatAlt2Icon,
 } from "@heroicons/react/outline";
 import { loadGetInitialProps } from "next/dist/shared/lib/utils";
 
@@ -35,6 +36,16 @@ const navigation = [
     name: "Payments",
     href: "/payments",
     icon: CreditCardIcon,
+  },
+  {
+    name: "Attendance Quotes",
+    href: "/attendanceQuotes",
+    icon: ChatAlt2Icon,
+  },
+  {
+    name: "Daily Quotes",
+    href: "/dailyQuotes",
+    icon: ChatAlt2Icon,
   },
 ];
 
@@ -145,7 +156,7 @@ export default function LayoutSidebar(props) {
                 <div className="flex-shrink-0 flex border-t border-gray-200 p-4">
                   <a href="#" className="flex-shrink-0 group block">
                     <div className="flex items-center">
-                      <div>
+                      {/* <div>
                         <img
                           className="inline-block h-10 w-10 rounded-full"
                           src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
@@ -159,7 +170,7 @@ export default function LayoutSidebar(props) {
                         <p className="text-sm font-medium text-gray-500 group-hover:text-gray-700">
                           View profile
                         </p>
-                      </div>
+                      </div> */}
                     </div>
                   </a>
                 </div>
@@ -178,8 +189,8 @@ export default function LayoutSidebar(props) {
             <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
               <div className="flex items-center flex-shrink-0 px-4">
                 <img
-                  className="h-8 w-auto"
-                  src="https://tailwindui.com/img/logos/workflow-logo-indigo-600-mark-gray-800-text.svg"
+                  className="h-12 w-auto"
+                  src="/assets/habuild_logo_big.png"
                   alt="Workflow"
                 />
               </div>
@@ -212,7 +223,7 @@ export default function LayoutSidebar(props) {
             <div className="flex-shrink-0 flex border-t border-gray-200 p-4">
               <a href="#" className="flex-shrink-0 w-full group block">
                 <div className="flex items-center">
-                  <div>
+                  {/* <div>
                     <img
                       className="inline-block h-9 w-9 rounded-full"
                       src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
@@ -226,7 +237,7 @@ export default function LayoutSidebar(props) {
                     <p className="text-xs font-medium text-gray-500 group-hover:text-gray-700">
                       View profile
                     </p>
-                  </div>
+                  </div> */}
                 </div>
               </a>
             </div>

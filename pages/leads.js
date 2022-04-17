@@ -57,9 +57,9 @@ const attendance = [
 
 const filters = {
   status: [
-    { value: "lead", label: "Lead", checked: false },
-    { value: "prelead", label: "Pre-Lead", checked: false },
-    { value: "converted", label: "Converted", checked: false },
+    // { value: "lead", label: "Lead", checked: false },
+    // { value: "prelead", label: "Pre-Lead", checked: false },
+    // { value: "converted", label: "Converted", checked: false },
   ],
   leadDate: [
     { value: "asc", label: "Ascending", checked: false },
@@ -112,7 +112,7 @@ const Leads = (props) => {
 
   const [memberComms, setMemberComms] = useState([]);
 
-  useEffect(async () => {
+  useEffect(() => {
     getPaginatedLeads(1);
     getDemobatches();
   }, []);
@@ -144,8 +144,15 @@ const Leads = (props) => {
       }
     }
 
+    // console.log("API", api);
+
     await fetch(api)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res) {
+          throw Error("No Response from Server");
+        }
+        return res.json();
+      })
       .then((data) => {
         // console.log("DATA", data);
         const leads = [];
@@ -173,6 +180,12 @@ const Leads = (props) => {
 
         setTotalRecords(data.leads.totalLeadsSize);
         setLeads(leads);
+        setLoading(false);
+      })
+      .catch((err) => {
+        toast.error("Error, please try refreshing.");
+        // toast.error(err);
+        setLeads([]);
         setLoading(false);
       });
   };
@@ -320,7 +333,7 @@ const Leads = (props) => {
       key: "attendance",
       render: () => {
         return (
-          <div className="flex relative z-0 overflow-hidden">
+          <div className="flex relative -z-1 overflow-hidden">
             {attendance.map((item) => {
               if (item.attended) {
                 return (
@@ -409,26 +422,28 @@ const Leads = (props) => {
           return;
         }
 
-        setLeads([
-          {
-            member_id: data.member_id,
-            name: data.name,
-            status: data.status,
-            email: data.email,
-            source: data.source,
-            phone: data.mobile_number,
-            leadTime: format(
-              parseISO(data.lead_time || data.created_at),
-              "PPpp"
-            ),
-            isSelected: {
-              identifier: data.name,
-              value: false,
-            },
-            action: data,
-            wa_comm_status: data.wa_comm_status,
-          },
-        ]);
+        setLeads(
+          data.data.map((item) => {
+            return {
+              member_id: item.member_id,
+              name: item.name,
+              status: item.status,
+              email: item.email,
+              source: item.source,
+              phone: item.mobile_number,
+              leadTime: format(
+                parseISO(item.lead_time || item.created_at),
+                "PPpp"
+              ),
+              isSelected: {
+                identifier: item.name,
+                value: false,
+              },
+              action: item,
+              wa_comm_status: item.wa_comm_status,
+            };
+          })
+        );
         setLoading(false);
       });
   };
@@ -471,7 +486,7 @@ const Leads = (props) => {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 id="search"
                 name="search"
-                className="block w-full bg-white border border-gray-300 rounded-md py-2 pl-10 pr-3 text-sm placeholder-gray-500 focus:outline-none focus:text-gray-900 focus:placeholder-gray-400 focus:ring-1 focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                className="w-full bg-white border border-gray-300 rounded-md py-2 pl-10 pr-3 text-sm placeholder-gray-500 focus:outline-none focus:text-gray-900 focus:placeholder-gray-400 focus:ring-1 focus:ring-green-500 focus:border-green-500 sm:text-sm"
                 placeholder="Search Lead by Phone number, name or email."
                 type="search"
               />
@@ -498,7 +513,10 @@ const Leads = (props) => {
 
       <button
         title="Refresh Leads"
-        onClick={() => getPaginatedLeads(1)}
+        onClick={() => {
+          setFilterParams({});
+          getPaginatedLeads(1);
+        }}
         className="font-medium px-4 py-2 rounded-md bg-green-300 hover:bg-green-500 text-green-700 hover:text-white"
       >
         <RefreshIcon className="h-5 w-5" />
@@ -512,193 +530,20 @@ const Leads = (props) => {
         <FilterIcon className="h-5 w-5" />
       </button>
 
+      {Object.keys(filterParams).length > 0 && (
+        <button
+          title="Clear Filters"
+          onClick={() => {
+            setFilterParams({});
+            getPaginatedLeads(1);
+          }}
+          className="ml-2   text-gray-500 hover:text-gray-900"
+        >
+          Clear Filters
+        </button>
+      )}
+
       <div className="flex flex-row w-full mt-8 justify-between">
-        {/* <div className="flex flex-row">
-          <Disclosure
-            as="section"
-            aria-labelledby="filter-heading"
-            className="relative z-10  grid items-center"
-          >
-            <h2 id="filter-heading" className="sr-only">
-              Filters
-            </h2>
-            <div className="relative col-start-1 row-start-1 py-4">
-              <div className="max-w-7xl mx-auto flex space-x-6 divide-x divide-gray-200 text-sm px-4 sm:px-6 lg:px-8">
-                <div>
-                  <Disclosure.Button className="group text-gray-700 font-medium flex items-center py-1">
-                    <FilterIcon
-                      className="flex-none w-5 h-5 mr-2 text-gray-400 group-hover:text-gray-500"
-                      aria-hidden="true"
-                    />
-                    {Object.keys(filterParams).length} Filters
-                  </Disclosure.Button>
-                </div>
-                <div className="pl-6">
-                  {Object.keys(filterParams).length > 0 && (
-                    <>
-                      <button
-                        onClick={() => getPaginatedLeads(1)}
-                        type="button"
-                        className="border-2 border-green-300 rounded-md px-2 py-1 hover:bg-green-300 hover:text-white text-gray-500"
-                      >
-                        Filter
-                      </button>
-                      <button
-                        onClick={() => {
-                          setFilterParams({});
-                          getPaginatedLeads(1);
-                        }}
-                        type="button"
-                        className="ml-2 hover:text-gray-700 text-gray-500"
-                      >
-                        Clear all
-                      </button>
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
-            <Disclosure.Panel className="border-t border-gray-200 py-10">
-              <div className="max-w-7xl mx-auto grid grid-cols-2 gap-x-4 px-4 text-sm sm:px-6 md:gap-x-6 lg:px-8">
-                <div className="grid grid-cols-1 gap-y-10 auto-rows-min md:grid-cols-2 md:gap-x-6">
-                  <fieldset>
-                    <legend className="block font-medium">Batch</legend>
-                    <div className="pt-6 space-y-6 sm:pt-4 sm:space-y-4">
-                      {demoBatches.map((option, optionIdx) => (
-                        <div key={option.id} className="flex items-center">
-                          <input
-                            id={option.id}
-                            name="batch"
-                            type="radio"
-                            checked={filterParams.batchId == option.id}
-                            value={option.name}
-                            onChange={() =>
-                              setFilterParams({
-                                ...filterParams,
-                                batchId: option.id,
-                              })
-                            }
-                            className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
-                          />
-                          <label
-                            htmlFor={option.id}
-                            className="ml-3 block text-sm text-gray-700"
-                          >
-                            {option.name}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  </fieldset>
-                  <fieldset>
-                    <legend className="block font-medium">Status</legend>
-                    <div className="pt-6 space-y-6 sm:pt-4 sm:space-y-4">
-                      {filters.status.map((option, optionIdx) => (
-                        <div key={option.value} className="flex items-center">
-                          <input
-                            id={option.value}
-                            onChange={() =>
-                              setFilterParams({
-                                ...filterParams,
-                                status: option.value,
-                              })
-                            }
-                            checked={filterParams.status == option.value}
-                            name="status"
-                            type="radio"
-                            className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
-                          />
-                          <label className="ml-3 block text-sm text-gray-700">
-                            {option.label}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  </fieldset>
-                </div>
-                <div className="grid grid-cols-1 gap-y-10 auto-rows-min md:grid-cols-2 md:gap-x-6">
-                  <fieldset>
-                    <legend className="block font-medium">Source</legend>
-                    <div className="pt-6 space-y-6 sm:pt-4 sm:space-y-4">
-                      {filters.source.map((option, optionIdx) => (
-                        <div key={option.value} className="flex items-center">
-                          <input
-                            id={option.value}
-                            onChange={() =>
-                              setFilterParams({
-                                ...filterParams,
-                                source: option.value,
-                              })
-                            }
-                            checked={filterParams.source == option.value}
-                            name="source"
-                            type="radio"
-                            className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
-                          />
-                          <label className="ml-3 block text-sm text-gray-700">
-                            {option.label}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  </fieldset>
-                  <fieldset>
-                    <legend className="block font-medium">Lead Date</legend>
-                    <div className="pt-6 space-y-6 sm:pt-4 sm:space-y-4">
-                      {filters.leadDate.map((option, optionIdx) => (
-                        <div key={option.value} className="flex items-center">
-                          <input
-                            id={option.value}
-                            onChange={() =>
-                              setFilterParams({
-                                ...filterParams,
-                                leadDate: option.value,
-                              })
-                            }
-                            checked={filterParams.leadDate == option.value}
-                            name="leadDate"
-                            type="radio"
-                            className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
-                          />
-                          <label className="ml-3 block text-sm text-gray-700">
-                            {option.label}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  </fieldset>
-                </div>
-                <div className="grid grid-cols-1 gap-y-10 auto-rows-min md:grid-cols-2 md:gap-x-6">
-                  <fieldset>
-                    <legend className="block font-medium">Paid</legend>
-                    <div className="pt-6 space-y-6 sm:pt-4 sm:space-y-4">
-                      {filters.paid.map((option, optionIdx) => (
-                        <div key={option.value} className="flex items-center">
-                          <input
-                            id={option.value}
-                            onChange={() =>
-                              setFilterParams({
-                                ...filterParams,
-                                paid: option.value,
-                              })
-                            }
-                            checked={filterParams.paid == option.value}
-                            name="paid"
-                            type="radio"
-                            className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
-                          />
-                          <label className="ml-3 block text-sm text-gray-700">
-                            {option.label}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  </fieldset>
-                </div>
-              </div>
-            </Disclosure.Panel>
-          </Disclosure>
-        </div> */}
         <div className="fixed right-8 flex-end space-x-2">
           {/* <button
             onClick={() => setViewSendWAModal(true)}
@@ -753,6 +598,7 @@ const Leads = (props) => {
       />
 
       <AddLeadModal
+        getPaginatedLeads={getPaginatedLeads}
         viewAddLeadModal={viewAddLeadModal}
         setViewAddLeadModal={setViewAddLeadModal}
       />
@@ -785,6 +631,10 @@ const Leads = (props) => {
       />
 
       <FiltersModal
+        getPaginatedLeads={getPaginatedLeads}
+        demoBatches={demoBatches}
+        filterParams={filterParams}
+        setFilterParams={setFilterParams}
         modalOpen={viewFilterModal}
         setModalOpen={setViewFilterModal}
       />
@@ -1033,10 +883,155 @@ const AddCommModal = (props) => {
 const FiltersModal = (props) => {
   return (
     <Modal
+      onActionButtonClick={() => {
+        props.getPaginatedLeads(1);
+        props.setModalOpen(false);
+      }}
       modalOpen={props.modalOpen}
       setModalOpen={props.setModalOpen}
       actionText="Filter"
-    ></Modal>
+    >
+      <div>
+        <div className="grid grid-cols-4 gap-x-4 space-y-4 px-4 text-sm sm:px-6 md:gap-x-8 lg:px-8">
+          <fieldset className="col-span-2">
+            <legend className="block font-medium">Batch</legend>
+            <div className="pt-6 space-y-6 sm:pt-4 sm:space-y-4">
+              {props.demoBatches.map((option, optionIdx) => (
+                <div key={option.id} className="flex items-center">
+                  <input
+                    id={option.id}
+                    name="batch"
+                    type="radio"
+                    checked={props.filterParams.batchId == option.id}
+                    value={option.name}
+                    onChange={() =>
+                      props.setFilterParams({
+                        ...props.filterParams,
+                        batchId: option.id,
+                      })
+                    }
+                    className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
+                  />
+                  <label
+                    htmlFor={option.id}
+                    className="ml-3 block text-sm text-gray-700"
+                  >
+                    {option.name}
+                  </label>
+                </div>
+              ))}
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend className="block font-medium">Start/End Date</legend>
+            <div className="pt-6 space-y-6 sm:pt-4 sm:space-y-4"></div>
+          </fieldset>
+          {/* <fieldset>
+            <legend className="block font-medium">Status</legend>
+            <div className="pt-6 space-y-6 sm:pt-4 sm:space-y-4">
+              {filters.status.map((option, optionIdx) => (
+                <div key={option.value} className="flex items-center">
+                  <input
+                    disabled
+                    id={option.value}
+                    onChange={() =>
+                      props.setFilterParams({
+                        ...props.filterParams,
+                        status: option.value,
+                      })
+                    }
+                    checked={props.filterParams.status == option.value}
+                    name="status"
+                    type="radio"
+                    className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
+                  />
+                  <label className="ml-3 block text-sm text-gray-700">
+                    {option.label}
+                  </label>
+                </div>
+              ))}
+            </div>
+          </fieldset> */}
+          <fieldset>
+            <legend className="block font-medium">Source</legend>
+            <div className="pt-6 space-y-6 sm:pt-4 sm:space-y-4">
+              {filters.source.map((option, optionIdx) => (
+                <div key={option.value} className="flex items-center">
+                  <input
+                    disabled
+                    id={option.value}
+                    onChange={() =>
+                      props.setFilterParams({
+                        ...props.filterParams,
+                        source: option.value,
+                      })
+                    }
+                    checked={props.filterParams.source == option.value}
+                    name="source"
+                    type="radio"
+                    className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
+                  />
+                  <label className="ml-3 block text-sm text-gray-700">
+                    {option.label}
+                  </label>
+                </div>
+              ))}
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend className="block font-medium">Lead Date</legend>
+            <div className="pt-6 space-y-6 sm:pt-4 sm:space-y-4">
+              {filters.leadDate.map((option, optionIdx) => (
+                <div key={option.value} className="flex items-center">
+                  <input
+                    id={option.value}
+                    onChange={() =>
+                      props.setFilterParams({
+                        ...props.filterParams,
+                        leadDate: option.value,
+                      })
+                    }
+                    checked={props.filterParams.leadDate == option.value}
+                    name="leadDate"
+                    type="radio"
+                    className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
+                  />
+                  <label className="ml-3 block text-sm text-gray-700">
+                    {option.label}
+                  </label>
+                </div>
+              ))}
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend className="block font-medium">Paid</legend>
+            <div className="pt-6 space-y-6 sm:pt-4 sm:space-y-4">
+              {filters.paid.map((option, optionIdx) => (
+                <div key={option.value} className="flex items-center">
+                  <input
+                    disabled
+                    id={option.value}
+                    onChange={() =>
+                      props.setFilterParams({
+                        ...props.filterParams,
+                        paid: option.value,
+                      })
+                    }
+                    checked={props.filterParams.paid == option.value}
+                    name="paid"
+                    type="radio"
+                    className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
+                  />
+                  <label className="ml-3 block text-sm text-gray-700">
+                    {option.label}
+                  </label>
+                </div>
+              ))}
+            </div>
+          </fieldset>
+        </div>
+      </div>
+    </Modal>
   );
 };
 
@@ -1052,6 +1047,68 @@ const SendWAModal = (props) => {
   const templateChange = (obj) => {
     setMessage(obj.description);
     setSelectedTemplate(obj);
+  };
+
+  const sendMessageApi = (mode) => {
+    let vars = {};
+    let api = "";
+
+    if (!selectedTemplate) {
+      toast.error("Template message not selected.");
+      return;
+    }
+
+    if (mode !== "all") {
+      if (props.selectedLeadsLength == 0) {
+        toast.error("No person Selected.");
+        props.setOpen(false);
+        return;
+      }
+    }
+
+    if (mode == "all") {
+      vars = {
+        batch_ids: ["2", "3", "4"],
+        template_name: selectedTemplate.title,
+      };
+      api = "https://api.habuild.in/api/notification/whatsapp/batch";
+    } else {
+      const member_ids = props.selectedLeads.map((item) => item.member_id);
+      vars = {
+        member_ids,
+        template_name: selectedTemplate.title,
+      };
+      api = "https://api.habuild.in/api/notification/whatsapp";
+    }
+
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    var raw = JSON.stringify(vars);
+    var requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+
+    fetch(api, requestOptions)
+      .then((response) => response.json())
+      .then((result) => {
+        setApiLoading(false);
+        // if (result.errorMessage) {
+        //   toast.error(result.errorMessage);
+        // } else {
+        //   toast.success(result.message);
+        // }
+        props.setSelectedLeads([]);
+        props.setOpen(false);
+        // console.log(result);
+      })
+      .catch((error) => {
+        setApiLoading(false);
+        // toast.error(error);
+        console.log("error", error);
+      });
   };
 
   return (
@@ -1089,6 +1146,34 @@ const SendWAModal = (props) => {
               className="p-2 mt-1 block w-full shadow-sm border border-gray-200 rounded-md"
             />
           </div>
+
+          {apiLoading ? (
+            <RefreshIcon className="text-white animate-spin h-6 w-6 mx-auto" />
+          ) : (
+            <>
+              <button
+                onClick={() => {
+                  if (!apiLoading) {
+                    sendMessageApi;
+                  }
+                }}
+                className="px-4 py-2 rounded-md bg-green-300 text-green-700 hover:bg-green-700 hover:text-white"
+              >
+                Send Message to Selected People
+              </button>
+
+              <button
+                onClick={() => {
+                  if (!apiLoading) {
+                    sendMessageApi("all");
+                  }
+                }}
+                className="px-4 py-2 rounded-md bg-green-300 text-green-700 hover:bg-green-700 hover:text-white"
+              >
+                Send Message to All Leads
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>
@@ -1104,9 +1189,11 @@ const StopWACommModal = (props) => {
 
     const selectedLeadsIds = props.selectedLeads.map((item) => item.member_id);
 
-    if (!selectedLeadsIds > 0) {
+    console.log("Selected Leads ids", selectedLeadsIds);
+
+    if (selectedLeadsIds.length == 0) {
       setApiLoading(false);
-      props.setViewStopWACommModal(false);
+      props.setOpen(false);
       toast.error("No Lead selected.");
       return;
     }
@@ -1338,6 +1425,7 @@ const AddLeadModal = (props) => {
       .then((result) => {
         setApiLoading(false);
         toast.success("Lead Created");
+        props.getPaginatedLeads(1);
         // console.log(result);
       })
       .catch((error) => {
