@@ -1078,6 +1078,7 @@ const SendWAModal = (props) => {
     if (mode == "all") {
       vars = {
         batch_ids: ["2", "3", "4"],
+        // batch_ids: ["4"],
         template_name: selectedTemplate.title,
       };
       api = "https://api.habuild.in/api/notification/whatsapp/batch";
@@ -1101,6 +1102,9 @@ const SendWAModal = (props) => {
       body: raw,
       redirect: "follow",
     };
+
+    // console.log(api);
+    // console.log(vars);
 
     fetch(api, requestOptions)
       .then((response) => response.json())
@@ -1177,7 +1181,9 @@ const SendWAModal = (props) => {
               <button
                 onClick={() => {
                   if (!apiLoading) {
-                    sendMessageApi("all");
+                    if (window.confirm("Are you sure you want to do this?")) {
+                      sendMessageApi("all");
+                    }
                   }
                 }}
                 className="px-4 py-2 font-medium rounded-md bg-green-300 text-green-700 hover:bg-green-700 hover:text-white"
