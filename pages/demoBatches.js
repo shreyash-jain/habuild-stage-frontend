@@ -170,8 +170,8 @@ const AddDemoBatchModal = (props) => {
       body: raw,
       redirect: "follow",
     };
-    // fetch("https://api.habuild.in/api/demobatches", requestOptions)
-    fetch("http://localhost:4000/api/demobatches", requestOptions)
+    fetch("https://api.habuild.in/api/demobatches", requestOptions)
+      // fetch("http://localhost:4000/api/demobatches", requestOptions)
       .then((response) => response.text())
       .then((result) => {
         setApiLoading(false);
