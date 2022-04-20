@@ -1164,7 +1164,7 @@ const SendWAModal = (props) => {
           </div>
 
           {apiLoading ? (
-            <RefreshIcon className="text-white animate-spin h-6 w-6 mx-auto" />
+            <RefreshIcon className="text-green-300 animate-spin h-6 w-6 mx-auto" />
           ) : (
             <>
               <button
@@ -1396,11 +1396,12 @@ const CommsModal = (props) => {
           columns={columns}
           pagination={false}
           dataSource={props.comms?.map((item) => {
+            // console.log("IITem", item);
             return {
               mode: item.mode,
-              message: item.description,
+              message: item.message,
               time: format(parseISO(item.created_at), "PPpp"),
-              // destination: item.d
+              destination: item.mode,
             };
           })}
         />

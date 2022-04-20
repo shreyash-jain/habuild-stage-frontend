@@ -22,6 +22,21 @@ import { format, parseISO } from "date-fns";
 import toast from "react-hot-toast";
 
 const DailyQuotes = (props) => {
+  const [dailyQuotes, setDailyQuotes] = useState([]);
+
+  useEffect(() => {
+    getDailyQuotes();
+  }, []);
+
+  const getDailyQuotes = async () => {
+    await fetch("https://api.habuild.in/api/daily_quote/all_daily_quotes")
+      .then((res) => res.json())
+      .then((data) => {
+        // console.log(data);
+        setDailyQuotes(data.dailyQuotes);
+      });
+  };
+
   const columns = [
     {
       title: "Date",
@@ -34,29 +49,39 @@ const DailyQuotes = (props) => {
       key: "highlight",
     },
     {
+      title: "Highlight_2",
+      dataIndex: "highlight_2",
+      key: "highlight_2",
+    },
+    {
       title: "Tip",
       dataIndex: "tip",
       key: "tip",
     },
-    {
-      title: "Tip 2",
-      dataIndex: "tip_2",
-      key: "tip_2",
-    },
-    {
-      title: "Tip 3",
-      dataIndex: "tip_3",
-      key: "tip_3",
-    },
+    // {
+    //   title: "Tip 2",
+    //   dataIndex: "tip_2",
+    //   key: "tip_2",
+    // },
+    // {
+    //   title: "Tip 3",
+    //   dataIndex: "tip_3",
+    //   key: "tip_3",
+    // },
     {
       title: "Quote 1",
-      dataIndex: "quote1",
-      key: "quote1",
+      dataIndex: "quote_1",
+      key: "quote_1",
     },
     {
       title: "Quote 2",
-      dataIndex: "quote2",
-      key: "quote2",
+      dataIndex: "quote_2",
+      key: "quote_2",
+    },
+    {
+      title: "Quote 3",
+      dataIndex: "quote_3",
+      key: "quote_3",
     },
     {
       title: "Program Id",
@@ -86,7 +111,7 @@ const DailyQuotes = (props) => {
         onPaginationApi={() => {}}
         columns={columns}
         pagination
-        dataSource={[{}]}
+        dataSource={dailyQuotes}
       />
 
       {/* <button
