@@ -23,6 +23,7 @@ import {
 } from "@heroicons/react/outline";
 import { format, parseISO } from "date-fns";
 import toast from "react-hot-toast";
+import Select from "react-select";
 
 const attendance = [
   {
@@ -1052,10 +1053,10 @@ const SendWAModal = (props) => {
     setMessage("");
   }, [props.open]);
 
-  const templateChange = (obj) => {
-    setMessage(obj.description);
-    setSelectedTemplate(obj);
-  };
+  // const templateChange = (obj) => {
+  //   setMessage(obj.description);
+  //   setSelectedTemplate(obj);
+  // };
 
   const sendMessageApi = (mode) => {
     setApiLoading(true);
@@ -1079,7 +1080,7 @@ const SendWAModal = (props) => {
       vars = {
         batch_ids: ["2", "3", "4"],
         // batch_ids: ["4"],
-        template_name: selectedTemplate.title,
+        template_name: selectedTemplate.identifier,
       };
       api = "https://api.habuild.in/api/notification/whatsapp/batch";
     } else {
@@ -1088,7 +1089,7 @@ const SendWAModal = (props) => {
       });
       vars = {
         member_ids,
-        template_name: selectedTemplate.title,
+        template_name: selectedTemplate.identifier,
       };
       api = "https://api.habuild.in/api/notification/whatsapp";
     }
@@ -1139,10 +1140,23 @@ const SendWAModal = (props) => {
           <div>{props.selectedLeadsLength} people selected</div>
 
           <div className="w-full">
-            <FancySelect
+            <Select
+              onChange={(option) => {
+                setSelectedTemplate(option.obj);
+                setMessage(option.obj.body);
+              }}
+              options={props.watiTemplates.map((item) => {
+                return {
+                  value: item.id,
+                  label: item.identifier,
+                  obj: item,
+                };
+              })}
+            ></Select>
+            {/* <FancySelect
               parentOnchange={templateChange}
               templateOptions={props.watiTemplates}
-            ></FancySelect>
+            ></FancySelect> */}
           </div>
 
           <div>
