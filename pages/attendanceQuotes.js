@@ -1,11 +1,4 @@
 import { useEffect, useState, Fragment } from "react";
-import {
-  Dialog,
-  Disclosure,
-  Menu,
-  Popover,
-  Transition,
-} from "@headlessui/react";
 import LayoutSidebar from "../components/LayoutSidebar";
 import Table from "../components/Table";
 import FlyoutMenu from "../components/FlyoutMenu";
@@ -18,12 +11,13 @@ import {
   SearchIcon,
   FilterIcon,
 } from "@heroicons/react/outline";
-import { format, parseISO } from "date-fns";
 import toast from "react-hot-toast";
 
 const AttendanceQuotes = (props) => {
+  const [loading, setLoading] = useState(false);
   const [attendnaceQuotes, setAttendanceQuotes] = useState([]);
   const [viewAddModal, setViewAddModal] = useState(false);
+  const [viewEditModal, setViewEditModal] = useState(false);
 
   const [programs, setPrograms] = useState([]);
   const [demoBatches, setDemoBatches] = useState([]);
@@ -37,24 +31,20 @@ const AttendanceQuotes = (props) => {
   }, []);
 
   const getAttendanceQuotes = async () => {
-    await fetch("https://api.habuild.in/api/attendance_quote/all")
+    setLoading(true);
+    await fetch("https://api.habuild.in/api/attendance_quote/all?limit=1000")
       .then((res) => res.json())
       .then((data) => {
         console.log("Data", data.attendanceQuotes);
         setAttendanceQuotes(
           data.attendanceQuotes.map((item) => {
             return {
-              total_days_absent: item.total_days_absent,
-              total_days_present: item.total_days_present,
-              day_presence: item.day_presence,
-              message: item.message,
-              status: item.status,
-              program_id: item.program_id,
-              demo_batch_id: item.demo_batch_id,
+              ...item,
               action: item,
             };
           })
         );
+        setLoading(false);
       });
   };
 
@@ -76,24 +66,30 @@ const AttendanceQuotes = (props) => {
   };
 
   const deleteAttendanceQuote = async (id) => {
-    await fetch(`https://api.habuild.in/api/attendance_quote/delete/${id}`)
-      .then((res) => res.json())
-      .then((data) => {
-        getAttendanceQuotes();
-      });
+    setLoading(true);
+    await fetch(`https://api.habuild.in/api/attendance_quote/delete/${id}`, {
+      method: "DELETE",
+    }).then((res) => {
+      console.log("Data", res);
+      setLoading(false);
+      getAttendanceQuotes();
+    });
   };
 
   const menuItems = [
     {
       name: "Edit",
       onClick: (actionEntity) => {
-        getComms(actionEntity);
+        setEditQuote(actionEntity);
+        setViewEditModal(true);
       },
     },
     {
       name: "Delete",
       onClick: (actionEntity) => {
-        deleteAttendanceQuote(actionEntity.id);
+        if (window.confirm("Are you sure you want to Delete this quote?")) {
+          deleteAttendanceQuote(actionEntity.id);
+        }
       },
     },
     // {
@@ -169,12 +165,16 @@ const AttendanceQuotes = (props) => {
         Attendance Quotes
       </h1>
 
-      <Table
-        onPaginationApi={() => {}}
-        columns={columns}
-        pagination
-        dataSource={attendnaceQuotes}
-      />
+      {loading ? (
+        <RefreshIcon className="text-green-300 animate-spin h-8 w-8 mx-auto" />
+      ) : (
+        <Table
+          onPaginationApi={() => {}}
+          columns={columns}
+          pagination
+          dataSource={attendnaceQuotes}
+        />
+      )}
 
       {/* <button
         // onClick={() => setViewAddLeadModal(true)}
@@ -194,8 +194,18 @@ const AttendanceQuotes = (props) => {
         demoBatches={demoBatches}
         programs={programs}
         getQuotes={getAttendanceQuotes}
-        viewAddModal={viewAddModal}
-        setViewAddModal={setViewAddModal}
+        viewModal={viewAddModal}
+        setViewModal={setViewAddModal}
+      />
+
+      <AddAttendanceQuote
+        editQuote={editQuote}
+        demoBatches={demoBatches}
+        programs={programs}
+        getQuotes={getAttendanceQuotes}
+        viewModal={viewEditModal}
+        setViewModal={setViewEditModal}
+        mode="edit"
       />
     </div>
   );
@@ -211,7 +221,27 @@ const AddAttendanceQuote = (props) => {
   const [demo_batch_id, setDemoBatchId] = useState("");
   const [apiLoading, setApiLoading] = useState(false);
 
+  useEffect(() => {
+    if (props.mode == "edit") {
+      setDaysPresent(props.editQuote.total_days_present);
+      setDaysAbsent(props.editQuote.total_days_absent);
+      setDaysPresence(props.editQuote.day_presence);
+      setMessage(props.editQuote.message);
+      setStatus(props.editQuote.status);
+      setProgramId(props.editQuote.program_id);
+      setDemoBatchId(props.editQuote.demo_batch_id);
+    }
+  }, [props.viewModal]);
+
   const formSubmit = (e) => {
+    let API = "https://api.habuild.in/api/attendance_quote/add";
+    let method = "POST";
+
+    if (props.mode == "edit") {
+      API = `https://api.habuild.in/api/attendance_quote/update/${props.editQuote.id}`;
+      method = "PATCH";
+    }
+
     e.preventDefault();
     setApiLoading(true);
     if (
@@ -239,26 +269,28 @@ const AddAttendanceQuote = (props) => {
       demo_batch_id,
     });
     var requestOptions = {
-      method: "POST",
+      method: method,
       headers: myHeaders,
       body: raw,
       redirect: "follow",
     };
 
     try {
-      fetch("https://api.habuild.in/api/attendance_quote/add", requestOptions)
+      fetch(API, requestOptions)
         .then((response) => response.text())
         .then((result) => {
           setApiLoading(false);
-          toast.success("Attendance Quote Created");
+          toast.success(
+            `Attendance Quote ${props.mode == "edit" ? "Updated" : "Created"}`
+          );
           props.getQuotes();
-          setViewAddModal(false);
+          props.setViewModal(false);
           console.log(result);
         });
     } catch {
       (error) => {
         setApiLoading(false);
-        toast.error("No quote created");
+        toast.error(`No quote ${props.mode == "edit" ? "Updated" : "Created"}`);
         console.log("error", error);
       };
     }
@@ -267,8 +299,8 @@ const AddAttendanceQuote = (props) => {
   return (
     <Modal
       apiLoading={apiLoading}
-      modalOpen={props.viewAddModal}
-      setModalOpen={props.setViewAddModal}
+      modalOpen={props.viewModal}
+      setModalOpen={props.setViewModal}
       hideActionButtons
     >
       <form
@@ -277,7 +309,9 @@ const AddAttendanceQuote = (props) => {
           formSubmit(e);
         }}
       >
-        <h2 className="text-left text-xl font-bold text-gray-900">Add Lead</h2>
+        <h2 className="text-left text-xl font-bold text-gray-900">
+          {props.mode == "edit" ? "Edit" : "Add"} Quote
+        </h2>
 
         <div className="col-span-6 sm:col-span-3">
           <label className="block text-sm font-medium text-gray-700">
@@ -355,6 +389,7 @@ const AddAttendanceQuote = (props) => {
           </label>
 
           <select
+            value={program_id}
             onChange={(e) => setProgramId(e.target.value)}
             className="p-2 mt-1 block w-full shadow-sm border border-gray-200 rounded-md"
           >
@@ -378,6 +413,7 @@ const AddAttendanceQuote = (props) => {
           </label>
 
           <select
+            value={demo_batch_id}
             onChange={(e) => setDemoBatchId(e.target.value)}
             className="p-2 mt-1 block w-full shadow-sm border border-gray-200 rounded-md"
           >
@@ -396,7 +432,7 @@ const AddAttendanceQuote = (props) => {
           className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:col-start-2 sm:text-sm"
           type="submit"
         >
-          Add Quote
+          {props.mode == "edit" ? "Edit" : "Add"} Quote
           {apiLoading && (
             <RefreshIcon className="text-white animate-spin h-6 w-6 mx-auto" />
           )}
