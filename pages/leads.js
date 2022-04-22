@@ -1137,7 +1137,13 @@ const SendWAModal = (props) => {
     <div className="bg-white overflow-hidden shadow rounded-lg mt-4">
       <div className="px-4 py-5 sm:p-6">
         <div className="flex flex-col space-y-4">
-          <div>{props.selectedLeadsLength} people selected</div>
+          <div className="font-medium">
+            {props.selectedLeadsLength} people selected
+          </div>
+
+          <h1 className="text-xl font-bold text-gray-700">
+            Select Wati Template
+          </h1>
 
           <div className="w-full">
             <Select
@@ -1162,7 +1168,7 @@ const SendWAModal = (props) => {
           <div>
             <label
               htmlFor="first-name"
-              className="block text-md font-medium text-gray-700"
+              className="block text-md font-medium text-gray-500"
             >
               Message
             </label>
