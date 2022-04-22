@@ -375,7 +375,7 @@ const PaymentFormModal = (props) => {
 
         {paymentFormFields.map((item) => {
           return (
-            <div className="col-span-6 sm:col-span-3">
+            <div key={item.label} className="col-span-6 sm:col-span-3">
               <label className="block text-sm font-medium text-gray-700">
                 {item.label}
               </label>
