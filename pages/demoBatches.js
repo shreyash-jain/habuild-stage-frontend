@@ -161,7 +161,7 @@ const AddDemoBatchModal = (props) => {
       start_date: startDate,
       end_date: endDate,
       ad_id: ad_id,
-      status: "INACTIVE",
+      status: "ACTIVE",
     });
 
     var requestOptions = {
