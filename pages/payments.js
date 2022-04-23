@@ -37,7 +37,7 @@ const Payments = (props) => {
       .then((data) => {
         console.log("Payments", data);
         setPayments(
-          data.data.map((item) => {
+          data.data.paymentDataArr.map((item) => {
             return {
               ...item,
               action: item,
