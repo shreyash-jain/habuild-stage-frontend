@@ -12,6 +12,8 @@ import FlyoutMenu from "../components/FlyoutMenu";
 import Modal from "../components/Modal";
 import {
   RefreshIcon,
+  TrashIcon,
+  PlusIcon,
   XCircleIcon,
   CheckCircleIcon,
   ChevronDownIcon,
@@ -219,20 +221,49 @@ const DailyQuoteFormModal = (props) => {
   const [tip, setTip] = useState("");
   const [apiLoading, setApiLoading] = useState(false);
 
+  const [quoteFormArray, setQuoteFormArray] = useState([
+    {
+      date: "",
+      demo_batch_id: "",
+      highlight: "",
+      highlight_2: "",
+      program_id: "",
+      quote_1: "",
+      quote_2: "",
+      quote_3: "",
+      status: "",
+      tip: "",
+    },
+  ]);
+
   useEffect(() => {
     if (props.mode == "edit") {
-      setDate(props.editQuote.date?.split("T")[0]);
-      setDemoBatchId(props.editQuote.demo_batch_id);
-      setHighlight(props.editQuote.highlight);
-      setHighlight2(props.editQuote.highlight_2);
-      setProgramId(props.editQuote.program_id);
-      setQuote1(props.editQuote.quote_1);
-      setQuote2(props.editQuote.quote_2);
-      setQuote3(props.editQuote.quote_3);
-      setStatus(props.editQuote.status);
-      setTip(props.editQuote.tip);
+      const newArr = [
+        {
+          date: props.editQuote.date?.split("T")[0],
+          demo_batch_id: props.editQuote.demo_batch_id,
+          highlight: props.editQuote.highlight,
+          highlight_2: props.editQuote.highlight_2,
+          program_id: props.editQuote.program_id,
+          quote_1: props.editQuote.quote_1,
+          quote_2: props.editQuote.quote_2,
+          quote_3: props.editQuote.quote_3,
+          status: props.editQuote.status,
+          tip: props.editQuote.tip,
+        },
+      ];
+
+      setQuoteFormArray(newArr);
     }
   }, [props.viewModal]);
+
+  const handleQuoteFormChange = (fieldName, index, value) => {
+    const newArr = [...quoteFormArray];
+
+    newArr[index][fieldName] = value;
+
+    setQuoteFormArray(newArr);
+  };
 
   const formSubmit = (e) => {
     let API = "https://api.habuild.in/api/daily_quote/add_daily_quotes";
@@ -245,68 +276,77 @@ const DailyQuoteFormModal = (props) => {
 
     e.preventDefault();
     setApiLoading(true);
-    if (
-      !date ||
-      !highlight ||
-      !highlight_2 ||
-      !quote_1 ||
-      !quote_2 ||
-      !quote_3 ||
-      !status ||
-      !tip ||
-      !program_id ||
-      !demo_batch_id
-    ) {
-      alert("Please enter all details.");
-      setApiLoading(false);
-      return;
-    }
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    var raw = JSON.stringify({
-      date: date + " 01:00:00",
-      highlight,
-      highlight_2,
-      quote_1,
-      quote_2,
-      quote_3,
-      status,
-      tip,
-      program_id,
-      demo_batch_id,
-    });
-    var requestOptions = {
-      method: method,
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
-    };
 
-    console.log(raw);
-    console.log(API);
-    console.log(method);
+    for (let i = 0; i < quoteFormArray.length; i++) {
+      const item = quoteFormArray[i];
 
-    try {
-      fetch(API, requestOptions)
-        .then((response) => {
-          console.log("response", response);
-          return response.text();
-        })
-        .then((result) => {
-          setApiLoading(false);
-          toast.success(
-            `Daily Quote ${props.mode == "edit" ? "Updated" : "Created"}`
-          );
-          props.getQuotes();
-          props.setViewModal(false);
-          console.log("Api Result", result);
-        });
-    } catch {
-      (error) => {
+      if (
+        !item.date ||
+        !item.highlight ||
+        !item.highlight_2 ||
+        !item.quote_1 ||
+        !item.quote_2 ||
+        !item.quote_3 ||
+        !item.status ||
+        !item.tip ||
+        !item.program_id ||
+        !item.demo_batch_id
+      ) {
+        alert("Please enter all details.");
         setApiLoading(false);
-        toast.error(`No quote ${props.mode == "edit" ? "Updated" : "Created"}`);
-        console.log("error", error);
+        return;
+      }
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      var raw = JSON.stringify({
+        date: item.date + " 01:00:00",
+        highlight: item.highlight,
+        highlight_2: item.highlight_2,
+        quote_1: item.quote_1,
+        quote_2: item.quote_2,
+        quote_3: item.quote_3,
+        status: item.status,
+        tip: item.tip,
+        program_id: item.program_id,
+        demo_batch_id: item.demo_batch_id,
+      });
+      var requestOptions = {
+        method: method,
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
       };
+
+      console.log(raw);
+      console.log(API);
+      console.log(method);
+
+      try {
+        fetch(API, requestOptions)
+          .then((response) => {
+            console.log("response", response);
+            return response.text();
+          })
+          .then((result) => {
+            setApiLoading(false);
+            toast.success(
+              `Daily Quote ${props.mode == "edit" ? "Updated" : "Created"}`
+            );
+            // props.getQuotes();
+            // props.setViewModal(false);
+            console.log("Api Result", result);
+          });
+      } catch {
+        (error) => {
+          setApiLoading(false);
+          toast.error(
+            `No quote ${props.mode == "edit" ? "Updated" : "Created"}`
+          );
+          console.log("error", error);
+        };
+      }
+      props.getQuotes();
+      props.setViewModal(false);
     }
   };
 
@@ -317,178 +357,249 @@ const DailyQuoteFormModal = (props) => {
       setModalOpen={props.setViewModal}
       hideActionButtons
     >
+      <h2 className="text-left text-xl font-bold text-gray-900">
+        {props.mode == "edit" ? "Edit" : "Add"} Quote
+      </h2>
       <form
         className="flex flex-col w-full space-y-5"
         onSubmit={(e) => {
           formSubmit(e);
         }}
       >
-        <h2 className="text-left text-xl font-bold text-gray-900">
-          {props.mode == "edit" ? "Edit" : "Add"} Quote
-        </h2>
+        {quoteFormArray.length > 0 &&
+          quoteFormArray?.map((item, index) => {
+            return (
+              <div className="grid grid-cols-10 space-x-2 mb-4" key={index}>
+                <div className="col-span-1 ">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Date
+                  </label>
+                  <input
+                    value={item.date}
+                    onChange={(e) =>
+                      handleQuoteFormChange("date", index, e.target.value)
+                    }
+                    type="date"
+                    name="date"
+                    id="date"
+                    placeholder="Date"
+                    className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                  />
+                </div>
+                <div className="col-span-1 ">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Highlight
+                  </label>
+                  <input
+                    value={item.highlight}
+                    onChange={(e) =>
+                      handleQuoteFormChange("highlight", index, e.target.value)
+                    }
+                    type="text"
+                    name="highlight"
+                    id="highlight"
+                    placeholder="Highlight"
+                    className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                  />
+                </div>
+                <div className="col-span-1 ">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Highlight 2
+                  </label>
+                  <input
+                    value={item.highlight_2}
+                    onChange={(e) =>
+                      handleQuoteFormChange(
+                        "highlight_2",
+                        index,
+                        e.target.value
+                      )
+                    }
+                    type="text"
+                    name="highlight_2"
+                    id="highlight_2"
+                    placeholder="Highlight 2"
+                    className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                  />
+                </div>
 
-        <div className="col-span-6 sm:col-span-3">
-          <label className="block text-sm font-medium text-gray-700">
-            Date
-          </label>
-          <input
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            type="date"
-            name="date"
-            id="date"
-            placeholder="Date"
-            className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
-          />
-        </div>
-        <div className="col-span-6 sm:col-span-3">
-          <label className="block text-sm font-medium text-gray-700">
-            Highlight
-          </label>
-          <input
-            value={highlight}
-            onChange={(e) => setHighlight(e.target.value)}
-            type="text"
-            name="highlight"
-            id="highlight"
-            placeholder="Highlight"
-            className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
-          />
-        </div>
-        <div className="col-span-6 sm:col-span-3">
-          <label className="block text-sm font-medium text-gray-700">
-            Highlight 2
-          </label>
-          <input
-            value={highlight_2}
-            onChange={(e) => setHighlight2(e.target.value)}
-            type="text"
-            name="highlight_2"
-            id="highlight_2"
-            placeholder="Highlight 2"
-            className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
-          />
-        </div>
+                <div className="col-span-1 ">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Quote 1
+                  </label>
+                  <input
+                    value={item.quote_1}
+                    onChange={(e) =>
+                      handleQuoteFormChange("quote_1", index, e.target.value)
+                    }
+                    type="text"
+                    placeholder="Quote 1"
+                    className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                  />
+                </div>
 
-        <div className="col-span-6 sm:col-span-3">
-          <label className="block text-sm font-medium text-gray-700">
-            Quote 1
-          </label>
-          <input
-            value={quote_1}
-            onChange={(e) => setQuote1(e.target.value)}
-            type="text"
-            placeholder="Quote 1"
-            className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
-          />
-        </div>
+                <div className="col-span-1 ">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Quote 2
+                  </label>
+                  <input
+                    value={item.quote_2}
+                    onChange={(e) =>
+                      handleQuoteFormChange("quote_2", index, e.target.value)
+                    }
+                    type="text"
+                    placeholder="Quote 3"
+                    className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                  />
+                </div>
 
-        <div className="col-span-6 sm:col-span-3">
-          <label className="block text-sm font-medium text-gray-700">
-            Quote 2
-          </label>
-          <input
-            value={quote_2}
-            onChange={(e) => setQuote2(e.target.value)}
-            type="text"
-            placeholder="Quote 3"
-            className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
-          />
-        </div>
+                <div className="col-span-1 ">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Quote 3
+                  </label>
+                  <input
+                    value={item.quote_3}
+                    onChange={(e) =>
+                      handleQuoteFormChange("quote_3", index, e.target.value)
+                    }
+                    type="text"
+                    placeholder="Quote 3"
+                    className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                  />
+                </div>
+                <div className="col-span-1 ">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Status
+                  </label>
+                  <input
+                    value={item.status}
+                    onChange={(e) =>
+                      handleQuoteFormChange("status", index, e.target.value)
+                    }
+                    type="text"
+                    placeholder="Status"
+                    className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                  />
+                </div>
+                <div className="col-span-1 ">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Tip
+                  </label>
+                  <input
+                    value={item.tip}
+                    onChange={(e) =>
+                      handleQuoteFormChange("tip", index, e.target.value)
+                    }
+                    type="text"
+                    placeholder="Tip"
+                    className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                  />
+                </div>
 
-        <div className="col-span-6 sm:col-span-3">
-          <label className="block text-sm font-medium text-gray-700">
-            Quote 3
-          </label>
-          <input
-            value={quote_3}
-            onChange={(e) => setQuote3(e.target.value)}
-            type="text"
-            placeholder="Quote 3"
-            className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
-          />
-        </div>
-        <div className="col-span-6 sm:col-span-3">
-          <label className="block text-sm font-medium text-gray-700">
-            Status
-          </label>
-          <input
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            type="text"
-            placeholder="Status"
-            className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
-          />
-        </div>
-        <div className="col-span-6 sm:col-span-3">
-          <label className="block text-sm font-medium text-gray-700">Tip</label>
-          <input
-            value={tip}
-            onChange={(e) => setTip(e.target.value)}
-            type="text"
-            placeholder="Tip"
-            className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
-          />
-        </div>
+                <div className="col-span-1 ">
+                  <label
+                    htmlFor="program"
+                    className="block text-md font-medium text-gray-700"
+                  >
+                    Associated Program
+                  </label>
 
-        <div>
-          <label
-            htmlFor="program"
-            className="block text-md font-medium text-gray-700"
-          >
-            Associated Program
-          </label>
+                  <select
+                    value={item.program_id}
+                    onChange={(e) =>
+                      handleQuoteFormChange("program_id", index, e.target.value)
+                    }
+                    className="p-2 mt-1 block w-full shadow-sm border border-gray-200 rounded-md"
+                  >
+                    <option></option>
+                    {props.programs.map((item) => {
+                      return (
+                        <option key={item.id} value={item.id}>
+                          {item.title}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
 
-          <select
-            value={program_id}
-            onChange={(e) => setProgramId(e.target.value)}
-            className="p-2 mt-1 block w-full shadow-sm border border-gray-200 rounded-md"
-          >
-            <option></option>
-            {props.programs.map((item) => {
-              return (
-                <option key={item.id} value={item.id}>
-                  {item.title}
-                </option>
-              );
-            })}
-          </select>
-        </div>
+                <div className="col-span-1 ">
+                  <label
+                    htmlFor="program"
+                    className="block text-md font-medium text-gray-700"
+                  >
+                    Associated Demo Batch
+                  </label>
 
-        <div>
-          <label
-            htmlFor="program"
-            className="block text-md font-medium text-gray-700"
-          >
-            Associated Demo Batch
-          </label>
+                  <select
+                    value={item.demo_batch_id}
+                    onChange={(e) =>
+                      handleQuoteFormChange(
+                        "demo_batch_id",
+                        index,
+                        e.target.value
+                      )
+                    }
+                    className="p-2 mt-1 block w-full shadow-sm border border-gray-200 rounded-md"
+                  >
+                    <option></option>
+                    {props.demoBatches.map((item) => {
+                      return (
+                        <option key={item.id} value={item.id}>
+                          {item.name}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
 
-          <select
-            value={demo_batch_id}
-            onChange={(e) => setDemoBatchId(e.target.value)}
-            className="p-2 mt-1 block w-full shadow-sm border border-gray-200 rounded-md"
-          >
-            <option></option>
-            {props.demoBatches.map((item) => {
-              return (
-                <option key={item.id} value={item.id}>
-                  {item.name}
-                </option>
-              );
-            })}
-          </select>
-        </div>
+                <button
+                  onClick={() => {
+                    const newArr = [...quoteFormArray];
 
-        <button
-          className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:col-start-2 sm:text-sm"
-          type="submit"
-        >
-          {props.mode == "edit" ? "Edit" : "Add"} Quote
-          {apiLoading && (
-            <RefreshIcon className="text-white animate-spin h-6 w-6 mx-auto" />
-          )}
-        </button>
+                    newArr.splice(index, 1);
+
+                    setQuoteFormArray(newArr);
+                  }}
+                  className="w-4"
+                  title="Delete Quote"
+                >
+                  <TrashIcon className="font-medium text-red-200 h-4 w-4 hover:text-red-400" />
+                </button>
+              </div>
+            );
+          })}
       </form>
+
+      {props.mode !== "edit" && (
+        <button
+          onClick={() => {
+            const newArr = [...quoteFormArray];
+            newArr.push({
+              total_days_absent: "",
+              total_days_present: "",
+              day_presence: "",
+              message: "",
+              status: "",
+              program_id: "",
+              demo_batch_id: "",
+            });
+            setQuoteFormArray(newArr);
+          }}
+          className="mb-4 font-medium text-gray-500 bg-gray-200 hover:bg-gray-400 hover:text-white py-2 px-4 rounded-md"
+        >
+          <PlusIcon className="h-4 w-4 mx-auto" />
+        </button>
+      )}
+
+      <button
+        onClick={formSubmit}
+        className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:col-start-2 sm:text-sm"
+      >
+        {props.mode == "edit" ? "Edit" : "Add"} Quote
+        {apiLoading && (
+          <RefreshIcon className="text-white animate-spin h-6 w-6 mx-auto" />
+        )}
+      </button>
     </Modal>
   );
 };

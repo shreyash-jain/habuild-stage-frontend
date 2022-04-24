@@ -7,9 +7,11 @@ import {
   RefreshIcon,
   XCircleIcon,
   CheckCircleIcon,
+  TrashIcon,
   ChevronDownIcon,
   SearchIcon,
   FilterIcon,
+  PlusIcon,
 } from "@heroicons/react/outline";
 import toast from "react-hot-toast";
 
@@ -212,28 +214,47 @@ const AttendanceQuotes = (props) => {
 };
 
 const AddAttendanceQuote = (props) => {
-  const [total_days_present, setDaysPresent] = useState("");
-  const [total_days_absent, setDaysAbsent] = useState("");
-  const [day_presence, setDaysPresence] = useState("");
-  const [message, setMessage] = useState("");
-  const [status, setStatus] = useState("");
-  const [program_id, setProgramId] = useState("");
-  const [demo_batch_id, setDemoBatchId] = useState("");
   const [apiLoading, setApiLoading] = useState(false);
+
+  const [quoteFormArray, setQuoteFormArray] = useState([
+    {
+      total_days_absent: "",
+      total_days_present: "",
+      day_presence: "",
+      message: "",
+      status: "",
+      program_id: "",
+      demo_batch_id: "",
+    },
+  ]);
 
   useEffect(() => {
     if (props.mode == "edit") {
-      setDaysPresent(props.editQuote.total_days_present);
-      setDaysAbsent(props.editQuote.total_days_absent);
-      setDaysPresence(props.editQuote.day_presence);
-      setMessage(props.editQuote.message);
-      setStatus(props.editQuote.status);
-      setProgramId(props.editQuote.program_id);
-      setDemoBatchId(props.editQuote.demo_batch_id);
+      const newArr = [
+        {
+          total_days_absent: props.editQuote.total_days_present,
+          total_days_present: props.editQuote.total_days_absent,
+          day_presence: props.editQuote.day_presence,
+          message: props.editQuote.message,
+          status: props.editQuote.status,
+          program_id: props.editQuote.program_id,
+          demo_batch_id: props.editQuote.demo_batch_id,
+        },
+      ];
+
+      setQuoteFormArray(newArr);
     }
   }, [props.viewModal]);
 
-  const formSubmit = (e) => {
+  const handleQuoteFormChange = (fieldName, index, value) => {
+    const newArr = [...quoteFormArray];
+
+    newArr[index][fieldName] = value;
+
+    setQuoteFormArray(newArr);
+  };
+
+  const formSubmit = () => {
     let API = "https://api.habuild.in/api/attendance_quote/add";
     let method = "POST";
 
@@ -242,58 +263,64 @@ const AddAttendanceQuote = (props) => {
       method = "PATCH";
     }
 
-    e.preventDefault();
     setApiLoading(true);
-    if (
-      !total_days_present ||
-      !total_days_absent ||
-      !day_presence ||
-      !message ||
-      !status ||
-      !program_id ||
-      !demo_batch_id
-    ) {
-      alert("Please enter all details.");
-      setApiLoading(false);
-      return;
-    }
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    var raw = JSON.stringify({
-      total_days_absent,
-      total_days_present,
-      day_presence,
-      message,
-      status,
-      program_id,
-      demo_batch_id,
-    });
-    var requestOptions = {
-      method: method,
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
-    };
 
-    try {
-      fetch(API, requestOptions)
-        .then((response) => response.text())
-        .then((result) => {
-          setApiLoading(false);
-          toast.success(
-            `Attendance Quote ${props.mode == "edit" ? "Updated" : "Created"}`
-          );
-          props.getQuotes();
-          props.setViewModal(false);
-          console.log(result);
-        });
-    } catch {
-      (error) => {
+    for (let i = 0; i < quoteFormArray.length; i++) {
+      const item = quoteFormArray[i];
+      if (
+        !item.total_days_present ||
+        !item.total_days_absent ||
+        !item.day_presence ||
+        !item.message ||
+        !item.status ||
+        !item.program_id ||
+        !item.demo_batch_id
+      ) {
+        alert("Please enter all details.");
         setApiLoading(false);
-        toast.error(`No quote ${props.mode == "edit" ? "Updated" : "Created"}`);
-        console.log("error", error);
+        return;
+      }
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      var raw = JSON.stringify({
+        total_days_absent: item.total_days_absent,
+        total_days_present: item.total_days_present,
+        day_presence: item.day_presence,
+        message: item.message,
+        status: item.status,
+        program_id: item.program_id,
+        demo_batch_id: item.demo_batch_id,
+      });
+      var requestOptions = {
+        method: method,
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
       };
+
+      try {
+        fetch(API, requestOptions)
+          .then((response) => response.text())
+          .then((result) => {
+            setApiLoading(false);
+            toast.success(
+              `Attendance Quote ${props.mode == "edit" ? "Updated" : "Created"}`
+            );
+            console.log(result);
+          });
+      } catch {
+        (error) => {
+          setApiLoading(false);
+          toast.error(
+            `No quote ${props.mode == "edit" ? "Updated" : "Created"}`
+          );
+          console.log("error", error);
+        };
+      }
     }
+
+    props.getQuotes();
+    props.setViewModal(false);
   };
 
   return (
@@ -303,141 +330,216 @@ const AddAttendanceQuote = (props) => {
       setModalOpen={props.setViewModal}
       hideActionButtons
     >
+      <h2 className="text-left text-xl font-bold text-gray-900">
+        {props.mode == "edit" ? "Edit" : "Add"} Quote
+      </h2>
       <form
-        className="flex flex-col w-full space-y-5"
+        className="w-full my-8"
         onSubmit={(e) => {
-          formSubmit(e);
+          e.preventDefault();
         }}
       >
-        <h2 className="text-left text-xl font-bold text-gray-900">
-          {props.mode == "edit" ? "Edit" : "Add"} Quote
-        </h2>
+        {quoteFormArray.length > 0 &&
+          quoteFormArray?.map((item, index) => {
+            return (
+              <div className="grid grid-cols-11 space-x-2 mb-4" key={index}>
+                <div className="col-span-1 ">
+                  <label className="block text-xs font-medium text-gray-700">
+                    Total Days Present
+                  </label>
+                  <input
+                    value={item.total_days_present}
+                    // onChange={(e) => setDaysPresent(e.target.value)}
+                    onChange={(e) =>
+                      handleQuoteFormChange(
+                        "total_days_present",
+                        index,
+                        e.target.value
+                      )
+                    }
+                    type="number"
+                    name="total_days_present"
+                    id="total_days_present"
+                    placeholder="Total Days Present"
+                    className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                  />
+                </div>
+                <div className="col-span-1">
+                  <label className="block no-wrap text-xs font-medium text-gray-700">
+                    Total Days Absent
+                  </label>
+                  <input
+                    value={item.total_days_absent}
+                    // onChange={(e) => setDaysAbsent(e.target.value)}
+                    onChange={(e) =>
+                      handleQuoteFormChange(
+                        "total_days_absent",
+                        index,
+                        e.target.value
+                      )
+                    }
+                    type="number"
+                    name="total_days_absent"
+                    id="total_days_absent"
+                    placeholder="Total Days Absent"
+                    className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                  />
+                </div>
+                <div className="col-span-1 ">
+                  <label className="block text-xs font-medium text-gray-700">
+                    Day Presence
+                  </label>
+                  <select
+                    value={item.day_presence}
+                    onChange={(e) =>
+                      handleQuoteFormChange(
+                        "day_presence",
+                        index,
+                        e.target.value
+                      )
+                    }
+                    className="p-2 mt-1 block w-full shadow-sm border border-gray-200 rounded-md"
+                  >
+                    <option></option>
+                    <option value={1}>Yes</option>
+                    <option value={0}>No</option>
+                  </select>
+                </div>
+                <div className="col-span-3 ">
+                  <label className="block text-xs font-medium text-gray-700">
+                    Message
+                  </label>
+                  <input
+                    value={item.message}
+                    onChange={(e) =>
+                      handleQuoteFormChange("message", index, e.target.value)
+                    }
+                    type="text"
+                    name="message"
+                    id="message"
+                    placeholder="Message"
+                    className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                  />
+                </div>
+                <div className="col-span-1 ">
+                  <label className="block text-xs font-medium text-gray-700">
+                    Status
+                  </label>
+                  <input
+                    value={item.status}
+                    onChange={(e) =>
+                      handleQuoteFormChange("status", index, e.target.value)
+                    }
+                    type="text"
+                    placeholder="Status"
+                    className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                  />
+                </div>
 
-        <div className="col-span-6 sm:col-span-3">
-          <label className="block text-sm font-medium text-gray-700">
-            Total Days Present
-          </label>
-          <input
-            value={total_days_present}
-            onChange={(e) => setDaysPresent(e.target.value)}
-            type="number"
-            name="total_days_present"
-            id="total_days_present"
-            placeholder="Total Days Present"
-            className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
-          />
-        </div>
-        <div className="col-span-6 sm:col-span-3">
-          <label className="block text-sm font-medium text-gray-700">
-            Total Days Absent
-          </label>
-          <input
-            value={total_days_absent}
-            onChange={(e) => setDaysAbsent(e.target.value)}
-            type="number"
-            name="total_days_absent"
-            id="total_days_absent"
-            placeholder="Total Days Absent"
-            className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
-          />
-        </div>
-        <div className="col-span-6 sm:col-span-3">
-          <label className="block text-sm font-medium text-gray-700">
-            Day Presence
-          </label>
-          <input
-            value={day_presence}
-            onChange={(e) => setDaysPresence(e.target.value)}
-            type="number"
-            name="total_days_absent"
-            id="total_days_absent"
-            placeholder="Total Days Absent"
-            className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
-          />
-        </div>
-        <div className="col-span-6 sm:col-span-3">
-          <label className="block text-sm font-medium text-gray-700">
-            Message
-          </label>
-          <input
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            type="text"
-            placeholder="Message"
-            className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
-          />
-        </div>
-        <div className="col-span-6 sm:col-span-3">
-          <label className="block text-sm font-medium text-gray-700">
-            Status
-          </label>
-          <input
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            type="text"
-            placeholder="Status"
-            className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
-          />
-        </div>
+                <div className="col-span-2 ">
+                  <label
+                    htmlFor="program"
+                    className="block text-xs font-medium text-gray-700"
+                  >
+                    Associated Program
+                  </label>
 
-        <div>
-          <label
-            htmlFor="program"
-            className="block text-md font-medium text-gray-700"
-          >
-            Associated Program
-          </label>
+                  <select
+                    value={item.program_id}
+                    onChange={(e) =>
+                      handleQuoteFormChange("program_id", index, e.target.value)
+                    }
+                    className="p-2 mt-1 block w-full shadow-sm border border-gray-200 rounded-md"
+                  >
+                    <option></option>
+                    {props.programs.map((item) => {
+                      return (
+                        <option key={item.id} value={item.id}>
+                          {item.title}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
 
-          <select
-            value={program_id}
-            onChange={(e) => setProgramId(e.target.value)}
-            className="p-2 mt-1 block w-full shadow-sm border border-gray-200 rounded-md"
-          >
-            <option></option>
-            {props.programs.map((item) => {
-              return (
-                <option key={item.id} value={item.id}>
-                  {item.title}
-                </option>
-              );
-            })}
-          </select>
-        </div>
+                <div className="col-span-2 ">
+                  <label
+                    htmlFor="program"
+                    className="block text-xs font-medium text-gray-700"
+                  >
+                    Associated Demo Batch
+                  </label>
 
-        <div>
-          <label
-            htmlFor="program"
-            className="block text-md font-medium text-gray-700"
-          >
-            Associated Demo Batch
-          </label>
+                  <select
+                    value={item.demo_batch_id}
+                    onChange={(e) =>
+                      handleQuoteFormChange(
+                        "demo_batch_id",
+                        index,
+                        e.target.value
+                      )
+                    }
+                    className="p-2 mt-1 block w-full shadow-sm border border-gray-200 rounded-md"
+                  >
+                    <option></option>
+                    {props.demoBatches.map((item) => {
+                      return (
+                        <option key={item.id} value={item.id}>
+                          {item.name}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
 
-          <select
-            value={demo_batch_id}
-            onChange={(e) => setDemoBatchId(e.target.value)}
-            className="p-2 mt-1 block w-full shadow-sm border border-gray-200 rounded-md"
-          >
-            <option></option>
-            {props.demoBatches.map((item) => {
-              return (
-                <option key={item.id} value={item.id}>
-                  {item.name}
-                </option>
-              );
-            })}
-          </select>
-        </div>
+                <button
+                  onClick={() => {
+                    const newArr = [...quoteFormArray];
 
-        <button
-          className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:col-start-2 sm:text-sm"
-          type="submit"
-        >
-          {props.mode == "edit" ? "Edit" : "Add"} Quote
-          {apiLoading && (
-            <RefreshIcon className="text-white animate-spin h-6 w-6 mx-auto" />
-          )}
-        </button>
+                    newArr.splice(index, 1);
+
+                    setQuoteFormArray(newArr);
+                  }}
+                  className="w-4"
+                  title="Delete Quote"
+                >
+                  <TrashIcon className="font-medium text-red-200 h-4 w-4 hover:text-red-400" />
+                </button>
+              </div>
+            );
+          })}
       </form>
+
+      {props.mode !== "edit" && (
+        <button
+          onClick={() => {
+            const newArr = [...quoteFormArray];
+            newArr.push({
+              total_days_absent: "",
+              total_days_present: "",
+              day_presence: "",
+              message: "",
+              status: "",
+              program_id: "",
+              demo_batch_id: "",
+            });
+            setQuoteFormArray(newArr);
+          }}
+          className="mb-4 font-medium text-gray-500 bg-gray-200 hover:bg-gray-400 hover:text-white py-2 px-4 rounded-md"
+        >
+          <PlusIcon className="h-4 w-4 mx-auto" />
+        </button>
+      )}
+
+      <button
+        className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:col-start-2 sm:text-sm"
+        onClick={formSubmit}
+      >
+        {props.mode == "edit" ? "Edit" : "Add"} Quote
+        {apiLoading && (
+          <RefreshIcon className="text-white animate-spin h-6 w-6 mx-auto" />
+        )}
+      </button>
     </Modal>
   );
 };

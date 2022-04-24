@@ -48,13 +48,13 @@ const Payments = (props) => {
   };
 
   const menuItems = [
-    {
-      name: "Edit",
-      onClick: (actionEntity) => {
-        setEditPayment(actionEntity);
-        setViewEditModal(true);
-      },
-    },
+    // {
+    //   name: "Edit",
+    //   onClick: (actionEntity) => {
+    //     setEditPayment(actionEntity);
+    //     setViewEditModal(true);
+    //   },
+    // },
     // {
     //   name: "Delete",
     //   onClick: (actionEntity) => {
