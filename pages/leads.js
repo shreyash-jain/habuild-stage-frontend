@@ -25,37 +25,6 @@ import { format, parseISO } from "date-fns";
 import toast from "react-hot-toast";
 import Select from "react-select";
 
-const attendance = [
-  {
-    day: "Monday",
-    attended: true,
-  },
-  {
-    day: "Tuesday",
-    attended: true,
-  },
-  {
-    day: "Wednesday",
-    attended: true,
-  },
-  {
-    day: "Thursday",
-    attended: true,
-  },
-  {
-    day: "Friday",
-    attended: true,
-  },
-  {
-    day: "Saturday",
-    attended: false,
-  },
-  {
-    day: "Sunday",
-    attended: true,
-  },
-];
-
 const filters = {
   status: [
     // { value: "lead", label: "Lead", checked: false },
@@ -77,6 +46,47 @@ const filters = {
     { value: "no", label: "No", checked: false },
   ],
 };
+
+// const attendance = [
+//   {
+//     day: "Monday",
+//     attended: true,
+//   },
+//   {
+//     day: "Tuesday",
+//     attended: true,
+//   },
+//   {
+//     day: "Wednesday",
+//     attended: true,
+//   },
+//   {
+//     day: "Thursday",
+//     attended: true,
+//   },
+//   {
+//     day: "Friday",
+//     attended: true,
+//   },
+//   {
+//     day: "Saturday",
+//     attended: false,
+//   },
+//   {
+//     day: "Sunday",
+//     attended: true,
+//   },
+// ];
+
+const weekDaysForAttendance = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -159,6 +169,21 @@ const Leads = (props) => {
         const leads = [];
 
         for (let i = 0; i < data.leads.leadDataArr.length; i++) {
+          console.log(data.leads.leadDataArr[i]);
+
+          let leadAtt = data.leads.leadDataArr[i].attendance.map(
+            (item, index) => {
+              let attended = false;
+
+              if (item.includes(1)) attended = true;
+
+              return {
+                day: weekDaysForAttendance[index],
+                attended,
+              };
+            }
+          );
+
           leads.push({
             member_id: data.leads.leadDataArr[i].member_id,
             name: data.leads.leadDataArr[i].name,
@@ -176,6 +201,7 @@ const Leads = (props) => {
             },
             action: data.leads.leadDataArr[i],
             wa_comm_status: data.leads.leadDataArr[i].wa_comm_status,
+            attendance: leadAtt,
           });
         }
 
@@ -332,10 +358,10 @@ const Leads = (props) => {
       title: "Attendance",
       dataIndex: "attendance",
       key: "attendance",
-      render: () => {
+      render: (attendance) => {
         return (
           <div className="flex relative -z-1 overflow-hidden">
-            {attendance.map((item) => {
+            {attendance?.map((item) => {
               if (item.attended) {
                 return (
                   <span key={item.day} title={item.day}>
@@ -657,6 +683,7 @@ const tabs = [
 const MenuSidePanel = (props) => {
   const [currentTab, setCurrentTab] = useState("Send WA Message");
   const [watiTemplates, setWatiTemplates] = useState([]);
+  const [refetchLoading, setRefetchLoading] = useState(false);
 
   useEffect(async () => {
     // if (!props.selectedLeads.length > 0) {
@@ -665,13 +692,29 @@ const MenuSidePanel = (props) => {
     //   toast.error("No Lead selected.");
     //   return;
     // }
+    fetchTemplates();
+  }, []);
 
+  const fetchTemplates = async (calledFrom) => {
     await fetch("https://api.habuild.in/webhook/templates")
       .then((res) => res.json())
       .then((data) => {
         setWatiTemplates(data.data);
+        if (calledFrom == "fromRefetch") {
+          setRefetchLoading(false);
+          toast.success("Wat templates updated.");
+        }
       });
-  }, []);
+  };
+
+  const refetchTemplates = async () => {
+    setRefetchLoading(true);
+    await fetch("https://api.habuild.in/webhook/templates_from_wati", {
+      method: "PATCH",
+    }).then((res) => {
+      fetchTemplates("fromRefetch");
+    });
+  };
 
   return (
     <SidePannel title="Manage" isOpen={props.open} setIsOpen={props.setOpen}>
@@ -729,12 +772,14 @@ const MenuSidePanel = (props) => {
 
         {currentTab == "Send WA Message" && (
           <SendWAModal
+            refetchTemplates={refetchTemplates}
             searchTerm={props.searchTerm}
             open={props.open}
             setOpen={props.setOpen}
             watiTemplates={watiTemplates}
             selectedLeads={props.selectedLeads}
             selectedLeadsLength={props.selectedLeads.length}
+            refetchLoading={refetchLoading}
           />
         )}
       </div>
@@ -1159,6 +1204,18 @@ const SendWAModal = (props) => {
                 };
               })}
             ></Select>
+
+            {props.refetchLoading ? (
+              <RefreshIcon className="text-green-300 animate-spin h-6 w-6 mx-auto" />
+            ) : (
+              <button
+                className="px-4 py-2 font-medium rounded-md bg-white mt-2 text-green-500 hover:bg-green-500 hover:text-white"
+                onClick={props.refetchTemplates}
+              >
+                Refetch Templates
+              </button>
+            )}
+
             {/* <FancySelect
               parentOnchange={templateChange}
               templateOptions={props.watiTemplates}
