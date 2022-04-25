@@ -169,8 +169,6 @@ const Leads = (props) => {
         const leads = [];
 
         for (let i = 0; i < data.leads.leadDataArr.length; i++) {
-          console.log(data.leads.leadDataArr[i]);
-
           let leadAtt = data.leads.leadDataArr[i].attendance.map(
             (item, index) => {
               let attended = false;
@@ -450,30 +448,40 @@ const Leads = (props) => {
           return;
         }
 
-        console.log("Search Data", data);
+        const leads = [];
 
-        setLeads(
-          data.data.map((item) => {
+        for (let i = 0; i < data.data.length; i++) {
+          let leadAtt = data.data[i].attendance.map((item, index) => {
+            let attended = false;
+
+            if (item.includes(1)) attended = true;
+
             return {
-              member_id: item.id,
-              name: item.name,
-              status: item.status,
-              email: item.email,
-              source: item.source,
-              phone: item.mobile_number,
-              leadTime: format(
-                parseISO(item.lead_time || item.created_at),
-                "PPpp"
-              ),
-              isSelected: {
-                identifier: item.id,
-                value: false,
-              },
-              action: item,
-              wa_comm_status: item.wa_comm_status,
+              day: weekDaysForAttendance[index],
+              attended,
             };
-          })
-        );
+          });
+
+          leads.push({
+            member_id: data.data[i].member_id,
+            name: data.data[i].name,
+            status: data.data[i].status,
+            email: data.data[i].email,
+            source: data.data[i].lead_source,
+            phone: data.data[i].mobile_number,
+            leadTime: format(parseISO(data.data[i].created_at), "PPpp"),
+            isSelected: {
+              identifier: data.data[i].member_id,
+              value: false,
+            },
+            action: data.data[i],
+            wa_comm_status: data.data[i].wa_communication_status,
+            attendance: leadAtt,
+          });
+        }
+
+        setLeads(leads);
+
         setLoading(false);
       });
   };
@@ -1149,6 +1157,8 @@ const SendWAModal = (props) => {
       redirect: "follow",
     };
 
+    // console.log("Vars", vars);
+
     // console.log(api);
     // console.log(vars);
 
@@ -1284,7 +1294,7 @@ const StopWACommModal = (props) => {
 
     const selectedLeadsIds = props.selectedLeads.map((item) => item.member_id);
 
-    console.log("Selected Leads ids", selectedLeadsIds);
+    // console.log("Selected Leads ids", selectedLeadsIds);
 
     if (selectedLeadsIds.length == 0) {
       setApiLoading(false);
@@ -1442,9 +1452,9 @@ const CommsModal = (props) => {
       key: "mode",
     },
     {
-      title: "Message",
-      dataIndex: "message",
-      key: "message",
+      title: "Template Identifier",
+      dataIndex: "template_identifier",
+      key: "template_identifier",
     },
     {
       title: "Destination",
@@ -1476,7 +1486,7 @@ const CommsModal = (props) => {
             // console.log("IITem", item);
             return {
               mode: item.mode,
-              message: item.message,
+              template_identifier: item.template_identifier,
               time: format(parseISO(item.created_at), "PPpp"),
               destination: item.mode,
             };
