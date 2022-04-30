@@ -51,7 +51,7 @@ const AddDemoProgramModal = (props) => {
       type: "select",
       name: "programId",
       setterMethod: setAssociatedProgram,
-      options: props.programs.map((item) => {
+      options: props.programs?.map((item) => {
         return {
           value: item.id,
           label: item.title,
@@ -127,7 +127,7 @@ const AddDemoProgramModal = (props) => {
           Add Demo Program
         </h2>
 
-        {addDemoProgramFields.map((item) => {
+        {addDemoProgramFields?.map((item) => {
           if (item.type == "select") {
             return (
               <div key={item.label}>

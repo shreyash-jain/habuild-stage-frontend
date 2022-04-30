@@ -64,7 +64,7 @@ const SendWAModal = (props) => {
       };
       api = "https://api.habuild.in/api/notification/whatsapp/batch";
     } else {
-      const member_ids = props.selectedLeads.map((item) => {
+      const member_ids = props.selectedLeads?.map((item) => {
         return item.member_id;
       });
       vars = {
@@ -133,7 +133,7 @@ const SendWAModal = (props) => {
                 setSelectedTemplate(option.obj);
                 setMessage(option.obj.body);
               }}
-              options={props.watiTemplates.map((item) => {
+              options={props.watiTemplates?.map((item) => {
                 return {
                   value: item.id,
                   label: item.identifier,
@@ -253,7 +253,7 @@ const SendMessageToAllLeads = (props) => {
 
   return (
     <div className="flex flex-col space-y-4">
-      {props.demoPrograms.map((demoProgram, personIdx) => (
+      {props.demoPrograms?.map((demoProgram, personIdx) => (
         <fieldset key={demoProgram.id} className="rounded-md p-4 shadow-md">
           <div className="relative flex items-start py-4">
             <div className="min-w-0 flex-1 text-sm">
@@ -273,7 +273,7 @@ const SendMessageToAllLeads = (props) => {
               />
             </div>
           </div>
-          {demoProgram.demobatches.map((demoBatch) => {
+          {demoProgram.demobatches?.map((demoBatch) => {
             const checked = selectedDemoBatches.includes(demoBatch.id);
             return (
               <div

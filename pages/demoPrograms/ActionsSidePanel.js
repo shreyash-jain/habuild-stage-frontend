@@ -76,7 +76,7 @@ const ActionsSidePanel = (props) => {
     <SidePannel
       width="max-w-6xl"
       title={`${props.demoProgram?.name}`}
-      isOpen={props.isOpen}
+      isOpen={props.isOpen || false}
       setIsOpen={props.setIsOpen}
     >
       <div>

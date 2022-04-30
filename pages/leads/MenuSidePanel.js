@@ -161,7 +161,7 @@ const MenuSidePanel = (props) => {
               props.getPaginatedLeads(props.currentPagePagination)
             }
             selectedLeads={props.selectedLeads}
-            selectedLeadsLength={props.selectedLeads.length}
+            selectedLeadsLength={props.selectedLeads?.length}
           />
         )}
 
@@ -174,7 +174,7 @@ const MenuSidePanel = (props) => {
             setOpen={props.setOpen}
             watiTemplates={watiTemplates}
             selectedLeads={props.selectedLeads}
-            selectedLeadsLength={props.selectedLeads.length}
+            selectedLeadsLength={props.selectedLeads?.length}
             refetchLoading={refetchLoading}
           />
         )}
