@@ -86,7 +86,6 @@ const MenuSidePanel = (props) => {
         return data.data;
       });
 
-
     withDemoBatches(demoPrograms);
   };
 
@@ -112,7 +111,11 @@ const MenuSidePanel = (props) => {
   };
 
   return (
-    <SidePannel title="Manage" isOpen={props.open} setIsOpen={props.setOpen}>
+    <SidePannel
+      title="Manage"
+      isOpen={props.open || false}
+      setIsOpen={props.setOpen}
+    >
       <div>
         <div className="sm:hidden">
           <label htmlFor="tabs" className="sr-only">
@@ -196,7 +199,6 @@ const ViewAttendance = (props) => {
   const [daysAttended, setDaysAttended] = useState(0);
 
   const [apiLoading, setApiLoading] = useState(false);
-
 
   const daysNum = [1, 2, 3, 4, 5, 6];
 

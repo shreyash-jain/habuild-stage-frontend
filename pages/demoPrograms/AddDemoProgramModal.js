@@ -112,7 +112,7 @@ const AddDemoProgramModal = (props) => {
   return (
     <Modal
       apiLoading={apiLoading}
-      modalOpen={props.viewAddModal}
+      modalOpen={props.viewAddModal || false}
       setModalOpen={props.setViewAddModal}
       actionText="Add Demo Program"
       hideActionButtons
