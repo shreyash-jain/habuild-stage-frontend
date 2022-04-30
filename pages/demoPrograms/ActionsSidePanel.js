@@ -1,6 +1,6 @@
 import { useEffect, useState, Fragment } from "react";
 import SidePannel from "../../components/SidePannel";
-import DemoBatches from "./demoBatches";
+import DemoBatches from "./DemoBatches";
 import ManageAds from "./ManageAds";
 
 const tabs = [
