@@ -174,7 +174,7 @@ const AddDemoAdModal = (props) => {
         }}
       >
         <h2 className="text-left text-xl font-bold text-gray-900">
-          Add Demo Ad for {props.demoProgram.name}
+          Add Demo Ad for {props.demoProgram?.name}
         </h2>
 
         <div className="col-span-6 sm:col-span-3">
