@@ -27,9 +27,14 @@ const navigation = [
     href: "/leadAnalytics",
     icon: ChartBarIcon,
   },
+  // {
+  //   name: "Demo Batches",
+  //   href: "/demoBatches",
+  //   icon: UserGroupIcon,
+  // },
   {
-    name: "Demo Batches",
-    href: "/demoBatches",
+    name: "Demo Programs",
+    href: "/demoPrograms",
     icon: UserGroupIcon,
   },
   {
