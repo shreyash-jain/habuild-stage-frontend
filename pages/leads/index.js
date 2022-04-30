@@ -6,12 +6,12 @@ import {
   Popover,
   Transition,
 } from "@headlessui/react";
-import LayoutSidebar from "../components/LayoutSidebar";
-import Table from "../components/Table";
-import FlyoutMenu from "../components/FlyoutMenu";
-import Modal from "../components/Modal";
-import FancySelect from "../components/FancySelect";
-import SidePannel from "../components/SidePannel";
+import LayoutSidebar from "../../components/LayoutSidebar";
+import Table from "../../components/Table";
+import FlyoutMenu from "../../components/FlyoutMenu";
+import Modal from "../../components/Modal";
+import FancySelect from "../../components/FancySelect";
+import SidePannel from "../../components/SidePannel";
 import {
   MenuAlt1Icon,
   RefreshIcon,
@@ -24,6 +24,7 @@ import {
 import { format, parseISO } from "date-fns";
 import toast from "react-hot-toast";
 import Select from "react-select";
+import MenuSidePanel from "./MenuSidePanel";
 
 const filters = {
   status: [
@@ -87,10 +88,6 @@ const weekDaysForAttendance = [
   "Saturday",
   "Sunday",
 ];
-
-function classNames(...classes) {
-  return classes.filter(Boolean).join(" ");
-}
 
 const Leads = (props) => {
   const [viewPaymentModal, setViewPaymentModal] = useState(false);
@@ -450,6 +447,7 @@ const Leads = (props) => {
 
         const leads = [];
 
+
         for (let i = 0; i < data.data.length; i++) {
           let leadAtt = data.data[i].attendance.map((item, index) => {
             let attended = false;
@@ -469,7 +467,7 @@ const Leads = (props) => {
             email: data.data[i].email,
             source: data.data[i].lead_source,
             phone: data.data[i].mobile_number,
-            leadTime: format(parseISO(data.data[i].created_at), "PPpp"),
+            // leadTime: format(parseISO(data.data[i].lead_time), "PPpp"),
             isSelected: {
               identifier: data.data[i].member_id,
               value: false,
@@ -668,6 +666,7 @@ const Leads = (props) => {
         setSelectedLeads={setSelectedLeads}
         open={showMenuSidebar}
         setOpen={setShowMenuSidebar}
+        demoBatches={demoBatches}
       />
 
       <FiltersModal
@@ -680,118 +679,6 @@ const Leads = (props) => {
         setModalOpen={setViewFilterModal}
       />
     </div>
-  );
-};
-
-const tabs = [
-  { name: "Send WA Message", current: true },
-  { name: "Start/Stop WA Communication", current: false },
-];
-
-const MenuSidePanel = (props) => {
-  const [currentTab, setCurrentTab] = useState("Send WA Message");
-  const [watiTemplates, setWatiTemplates] = useState([]);
-  const [refetchLoading, setRefetchLoading] = useState(false);
-
-  useEffect(async () => {
-    // if (!props.selectedLeads.length > 0) {
-    //   setApiLoading(false);
-    //   props.setViewSendWAModal(false);
-    //   toast.error("No Lead selected.");
-    //   return;
-    // }
-    fetchTemplates();
-  }, []);
-
-  const fetchTemplates = async (calledFrom) => {
-    await fetch("https://api.habuild.in/webhook/templates")
-      .then((res) => res.json())
-      .then((data) => {
-        setWatiTemplates(data.data);
-        if (calledFrom == "fromRefetch") {
-          setRefetchLoading(false);
-          toast.success("Wat templates updated.");
-        }
-      });
-  };
-
-  const refetchTemplates = async () => {
-    setRefetchLoading(true);
-    await fetch("https://api.habuild.in/webhook/templates_from_wati", {
-      method: "PATCH",
-    }).then((res) => {
-      fetchTemplates("fromRefetch");
-    });
-  };
-
-  return (
-    <SidePannel title="Manage" isOpen={props.open} setIsOpen={props.setOpen}>
-      <div>
-        <div className="sm:hidden">
-          <label htmlFor="tabs" className="sr-only">
-            Select a tab
-          </label>
-          {/* Use an "onChange" listener to redirect the user to the selected tab URL. */}
-          <select
-            id="tabs"
-            name="tabs"
-            className="block w-full focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md"
-            defaultValue={tabs.find((tab) => tab.current).name}
-          >
-            {tabs.map((tab) => (
-              <option key={tab.name}>{tab.name}</option>
-            ))}
-          </select>
-        </div>
-        <div className="hidden sm:block">
-          <nav className="flex space-x-4" aria-label="Tabs">
-            {tabs.map((tab) => (
-              <button
-                onClick={() => {
-                  setCurrentTab(tab.name);
-                }}
-                key={tab.name}
-                className={classNames(
-                  currentTab == tab.name
-                    ? "bg-green-100 text-green-700"
-                    : "text-gray-500 hover:text-gray-700",
-                  "px-3 py-2 font-medium text-sm rounded-md"
-                )}
-                aria-current={currentTab == tab.name ? "page" : undefined}
-              >
-                {tab.name}
-              </button>
-            ))}
-          </nav>
-        </div>
-
-        {currentTab == "Start/Stop WA Communication" && (
-          <StopWACommModal
-            open={props.open}
-            setOpen={props.setOpen}
-            setSelectedLeads={props.setSelectedLeads}
-            getPaginatedLeads={() =>
-              props.getPaginatedLeads(props.currentPagePagination)
-            }
-            selectedLeads={props.selectedLeads}
-            selectedLeadsLength={props.selectedLeads.length}
-          />
-        )}
-
-        {currentTab == "Send WA Message" && (
-          <SendWAModal
-            refetchTemplates={refetchTemplates}
-            searchTerm={props.searchTerm}
-            open={props.open}
-            setOpen={props.setOpen}
-            watiTemplates={watiTemplates}
-            selectedLeads={props.selectedLeads}
-            selectedLeadsLength={props.selectedLeads.length}
-            refetchLoading={refetchLoading}
-          />
-        )}
-      </div>
-    </SidePannel>
   );
 };
 
@@ -1094,291 +981,6 @@ const FiltersModal = (props) => {
         </div>
       </div>
     </Modal>
-  );
-};
-
-const SendWAModal = (props) => {
-  const [apiLoading, setApiLoading] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState({});
-  const [message, setMessage] = useState("");
-
-  useEffect(() => {
-    setMessage("");
-  }, [props.open]);
-
-  // const templateChange = (obj) => {
-  //   setMessage(obj.description);
-  //   setSelectedTemplate(obj);
-  // };
-
-  const sendMessageApi = (mode) => {
-    setApiLoading(true);
-    let vars = {};
-    let api = "";
-
-    if (!selectedTemplate) {
-      toast.error("Template message not selected.");
-      return;
-    }
-
-    if (mode !== "all") {
-      if (props.selectedLeadsLength == 0) {
-        toast.error("No person Selected.");
-        props.setOpen(false);
-        return;
-      }
-    }
-
-    if (mode == "all") {
-      vars = {
-        batch_ids: ["2", "3", "4"],
-        // batch_ids: ["4"],
-        template_name: selectedTemplate.identifier,
-      };
-      api = "https://api.habuild.in/api/notification/whatsapp/batch";
-    } else {
-      const member_ids = props.selectedLeads.map((item) => {
-        return item.member_id;
-      });
-      vars = {
-        member_ids,
-        template_name: selectedTemplate.identifier,
-      };
-      api = "https://api.habuild.in/api/notification/whatsapp";
-    }
-
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    var raw = JSON.stringify(vars);
-    var requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
-    };
-
-    // console.log("Vars", vars);
-
-    // console.log(api);
-    // console.log(vars);
-
-    fetch(api, requestOptions)
-      .then((response) => response.json())
-      .then((result) => {
-        setApiLoading(false);
-        toast.success("Message sent successfully!");
-        // if (result.errorMessage) {
-        //   toast.error(result.errorMessage);
-        // } else {
-        //   toast.success(result.message);
-        // }
-        props.setSelectedLeads([]);
-        props.setOpen(false);
-        // console.log(result);
-      })
-      .catch((error) => {
-        setApiLoading(false);
-        // toast.error(error);
-        console.log("error", error);
-      });
-  };
-
-  return (
-    // <Modal
-    //   modalOpen={props.viewSendWAModal}
-    //   setModalOpen={props.setViewSendWAModal}
-    //   actionText="Send"
-    // >
-    <div className="bg-white overflow-hidden shadow rounded-lg mt-4">
-      <div className="px-4 py-5 sm:p-6">
-        <div className="flex flex-col space-y-4">
-          <div className="font-medium">
-            {props.selectedLeadsLength} people selected
-          </div>
-
-          <h1 className="text-xl font-bold text-gray-700">
-            Select Wati Template
-          </h1>
-
-          <div className="w-full">
-            <Select
-              onChange={(option) => {
-                setSelectedTemplate(option.obj);
-                setMessage(option.obj.body);
-              }}
-              options={props.watiTemplates.map((item) => {
-                return {
-                  value: item.id,
-                  label: item.identifier,
-                  obj: item,
-                };
-              })}
-            ></Select>
-
-            {props.refetchLoading ? (
-              <RefreshIcon className="text-green-300 animate-spin h-6 w-6 mx-auto" />
-            ) : (
-              <button
-                className="px-4 py-2 font-medium rounded-md bg-white mt-2 text-green-500 hover:bg-green-500 hover:text-white"
-                onClick={props.refetchTemplates}
-              >
-                Refetch Templates
-              </button>
-            )}
-
-            {/* <FancySelect
-              parentOnchange={templateChange}
-              templateOptions={props.watiTemplates}
-            ></FancySelect> */}
-          </div>
-
-          <div>
-            <label
-              htmlFor="first-name"
-              className="block text-md font-medium text-gray-500"
-            >
-              Message
-            </label>
-            <textarea
-              disabled
-              value={message}
-              rows={20}
-              name="message"
-              id="message"
-              autoComplete="message"
-              className="p-2 mt-1 block w-full shadow-sm border border-gray-200 rounded-md"
-            />
-          </div>
-
-          {apiLoading ? (
-            <RefreshIcon className="text-green-300 animate-spin h-6 w-6 mx-auto" />
-          ) : (
-            <>
-              <button
-                onClick={() => {
-                  if (!apiLoading) {
-                    sendMessageApi();
-                  }
-                }}
-                className="px-4 py-2 font-medium rounded-md bg-green-300 text-green-700 hover:bg-green-700 hover:text-white"
-              >
-                Send Message to Selected People
-              </button>
-
-              <button
-                onClick={() => {
-                  if (!apiLoading) {
-                    if (window.confirm("Are you sure you want to do this?")) {
-                      sendMessageApi("all");
-                    }
-                  }
-                }}
-                className="px-4 py-2 font-medium rounded-md bg-green-300 text-green-700 hover:bg-green-700 hover:text-white"
-              >
-                Send Message to All Leads
-              </button>
-            </>
-          )}
-        </div>
-      </div>
-    </div>
-    // </Modal>
-  );
-};
-
-const StopWACommModal = (props) => {
-  const [apiLoading, setApiLoading] = useState();
-
-  const apiCall = (status) => {
-    setApiLoading(true);
-
-    const selectedLeadsIds = props.selectedLeads.map((item) => item.member_id);
-
-    // console.log("Selected Leads ids", selectedLeadsIds);
-
-    if (selectedLeadsIds.length == 0) {
-      setApiLoading(false);
-      props.setOpen(false);
-      toast.error("No Lead selected.");
-      return;
-    }
-
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    var raw = JSON.stringify({
-      lead_member_ids: selectedLeadsIds,
-      status,
-    });
-    var requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
-    };
-    // fetch("http://localhost:4000/api/lead/updateLeadCommStatus", requestOptions)
-    fetch(
-      "https://api.habuild.in/api/lead/updateLeadCommStatus",
-      requestOptions
-    )
-      .then((response) => response.json())
-      .then((result) => {
-        setApiLoading(false);
-        if (result.errorMessage) {
-          toast.error(result.errorMessage);
-        } else {
-          toast.success(result.message);
-        }
-        props.getPaginatedLeads();
-        props.setSelectedLeads([]);
-        props.setOpen(false);
-        // console.log(result);
-      })
-      .catch((error) => {
-        setApiLoading(false);
-        // toast.error(error);
-        console.log("error", error);
-      });
-  };
-
-  return (
-    // <Modal
-    //   apiLoading={apiLoading}
-    //   modalOpen={props.viewStopWACommModal}
-    //   setModalOpen={props.setViewStopWACommModal}
-    //   hideActionButtons
-    // >
-    <div className="bg-white overflow-hidden shadow rounded-lg mt-4">
-      <div className="px-4 py-5 sm:p-6">
-        <div className="flex flex-col space-y-4 p-4 mt-4">
-          <div>{props.selectedLeadsLength} people selected</div>
-
-          <button
-            disabled={apiLoading}
-            onClick={() => apiCall("PAUSED")}
-            className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:col-start-2 sm:text-sm"
-            type="submit"
-          >
-            Stop WA Communication
-            {apiLoading && (
-              <RefreshIcon className="text-white animate-spin h-6 w-6 mx-auto" />
-            )}
-          </button>
-          <button
-            disabled={apiLoading}
-            onClick={() => apiCall("ACTIVE")}
-            className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:col-start-2 sm:text-sm"
-            type="submit"
-          >
-            Start WA Communication
-            {apiLoading && (
-              <RefreshIcon className="text-white animate-spin h-6 w-6 mx-auto" />
-            )}
-          </button>
-        </div>
-      </div>
-    </div>
-
-    // </Modal>
   );
 };
 
