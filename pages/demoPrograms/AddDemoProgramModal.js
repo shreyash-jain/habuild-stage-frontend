@@ -93,7 +93,7 @@ const AddDemoProgramModal = (props) => {
       requestOptions
     )
       .then((response) => {
-        console.log("Repsobnse", response);
+        // console.log("Repsobnse", response);
         return response.text();
       })
       .then((result) => {

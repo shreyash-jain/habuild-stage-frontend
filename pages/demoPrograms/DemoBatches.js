@@ -42,7 +42,6 @@ const DemoBatches = (props) => {
   };
 
   const deleteDemoBatch = async (demoBatch) => {
-    console.log("Demo Batch", demoBatch);
     if (!window.confirm("Are you sure?")) {
       return;
     }
@@ -191,11 +190,6 @@ const AddDemoBatchModal = (props) => {
         console.log("error", error);
       });
   };
-
-  console.log(
-    "Get Time !!!!!@@@@"
-    // new Date(props.demoProgram.start_date).setTime(startTime)
-  );
 
   return (
     <Modal

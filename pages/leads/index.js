@@ -447,7 +447,6 @@ const Leads = (props) => {
 
         const leads = [];
 
-        console.log("Search Data ", data);
 
         for (let i = 0; i < data.data.length; i++) {
           let leadAtt = data.data[i].attendance.map((item, index) => {

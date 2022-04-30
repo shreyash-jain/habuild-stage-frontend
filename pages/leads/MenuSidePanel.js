@@ -86,7 +86,6 @@ const MenuSidePanel = (props) => {
         return data.data;
       });
 
-    console.log("DEmo Programs!", demoPrograms);
 
     withDemoBatches(demoPrograms);
   };
@@ -198,7 +197,6 @@ const ViewAttendance = (props) => {
 
   const [apiLoading, setApiLoading] = useState(false);
 
-  console.log(props.demoBatches);
 
   const daysNum = [1, 2, 3, 4, 5, 6];
 
@@ -211,7 +209,6 @@ const ViewAttendance = (props) => {
       .then((res) => res.json())
       .then((data) => {
         setApiLoading(false);
-        console.log("data Resp ", data);
       });
   };
 

@@ -57,8 +57,8 @@ const SendWAModal = (props) => {
 
     if (mode == "all") {
       vars = {
-        // batch_ids: selectedDemoBatches
-        batch_ids: ["2", "3", "4"],
+        batch_ids: selectedDemoBatches,
+        // batch_ids: ["2", "3", "4"],
         // batch_ids: ["4"],
         template_name: selectedTemplate.identifier,
       };
@@ -276,11 +276,11 @@ const SendMessageToAllLeads = (props) => {
           {demoProgram.demobatches.map((demoBatch) => {
             const checked = selectedDemoBatches.includes(demoBatch.id);
             return (
-              <div className="mt-4 border-b border-gray-200 divide-y divide-gray-200">
-                <div
-                  key={demoBatch.id}
-                  className="relative flex items-start py-4"
-                >
+              <div
+                key={demoBatch.id}
+                className="mt-4 border-b border-gray-200 divide-y divide-gray-200"
+              >
+                <div className="relative flex items-start py-4">
                   <div className="min-w-0 flex-1 text-sm">
                     <label
                       htmlFor={`person-${demoBatch.id}`}

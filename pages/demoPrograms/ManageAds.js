@@ -28,7 +28,6 @@ const DemoAds = (props) => {
   }, [props.demoAds?.length]);
 
   const deleteDemoAd = async (demoAd) => {
-    console.log("Demo Batch", demoAd);
     if (!window.confirm("Are you sure?")) {
       return;
     }

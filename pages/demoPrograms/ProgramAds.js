@@ -193,7 +193,6 @@ const AddDemoBatchModal = (props) => {
         props.refreshData();
         props.setModalOpen(false);
         toast.success("Demo Batch Created");
-        console.log(result);
       })
       .catch((error) => {
         setApiLoading(false);

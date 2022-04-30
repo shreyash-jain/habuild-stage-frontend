@@ -21,7 +21,6 @@ const ActionsSidePanel = (props) => {
 
   useEffect(() => {
     setCurrentTab(props.initialTab);
-    console.log("Props", props);
   }, [props.initialTab]);
 
   useEffect(() => {
