@@ -88,7 +88,8 @@ const AddDemoProgramModal = (props) => {
     };
     // fetch("https://api.habuild.in/api/demoProgram/createDemoProgram", requestOptions)
     fetch(
-      "http://localhost:4000/api/demoprogram/createDemoProgram",
+      // "http://localhost:4000/api/demoprogram/createDemoProgram",
+      "https://api.habuild.in/api/demoprogram/createDemoProgram",
       requestOptions
     )
       .then((response) => {

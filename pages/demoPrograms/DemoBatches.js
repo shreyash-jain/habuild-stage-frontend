@@ -49,8 +49,8 @@ const DemoBatches = (props) => {
 
     setDeleteLoading(true);
     await fetch(
-      // `https://api.habuild.in/api/demoprogram/delBatch?id=${demoBatch.id}`,
-      `http://localhost:4000/api/demobatches/delDemoBatch?id=${demoBatch.id}`,
+      `https://api.habuild.in/api/demoprogram/delBatch?id=${demoBatch.id}`,
+      // `http://localhost:4000/api/demobatches/delDemoBatch?id=${demoBatch.id}`,
       {
         method: "DELETE",
       }
@@ -174,10 +174,10 @@ const AddDemoBatchModal = (props) => {
       redirect: "follow",
     };
     fetch(
-      `http://localhost:4000/api/demoprogram/addBatch?id=${props.demoProgram.id}`,
+      // `http://localhost:4000/api/demoprogram/addBatch?id=${props.demoProgram.id}`,
+      `https://api.habuild.in/api/demoprogram/addBatch?id=${props.demoProgram.id}`,
       requestOptions
     )
-      // fetch("http://localhost:4000/api/demobatches", requestOptions)
       .then((response) => response.text())
       .then((result) => {
         setApiLoading(false);

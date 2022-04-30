@@ -44,8 +44,8 @@ const DemoPrograms = () => {
 
   const getAllDemoPrograms = async () => {
     setLoading(true);
-    // await fetch(`https://api.habuild.in/api/demoprogram/?page=1&limit=10`)
-    await fetch(`http://localhost:4000/api/demoprogram/?page=1&limit=10`)
+    await fetch(`https://api.habuild.in/api/demoprogram/?page=1&limit=10`)
+      // await fetch(`http://localhost:4000/api/demoprogram/?page=1&limit=10`)
       .then((res) => {
         return res.json();
       })
@@ -85,8 +85,8 @@ const DemoPrograms = () => {
 
     setDeleteLoading(true);
     await fetch(
-      // `https://api.habuild.in/api/demoprogram/deleteDemoProgram?id=${demoProgram.id}`,
-      `http://localhost:4000/api/demoprogram/deleteDemoProgram?id=${demoProgram.id}`,
+      `https://api.habuild.in/api/demoprogram/deleteDemoProgram?id=${demoProgram.id}`,
+      // `http://localhost:4000/api/demoprogram/deleteDemoProgram?id=${demoProgram.id}`,
       {
         method: "DELETE",
       }

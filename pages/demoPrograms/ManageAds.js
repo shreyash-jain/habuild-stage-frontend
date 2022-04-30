@@ -35,8 +35,8 @@ const DemoAds = (props) => {
 
     setDeleteLoading(true);
     await fetch(
-      // `https://api.habuild.in/api/demoprogram/delBatch?id=${demoBatch.id}`,
-      `http://localhost:4000/api/habuild_ads/ads/del?id=${demoAd.id}`,
+      // `http://localhost:4000/api/habuild_ads/ads/del?id=${demoAd.id}`,
+      `https://api.habuild.in/api/habuild_ads/ads/del?id=${demoAd.id}`,
       {
         method: "DELETE",
       }
@@ -146,8 +146,8 @@ const AddDemoAdModal = (props) => {
       body: raw,
       redirect: "follow",
     };
-    fetch(`http://localhost:4000/api/habuild_ads/ads/add`, requestOptions)
-      // fetch("http://localhost:4000/api/demobatches", requestOptions)
+    // fetch(`http://localhost:4000/api/habuild_ads/ads/add`, requestOptions)
+    fetch(`https://api.habuild.in/api/habuild_ads/ads/add`, requestOptions)
       .then((response) => response.text())
       .then((result) => {
         setApiLoading(false);

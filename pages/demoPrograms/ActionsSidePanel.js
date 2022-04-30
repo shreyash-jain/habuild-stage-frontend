@@ -52,7 +52,8 @@ const ActionsSidePanel = (props) => {
 
   const getDemoBatches = async () => {
     await fetch(
-      `http://localhost:4000/api/demoprogram/demo_batches?id=${props.demoProgram.id}`
+      // `http://localhost:4000/api/demoprogram/demo_batches?id=${props.demoProgram.id}`
+      `https://api.habuild.in/api/demoprogram/demo_batches?id=${props.demoProgram.id}`
     )
       // await fetch(`https://api.habuild.in/api/demoprogram/demo_batches`)
       .then((res) => res.json())
@@ -63,7 +64,8 @@ const ActionsSidePanel = (props) => {
 
   const getDemoAds = async () => {
     await fetch(
-      `http://localhost:4000/api/demoprogram/ads/all?id=${props.demoProgram.id}`
+      // `https://api.habuild.in/api/demoprogram/ads/all?id=${props.demoProgram.id}`
+      `https://api.habuild.in/api/demoprogram/ads/all?id=${props.demoProgram.id}`
     )
       .then((res) => res.json())
       .then((data) => {

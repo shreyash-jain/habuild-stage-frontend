@@ -52,9 +52,9 @@ const MenuSidePanel = (props) => {
   const withDemoBatches = (demoPrograms) => {
     const demoProgramsWithDemoBatches = demoPrograms.map(async (item) => {
       const demobatches = await fetch(
-        `http://localhost:4000/api/demoprogram/demo_batches?id=${item.id}`
+        // `http://localhost:4000/api/demoprogram/demo_batches?id=${item.id}`
+        `https://api.habuild.in/api/demoprogram/demo_batches?id=${item.id}`
       )
-        // await fetch(`https://api.habuild.in/api/demoprogram/demo_batches`)
         .then((res) => res.json())
         .then((data) => {
           return data.data;
@@ -73,9 +73,9 @@ const MenuSidePanel = (props) => {
   };
 
   const getAllDemoPrograms = async () => {
-    // await fetch(`https://api.habuild.in/api/demoprogram/?page=1&limit=10`)
     const demoPrograms = await fetch(
-      `http://localhost:4000/api/demoprogram/?page=1&limit=10`
+      // `http://localhost:4000/api/demoprogram/?page=1&limit=10`
+      `https://api.habuild.in/api/demoprogram/?page=1&limit=10`
     )
       .then((res) => {
         return res.json();
