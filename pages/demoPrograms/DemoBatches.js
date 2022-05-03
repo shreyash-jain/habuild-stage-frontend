@@ -48,7 +48,7 @@ const DemoBatches = (props) => {
 
     setDeleteLoading(true);
     await fetch(
-      `https://api.habuild.in/api/demoprogram/delBatch?id=${demoBatch.id}`,
+      `https://api.habuild.in/api/demobatches/delDemoBatch?id=${demoBatch.id}`,
       // `http://localhost:4000/api/demobatches/delDemoBatch?id=${demoBatch.id}`,
       {
         method: "DELETE",
