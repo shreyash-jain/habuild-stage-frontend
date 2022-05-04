@@ -65,7 +65,7 @@ const AddDemoProgramModal = (props) => {
     e.preventDefault();
     setApiLoading(true);
 
-    if (!name || !startDate || !endDate || !meetingId || !associatedProgram) {
+    if (!name || !startDate || !endDate || !associatedProgram) {
       alert("Please enter all details.");
       setApiLoading(false);
       return;
