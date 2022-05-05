@@ -232,7 +232,7 @@ const AddDemoBatchModal = (props) => {
             htmlFor="first-name"
             className="block text-sm font-medium text-gray-700"
           >
-            Start Date
+            Start Time
           </label>
           <input
             onChange={(e) => setStartTime(e.target.value)}

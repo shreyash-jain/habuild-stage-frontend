@@ -135,8 +135,8 @@ const AddDemoAdModal = (props) => {
     myHeaders.append("Content-Type", "application/json");
     var raw = JSON.stringify({
       name,
-      demo_program_id: props.demoProgram.id,
-      ad_id,
+      demo_program_id: parseInt(props.demoProgram.id),
+      ad_id: parseInt(ad_id),
     });
 
     var requestOptions = {
