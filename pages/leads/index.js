@@ -119,18 +119,30 @@ const Leads = (props) => {
   const [currentPagePagination, setCurrentPagePagination] = useState(1);
 
   const [memberComms, setMemberComms] = useState([]);
+  const [demoPrograms, setDemoPrograms] = useState([]);
 
   useEffect(() => {
     getPaginatedLeads(1);
     getDemobatches();
+    getAllDemoPrograms();
   }, []);
 
   const getDemobatches = async () => {
     await fetch(`https://api.habuild.in/api/demobatches/`)
       .then((res) => res.json())
       .then((data) => {
-        // console.log("Demo Batches", data.demoBatches);
         setDemoBatches(data.demoBatches);
+      });
+  };
+
+  const getAllDemoPrograms = async () => {
+    await fetch(`https://api.habuild.in/api/demoprogram/?page=1&limit=10`)
+      // await fetch(`http://localhost:4000/api/demoprogram/?page=1&limit=10`)
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        setDemoPrograms(data.data);
       });
   };
 
@@ -166,6 +178,11 @@ const Leads = (props) => {
         const leads = [];
 
         for (let i = 0; i < data.leads.leadDataArr.length; i++) {
+          console.log(data.leads.leadDataArr[i]);
+
+          let demobatch = [];
+          let demoProgram = [];
+
           let leadAtt = data.leads.leadDataArr[i].attendance.map(
             (item, index) => {
               let attended = false;
@@ -178,6 +195,26 @@ const Leads = (props) => {
               };
             }
           );
+
+          if (data.leads.leadDataArr[i] !== "NA") {
+            demobatch = demoBatches.filter((item1) => {
+              if (item1.id == data.leads.leadDataArr[i].lead_batch_id) {
+                return true;
+              } else {
+                return false;
+              }
+            });
+          }
+
+          if (demobatch[0]) {
+            demoProgram = demoPrograms.filter((item) => {
+              if (demobatch[0]?.demo_program_id == item.id) {
+                return true;
+              } else {
+                return false;
+              }
+            });
+          }
 
           leads.push({
             member_id: data.leads.leadDataArr[i].member_id,
@@ -197,6 +234,9 @@ const Leads = (props) => {
             action: data.leads.leadDataArr[i],
             wa_comm_status: data.leads.leadDataArr[i].wa_comm_status,
             attendance: leadAtt,
+            demo_batch: demobatch[0]?.name,
+            demo_program: demoProgram[0]?.name,
+            leadObj: data.leads.leadDataArr[i],
           });
         }
 
@@ -204,12 +244,12 @@ const Leads = (props) => {
         setLeads(leads);
         setLoading(false);
       })
-      .catch((err) => {
-        toast.error("Error, please try refreshing.");
-        // toast.error(err);
-        setLeads([]);
-        setLoading(false);
-      });
+      // .catch((err) => {
+      //   toast.error("Error, please try refreshing.");
+      //   console.log(err);
+      //   setLeads([]);
+      //   setLoading(false);
+      // });
   };
 
   const menuItems = [
@@ -345,6 +385,16 @@ const Leads = (props) => {
       key: "member_id",
     },
     {
+      title: "Demo Batch",
+      dataIndex: "demo_batch",
+      key: "demo_batch",
+    },
+    {
+      title: "Demo Program",
+      dataIndex: "demo_program",
+      key: "demo_program",
+    },
+    {
       title: "WhatsApp Communication Status",
       dataIndex: "wa_comm_status",
       key: "wa_comm_status",
@@ -447,8 +497,9 @@ const Leads = (props) => {
 
         const leads = [];
 
-
         for (let i = 0; i < data.data.length; i++) {
+          let demoBatchName;
+
           let leadAtt = data.data[i].attendance.map((item, index) => {
             let attended = false;
 
@@ -459,6 +510,18 @@ const Leads = (props) => {
               attended,
             };
           });
+
+          if (data.data[i] !== "NA") {
+            const demobatch = demoBatches.filter((item1) => {
+              if (item1.id == data.data[i].lead_batch_id) {
+                return true;
+              } else {
+                return false;
+              }
+            });
+
+            demoBatchName = demobatch[0]?.name;
+          }
 
           leads.push({
             member_id: data.data[i].member_id,
@@ -475,6 +538,8 @@ const Leads = (props) => {
             action: data.data[i],
             wa_comm_status: data.data[i].wa_communication_status,
             attendance: leadAtt,
+            leadObj: data.data[i],
+            demo_batch: demoBatchName,
           });
         }
 
@@ -1208,6 +1273,25 @@ const AddLeadModal = (props) => {
             type="email"
             placeholder="Your E-mail"
             className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+          />
+        </div>
+
+        <h1 className="text-xl text-gray-600 font-bold mx-auto">Or</h1>
+
+        <div className="col-span-6 sm:col-span-3">
+          <label
+            htmlFor="first-name"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Upload CSV
+          </label>
+          <input
+            // value={email}
+            // onChange={(e) => setEmail(e.target.value)}
+            required
+            type="file"
+            placeholder="Leads CSV File"
+            className="mt-1 p-2 text-lg focus:ring-green-500 focus:border-green-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
           />
         </div>
 
