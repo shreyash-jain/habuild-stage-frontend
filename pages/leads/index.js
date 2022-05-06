@@ -178,8 +178,6 @@ const Leads = (props) => {
         const leads = [];
 
         for (let i = 0; i < data.leads.leadDataArr.length; i++) {
-          console.log(data.leads.leadDataArr[i]);
-
           let demobatch = [];
           let demoProgram = [];
 
