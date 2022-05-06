@@ -244,12 +244,12 @@ const Leads = (props) => {
         setLeads(leads);
         setLoading(false);
       })
-      // .catch((err) => {
-      //   toast.error("Error, please try refreshing.");
-      //   console.log(err);
-      //   setLeads([]);
-      //   setLoading(false);
-      // });
+      .catch((err) => {
+        toast.error("Error, please try refreshing.");
+        console.log(err);
+        setLeads([]);
+        setLoading(false);
+      });
   };
 
   const menuItems = [
