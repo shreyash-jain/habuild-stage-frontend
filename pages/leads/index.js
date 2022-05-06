@@ -183,7 +183,7 @@ const Leads = (props) => {
           let demobatch = [];
           let demoProgram = [];
 
-          let leadAtt = data.leads.leadDataArr[i].attendance.map(
+          let leadAtt = data.leads?.leadDataArr[i]?.attendance?.map(
             (item, index) => {
               let attended = false;
 
