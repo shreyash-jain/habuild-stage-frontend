@@ -41,7 +41,7 @@ const ServerHealthCheck = (props) => {
         <div>
           <XIcon className="text-red-400 h-8 w-8" />
           <span className="font-bold text-gray-500">
-            Something's Wrong with Server!
+            Something is Wrong with Server!
           </span>
         </div>
       )}
