@@ -53,11 +53,6 @@ const navigation = [
     href: "/dailyQuotes",
     icon: ChatAlt2Icon,
   },
-  {
-    name: "Server Health Check",
-    href: "/serverHealthCheck",
-    icon: ServerIcon,
-  },
 ];
 
 function classNames(...classes) {

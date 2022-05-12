@@ -6,10 +6,10 @@ import {
   Popover,
   Transition,
 } from "@headlessui/react";
-import LayoutSidebar from "../components/LayoutSidebar";
-import Table from "../components/Table";
-import FlyoutMenu from "../components/FlyoutMenu";
-import Modal from "../components/Modal";
+import LayoutSidebar from "../../components/LayoutSidebar";
+import Table from "../../components/Table";
+import FlyoutMenu from "../../components/FlyoutMenu";
+import Modal from "../../components/Modal";
 import {
   RefreshIcon,
   XCircleIcon,
@@ -20,9 +20,12 @@ import {
 } from "@heroicons/react/outline";
 import { format, parseISO } from "date-fns";
 import toast from "react-hot-toast";
+import MemberInfoSidePanel from "./memberInfoSidePanel";
 
 const Members = (props) => {
   const [members, setMembers] = useState([]);
+  const [viewMemberInfo, setViewMemberInfo] = useState(false);
+  const [memberForAction, setMemberAction] = useState({});
 
   useEffect(() => {
     getMembers();
@@ -35,18 +38,27 @@ const Members = (props) => {
         setMembers(
           data.rows.map((item) => {
             return {
-              name: item.name,
-              email: item.email,
-              phone: item.mobile_number,
+              ...item,
               isSelected: {
                 identifier: item.id,
                 value: false,
               },
+              action: item,
             };
           })
         );
       });
   };
+
+  const menuItems = [
+    {
+      name: "View",
+      onClick: (actionEntity) => {
+        setMemberAction(actionEntity);
+        setViewMemberInfo(true);
+      },
+    },
+  ];
 
   const columns = [
     {
@@ -75,28 +87,66 @@ const Members = (props) => {
       },
     },
     {
+      title: "Member Id",
+      dataIndex: "id",
+      key: "id",
+    },
+    {
       title: "Name",
       dataIndex: "name",
       key: "name",
     },
-
+    {
+      title: "Phone No.",
+      dataIndex: "mobile_number",
+      key: "mobile_number",
+    },
     {
       title: "Email",
       dataIndex: "email",
       key: "email",
     },
-
     {
-      title: "Phone No.",
-      dataIndex: "phone",
-      key: "phone",
+      title: "WA Comm. Status",
+      dataIndex: "wa_communication_status",
+      key: "wa_communication_status",
+    },
+    {
+      title: "Subscription Status",
+      dataIndex: "subscription_status",
+      key: "subscription_status",
+    },
+    {
+      title: "Days Left",
+      dataIndex: "days_left",
+      key: "days_left",
+    },
+    {
+      title: "Last Week Attendance",
+      dataIndex: "last_week_attendance",
+      key: "last_week_attendance",
+    },
+    {
+      title: "Plan Name",
+      dataIndex: "planName",
+      key: "planName",
+    },
+    {
+      title: "Batch Name",
+      dataIndex: "batchName",
+      key: "batchName",
     },
     {
       title: "Actions",
       dataIndex: "action",
       key: "action",
-      render: (lead) => {
-        return <FlyoutMenu menuItems={[]}></FlyoutMenu>;
+      render: (actionEntity) => {
+        return (
+          <FlyoutMenu
+            menuItems={menuItems}
+            actionEntity={actionEntity}
+          ></FlyoutMenu>
+        );
       },
     },
   ];
@@ -363,6 +413,12 @@ const Members = (props) => {
       >
         Add Member +
       </button>
+
+      <MemberInfoSidePanel
+        memberForAction={memberForAction}
+        open={viewMemberInfo}
+        setOpen={setViewMemberInfo}
+      />
     </div>
   );
 };
