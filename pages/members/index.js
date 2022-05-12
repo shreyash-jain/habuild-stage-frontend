@@ -36,7 +36,7 @@ const Members = (props) => {
       .then((res) => res.json())
       .then((data) => {
         setMembers(
-          data.rows.map((item) => {
+          data.data.map((item) => {
             return {
               ...item,
               isSelected: {
