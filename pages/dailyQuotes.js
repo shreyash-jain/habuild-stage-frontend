@@ -101,9 +101,9 @@ const DailyQuotes = (props) => {
 
   const columns = [
     {
-      title: "Date",
-      dataIndex: "date",
-      key: "date",
+      title: "DayQuote",
+      dataIndex: "day_id",
+      key: "day_id",
     },
     {
       title: "Highlight",
