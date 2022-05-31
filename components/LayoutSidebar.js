@@ -16,6 +16,7 @@ import {
   CreditCardIcon,
   ChatAlt2Icon,
   ServerIcon,
+  CashIcon,
 } from "@heroicons/react/outline";
 import { loadGetInitialProps } from "next/dist/shared/lib/utils";
 
@@ -52,6 +53,11 @@ const navigation = [
     name: "Daily Quotes",
     href: "/dailyQuotes",
     icon: ChatAlt2Icon,
+  },
+  {
+    name: "Payment Approval",
+    href: "/paymentApproval",
+    icon: CashIcon,
   },
 ];
 
