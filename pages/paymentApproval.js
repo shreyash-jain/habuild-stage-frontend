@@ -25,6 +25,8 @@ const PaymentApproval = () => {
 
   const [loading, setLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [showScreenshotModal, setShowScreenshotModal] = useState(false);
+  const [imageToShow, setImageToShow] = useState("");
 
   useEffect(() => {
     getAllDemoPrograms();
@@ -127,7 +129,19 @@ const PaymentApproval = () => {
       dataIndex: "Payment Screenshot",
       key: "Payment Screenshot",
       render: (link) => {
-        return <img src={link} />;
+        return (
+          <>
+            <img
+              onClick={() => {
+                setImageToShow(link);
+                setShowScreenshotModal(true);
+              }}
+              src={link}
+              alt=""
+              className="w-20 rounded-md hover:cursor-pointer hover:opacity-75"
+            />
+          </>
+        );
       },
     },
     {
@@ -199,6 +213,20 @@ const PaymentApproval = () => {
           ]}
         />
       )}
+
+      <Modal
+        // apiLoading={apiLoading}
+        modalOpen={showScreenshotModal}
+        setModalOpen={setShowScreenshotModal}
+        hideActionButtons
+      >
+        <img src={imageToShow} />
+
+        <input
+          className="px-2 py-1 rounded-md w-full mt-4 border border-gray-400"
+          placeholder="UTR"
+        />
+      </Modal>
 
       {/* <ActionsSidePanel
         demoProgram={demoProgramForAction}
