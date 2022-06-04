@@ -13,15 +13,7 @@ function classNames(...classes) {
 }
 
 const PaymentApproval = () => {
-  const [viewAddModal, setViewAddModal] = useState(false);
-  const [demoBatches, setDemoBatches] = useState([]);
-
-  const [demoPrograms, setDemoPrograms] = useState([]);
-  const [programs, setPrograms] = useState([]);
-
-  const [showActionsPanel, setShowActionsPanel] = useState(false);
-  const [demoProgramForAction, setDemoProgramForAction] = useState({});
-  const [initialTab, setInitialTab] = useState("");
+  const [paymentsToApprove, setPaymentsToApprove] = useState([]);
 
   const [loading, setLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
@@ -29,35 +21,25 @@ const PaymentApproval = () => {
   const [imageToShow, setImageToShow] = useState("");
 
   useEffect(() => {
-    getAllDemoPrograms();
-    getAllPrograms();
-    // getDemoBatches();
+    getAllPaymentsToApprove();
   }, []);
 
-  const getAllPrograms = async () => {
-    await fetch(`https://api.habuild.in/api/program/`)
-      .then((res) => res.json())
-      .then((data) => {
-        setPrograms(data.programs);
-      });
-  };
-
-  const getAllDemoPrograms = async () => {
+  const getAllPaymentsToApprove = async () => {
     setLoading(true);
-    await fetch(`https://api.habuild.in/api/demoprogram/?page=1&limit=10`)
-      // await fetch(`http://localhost:4000/api/demoprogram/?page=1&limit=10`)
+    await fetch(`https://api.habuild.in/api/payment/offline_payments`)
       .then((res) => {
         return res.json();
       })
       .then((data) => {
-        setDemoPrograms(
-          data.data.map((item) => {
-            return {
-              ...item,
-              action: item,
-            };
-          })
-        );
+        console.log("data", data);
+        const data1 = data.payment_logs.map((item) => {
+          return {
+            ...item,
+            mobile_number: item.habuild_members.mobile_number,
+            email: item.habuild_members.email,
+          };
+        });
+        setPaymentsToApprove(data1);
         setLoading(false);
       });
   };
@@ -77,27 +59,6 @@ const PaymentApproval = () => {
   //   setShowActionsPanel(true);
   //   setInitialTab("View/Manage Batches");
   // };
-
-  const deleteDemoProgram = async (demoProgram) => {
-    if (!window.confirm("Are you sure?")) {
-      return;
-    }
-
-    setDeleteLoading(true);
-    await fetch(
-      `https://api.habuild.in/api/demoprogram/deleteDemoProgram?id=${demoProgram.id}`,
-      // `http://localhost:4000/api/demoprogram/deleteDemoProgram?id=${demoProgram.id}`,
-      {
-        method: "DELETE",
-      }
-    ).then((res) => {
-      setDeleteLoading(false);
-      getAllDemoPrograms();
-      if (res.status == 404) {
-        toast.error("Demo Program Not Deleted.");
-      }
-    });
-  };
 
   const menuItems = [
     {
@@ -121,13 +82,13 @@ const PaymentApproval = () => {
   const columns = [
     {
       title: "Mobile Number",
-      dataIndex: "Mobile Number",
-      key: "Mobile Number",
+      dataIndex: "mobile_number",
+      key: "mobile_number",
     },
     {
       title: "Payment Screenshot",
-      dataIndex: "Payment Screenshot",
-      key: "Payment Screenshot",
+      dataIndex: "screenshot",
+      key: "screenshot",
       render: (link) => {
         return (
           <>
@@ -146,18 +107,18 @@ const PaymentApproval = () => {
     },
     {
       title: "Email",
-      dataIndex: "Email",
-      key: "Email",
+      dataIndex: "email",
+      key: "email",
     },
     {
       title: "Amount",
-      dataIndex: "Amount",
-      key: "Amount",
+      dataIndex: "amount",
+      key: "amount",
     },
     {
       title: "Payment App",
-      dataIndex: "Payment App ",
-      key: "Payment App ",
+      dataIndex: "mode",
+      key: "mode",
     },
     {
       title: "Plan",
@@ -175,10 +136,20 @@ const PaymentApproval = () => {
           );
         }
         return (
-          <FlyoutMenu
-            actionEntity={actionEntity}
-            menuItems={menuItems}
-          ></FlyoutMenu>
+          <div className="flex flex-row space-x-2">
+            <button
+              type="button"
+              className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-grey-800 hover:text-white bg-green-400 hover:bg-green-600 focus:outline-none "
+            >
+              Approve
+            </button>
+            <button
+              type="button"
+              className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-grey-800 hover:text-white bg-red-400 hover:bg-red-600 focus:outline-none "
+            >
+              Deny
+            </button>
+          </div>
         );
       },
     },
@@ -198,27 +169,14 @@ const PaymentApproval = () => {
       {loading ? (
         <RefreshIcon className="text-white animate-spin h-6 w-6 mx-auto" />
       ) : (
-        <Table
-          columns={columns}
-          dataSource={[
-            {
-              "Payment Screenshot":
-                "https://drive.google.com/uc?id=1S6QUl-CXuQ5wkruPFpGF7G37IF5_ogdF&export=download",
-              "Mobile Number": "8146524618",
-              Email: "japneet.singh786@gmail.com",
-              Amount: "1300",
-              "Payment App ": "Google Pay",
-              Plan: "3 Months",
-            },
-          ]}
-        />
+        <Table columns={columns} dataSource={paymentsToApprove} />
       )}
 
       <Modal
         // apiLoading={apiLoading}
         modalOpen={showScreenshotModal}
         setModalOpen={setShowScreenshotModal}
-        hideActionButtons
+        actionText="Approve"
       >
         <img src={imageToShow} />
 
