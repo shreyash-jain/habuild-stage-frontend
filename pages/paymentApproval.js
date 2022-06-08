@@ -22,6 +22,8 @@ const PaymentApproval = () => {
   const [imageToShow, setImageToShow] = useState("");
 
   const [paymentToDecide, setPaymentToDecide] = useState({});
+  const [selectedBatchId, setSelectedBatchId] = useState("");
+  const [utr, setUtr] = useState("");
 
   const [memberProgramsWithBatches, setMemberProgramsWithBatches] = useState(
     []
@@ -32,19 +34,19 @@ const PaymentApproval = () => {
     getMemberProgramsWithBatches();
   }, []);
 
-  const getMemberProgramsWithBatches = () => {
+  const getMemberProgramsWithBatches = async () => {
     // fetch(`https://api.habuild.in/api/program/`)
-    fetch(`http://localhost:4000/api/program/`)
+    await fetch(`http://localhost:4000/api/program/`)
       .then((res) => {
         return res.json();
       })
-      .then((data) => {
+      .then(async (data) => {
         console.log("Program Data", data);
-        const memberProgramsWithBatches = [];
 
-        const newArr = [...memberProgramsWithBatches];
+        const newArr = [];
+
         for (let i = 0; i < data.programs.length; i++) {
-          fetch(
+          await fetch(
             // `https://api.habuild.in/api/batch/program/${data.programs[i].id}`
             `http://localhost:4000/api/batch/program/${data.programs[i].id}`
           )
@@ -56,8 +58,9 @@ const PaymentApproval = () => {
                 ...data.programs[i],
                 batches: data1.batch,
               };
-
               newArr.push(obj);
+
+              console.log("NEw Arr Programs with Batches", newArr);
             });
         }
         setMemberProgramsWithBatches(newArr);
@@ -185,6 +188,34 @@ const PaymentApproval = () => {
 
   console.log("member Batches ", memberProgramsWithBatches);
 
+  const computeSelectOptions = () => {
+    const overallArr = [];
+
+    for (let i = 0; i < memberProgramsWithBatches.length; i++) {
+      memberProgramsWithBatches[i].batches.map((item1) => {
+        const obj = {
+          label: memberProgramsWithBatches[i].title + " - " + item1.name,
+          value: item1.id,
+        };
+        overallArr.push(obj);
+      });
+    }
+
+    return overallArr;
+  };
+
+  const approvePayment = async () => {
+    await fetch(
+      `http://localhost:3000/api/payment/approve_payment?memberId=${paymentToDecide.habuild_members.id}&paymentId=${paymentToDecide.id}&batchId=${selectedBatchId}`
+    )
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {});
+  };
+
+  console.log("PaymentTO Decide", paymentToDecide);
+
   return (
     <div>
       <h1 className="text-2xl font-semibold text-gray-900">Payment Approval</h1>
@@ -207,39 +238,25 @@ const PaymentApproval = () => {
         modalOpen={showScreenshotModal}
         setModalOpen={setShowScreenshotModal}
         actionText="Approve"
+        onActionButtonClick={approvePayment}
       >
         <img src={imageToShow} />
 
         <h2>Amount - {paymentToDecide.amount}</h2>
 
         <Select
-          // onChange={(option) => {
-          //   setSelectedTemplate(option.obj);
-          //   setMessage(option.obj.body);
-          // }}
-          options={memberProgramsWithBatches.map((item) => {
-            const overallArr = [];
-
-            const arr = item.batches.map((item1) => {
-              return {
-                label: item.title + " - " + item1.name,
-                value: item1.id,
-              };
-            });
-            
-            console.log("ARRR", arr);
-
-            overallArr.push(...overallArr, ...arr);
-
-            console.log("OverAll Artrrrrr", overallArr);
-
-            return overallArr;
-          })}
+          onChange={(option) => {
+            setSelectedBatchId(option.value);
+          }}
+          options={computeSelectOptions()}
+          placeholder="Select Batch"
         ></Select>
 
         <input
           className="px-2 py-1 rounded-md w-full mt-4 border border-gray-400"
           placeholder="UTR"
+          onChange={(e) => setUtr(e.target.value)}
+          value={utr}
         />
       </Modal>
 
