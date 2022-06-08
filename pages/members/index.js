@@ -17,15 +17,19 @@ import {
   ChevronDownIcon,
   SearchIcon,
   FilterIcon,
+  MenuAlt1Icon,
+  ExternalLinkIcon,
 } from "@heroicons/react/outline";
 import { format, parseISO } from "date-fns";
 import toast from "react-hot-toast";
 import MemberInfoSidePanel from "./memberInfoSidePanel";
+import MenuSidePanel from "./MenuSidePanel";
 
 const Members = (props) => {
   const [members, setMembers] = useState([]);
   const [viewMemberInfo, setViewMemberInfo] = useState(false);
   const [memberForAction, setMemberAction] = useState({});
+  const [showMenuSidebar, setShowMenuSidebar] = useState(false);
 
   useEffect(() => {
     getMembers();
@@ -92,6 +96,24 @@ const Members = (props) => {
       key: "id",
     },
     {
+      title: "",
+      dataIndex: "action",
+      key: "action",
+      render: (actionEntity) => {
+        return (
+          <>
+            <ExternalLinkIcon
+              className="h-5 w-5 text-green-400 cursor-pointer hover:text-green-600"
+              onClick={() => {
+                setMemberAction(actionEntity);
+                setViewMemberInfo(true);
+              }}
+            />
+          </>
+        );
+      },
+    },
+    {
       title: "Name",
       dataIndex: "name",
       key: "name",
@@ -101,20 +123,46 @@ const Members = (props) => {
       dataIndex: "mobile_number",
       key: "mobile_number",
     },
-    {
-      title: "Email",
-      dataIndex: "email",
-      key: "email",
-    },
+
     {
       title: "WA Comm. Status",
       dataIndex: "wa_communication_status",
       key: "wa_communication_status",
+      render: (status) => {
+        if (status == "ACTIVE") {
+          return (
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-green-300 text-green-800">
+              {status}
+            </span>
+          );
+        } else {
+          return (
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-red-300 text-red-800">
+              {status}
+            </span>
+          );
+        }
+      },
     },
     {
       title: "Subscription Status",
       dataIndex: "subscription_status",
       key: "subscription_status",
+      render: (status) => {
+        if (status == "ACTIVE") {
+          return (
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-green-300 text-green-800">
+              {status}
+            </span>
+          );
+        } else {
+          return (
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-red-300 text-red-800">
+              {status}
+            </span>
+          );
+        }
+      },
     },
     {
       title: "Days Left",
@@ -414,10 +462,28 @@ const Members = (props) => {
         Add Member +
       </button>
 
+      <button
+        onClick={() => setShowMenuSidebar(true)}
+        className="transition duration-300 font-medium px-4 py-2 rounded-md bg-green-300 hover:bg-green-500 text-green-700 hover:text-white fixed bottom-2 right-40"
+      >
+        <MenuAlt1Icon className="w-6 h-6" />
+      </button>
+
       <MemberInfoSidePanel
         memberForAction={memberForAction}
         open={viewMemberInfo}
         setOpen={setViewMemberInfo}
+      />
+
+      <MenuSidePanel
+        // searchTerm={searchTerm}
+        // currentPagePagination={currentPagePagination}
+        // getPaginatedLeads={getPaginatedLeads}
+        // selectedLeads={selectedLeads}
+        // setSelectedLeads={setSelectedLeads}
+        open={showMenuSidebar}
+        setOpen={setShowMenuSidebar}
+        // demoBatches={demoBatches}
       />
     </div>
   );

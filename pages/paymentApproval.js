@@ -7,6 +7,7 @@ import Table from "../components/Table";
 import FlyoutMenu from "../components/FlyoutMenu";
 
 import { format, parseISO } from "date-fns";
+import Select from "react-select";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -20,9 +21,51 @@ const PaymentApproval = () => {
   const [showScreenshotModal, setShowScreenshotModal] = useState(false);
   const [imageToShow, setImageToShow] = useState("");
 
+  const [paymentToDecide, setPaymentToDecide] = useState({});
+  const [selectedBatchId, setSelectedBatchId] = useState("");
+  const [utr, setUtr] = useState("");
+
+  const [memberProgramsWithBatches, setMemberProgramsWithBatches] = useState(
+    []
+  );
+
   useEffect(() => {
     getAllPaymentsToApprove();
+    getMemberProgramsWithBatches();
   }, []);
+
+  const getMemberProgramsWithBatches = async () => {
+    // fetch(`https://api.habuild.in/api/program/`)
+    await fetch(`http://localhost:4000/api/program/`)
+      .then((res) => {
+        return res.json();
+      })
+      .then(async (data) => {
+        console.log("Program Data", data);
+
+        const newArr = [];
+
+        for (let i = 0; i < data.programs.length; i++) {
+          await fetch(
+            // `https://api.habuild.in/api/batch/program/${data.programs[i].id}`
+            `http://localhost:4000/api/batch/program/${data.programs[i].id}`
+          )
+            .then((res) => {
+              return res.json();
+            })
+            .then((data1) => {
+              const obj = {
+                ...data.programs[i],
+                batches: data1.batch,
+              };
+              newArr.push(obj);
+
+              console.log("NEw Arr Programs with Batches", newArr);
+            });
+        }
+        setMemberProgramsWithBatches(newArr);
+      });
+  };
 
   const getAllPaymentsToApprove = async () => {
     setLoading(true);
@@ -37,6 +80,7 @@ const PaymentApproval = () => {
             ...item,
             mobile_number: item.habuild_members.mobile_number,
             email: item.habuild_members.email,
+            action: item,
           };
         });
         setPaymentsToApprove(data1);
@@ -60,25 +104,6 @@ const PaymentApproval = () => {
   //   setInitialTab("View/Manage Batches");
   // };
 
-  const menuItems = [
-    {
-      name: "Approve",
-      onClick: (actionEntity) => {
-        // setDemoProgramForAction(actionEntity);
-        // setShowActionsPanel(true);
-        // setInitialTab("View/Manage Batches");
-      },
-    },
-    {
-      name: "Deny",
-      onClick: (actionEntity) => {
-        // setShowActionsPanel(true);
-        // setDemoProgramForAction(actionEntity);
-        // setInitialTab("View/Manage Ads");
-      },
-    },
-  ];
-
   const columns = [
     {
       title: "Mobile Number",
@@ -93,13 +118,14 @@ const PaymentApproval = () => {
         return (
           <>
             <img
-              onClick={() => {
-                setImageToShow(link);
-                setShowScreenshotModal(true);
-              }}
+              // onClick={() => {
+              //   setImageToShow(link);
+              //   setShowScreenshotModal(true);
+              // }}
               src={link}
               alt=""
-              className="w-20 rounded-md hover:cursor-pointer hover:opacity-75"
+              // className="w-20 rounded-md hover:cursor-pointer hover:opacity-75"
+              className="w-20 rounded-md"
             />
           </>
         );
@@ -138,6 +164,11 @@ const PaymentApproval = () => {
         return (
           <div className="flex flex-row space-x-2">
             <button
+              onClick={() => {
+                setImageToShow(actionEntity.screenshot);
+                setPaymentToDecide(actionEntity);
+                setShowScreenshotModal(true);
+              }}
               type="button"
               className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-grey-800 hover:text-white bg-green-400 hover:bg-green-600 focus:outline-none "
             >
@@ -154,6 +185,36 @@ const PaymentApproval = () => {
       },
     },
   ];
+
+  console.log("member Batches ", memberProgramsWithBatches);
+
+  const computeSelectOptions = () => {
+    const overallArr = [];
+
+    for (let i = 0; i < memberProgramsWithBatches.length; i++) {
+      memberProgramsWithBatches[i].batches.map((item1) => {
+        const obj = {
+          label: memberProgramsWithBatches[i].title + " - " + item1.name,
+          value: item1.id,
+        };
+        overallArr.push(obj);
+      });
+    }
+
+    return overallArr;
+  };
+
+  const approvePayment = async () => {
+    await fetch(
+      `http://localhost:3000/api/payment/approve_payment?memberId=${paymentToDecide.habuild_members.id}&paymentId=${paymentToDecide.id}&batchId=${selectedBatchId}`
+    )
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {});
+  };
+
+  console.log("PaymentTO Decide", paymentToDecide);
 
   return (
     <div>
@@ -177,12 +238,25 @@ const PaymentApproval = () => {
         modalOpen={showScreenshotModal}
         setModalOpen={setShowScreenshotModal}
         actionText="Approve"
+        onActionButtonClick={approvePayment}
       >
         <img src={imageToShow} />
+
+        <h2>Amount - {paymentToDecide.amount}</h2>
+
+        <Select
+          onChange={(option) => {
+            setSelectedBatchId(option.value);
+          }}
+          options={computeSelectOptions()}
+          placeholder="Select Batch"
+        ></Select>
 
         <input
           className="px-2 py-1 rounded-md w-full mt-4 border border-gray-400"
           placeholder="UTR"
+          onChange={(e) => setUtr(e.target.value)}
+          value={utr}
         />
       </Modal>
 

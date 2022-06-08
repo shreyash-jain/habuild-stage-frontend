@@ -22,9 +22,16 @@ import {
 } from "@heroicons/react/outline";
 import { format, parseISO } from "date-fns";
 import toast from "react-hot-toast";
+import { Switch } from "@headlessui/react";
+
+function classNames(...classes) {
+  return classes.filter(Boolean).join(" ");
+}
 
 const DailyQuotes = (props) => {
   const [dailyQuotes, setDailyQuotes] = useState([]);
+  const [memberDailyQuotes, setMemberDailyQuotes] = useState([]);
+  const [leadDailyQuotes, setLeadDailyQuotes] = useState([]);
   const [viewAddModal, setViewAddModal] = useState(false);
   const [viewEditModal, setViewEditModal] = useState(false);
 
@@ -32,6 +39,8 @@ const DailyQuotes = (props) => {
   const [programs, setPrograms] = useState([]);
 
   const [editQuote, setEditQuote] = useState({});
+
+  const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
     getDailyQuotes();
@@ -53,6 +62,27 @@ const DailyQuotes = (props) => {
               ...item,
               action: item,
             };
+          })
+        );
+
+        setMemberDailyQuotes(
+          data.dailyQuotes.filter((item) => {
+            if (item.type == "MEMBER") {
+              return {
+                ...item,
+                action: item,
+              };
+            }
+          })
+        );
+        setLeadDailyQuotes(
+          data.dailyQuotes.filter((item) => {
+            if (item.type !== "MEMBER") {
+              return {
+                ...item,
+                action: item,
+              };
+            }
           })
         );
       });
@@ -105,17 +135,17 @@ const DailyQuotes = (props) => {
       dataIndex: "day_id",
       key: "day_id",
     },
-    {
+    !enabled && {
       title: "Highlight",
       dataIndex: "highlight",
       key: "highlight",
     },
-    {
+    !enabled && {
       title: "Highlight_2",
       dataIndex: "highlight_2",
       key: "highlight_2",
     },
-    {
+    !enabled && {
       title: "Tip",
       dataIndex: "tip",
       key: "tip",
@@ -145,6 +175,11 @@ const DailyQuotes = (props) => {
       dataIndex: "quote_3",
       key: "quote_3",
     },
+    enabled && {
+      title: "Morning Message",
+      dataIndex: "morning_message",
+      key: "morning_message",
+    },
     {
       title: "Program Id",
       dataIndex: "program_id",
@@ -173,11 +208,73 @@ const DailyQuotes = (props) => {
     <div>
       <h1 className="text-2xl font-semibold text-gray-900">Daily Quotes</h1>
 
+      <div className="flex flex-row space-x-2 justify-center items-center">
+        <p className="font-light text-lg">Show Member Quotes</p>
+
+        <Switch
+          checked={enabled}
+          onChange={setEnabled}
+          className={classNames(
+            enabled ? "bg-green-600" : "bg-gray-200",
+            "relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+          )}
+        >
+          <span className="sr-only">Use setting</span>
+          <span
+            className={classNames(
+              enabled ? "translate-x-5" : "translate-x-0",
+              "pointer-events-none relative inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200"
+            )}
+          >
+            <span
+              className={classNames(
+                enabled
+                  ? "opacity-0 ease-out duration-100"
+                  : "opacity-100 ease-in duration-200",
+                "absolute inset-0 h-full w-full flex items-center justify-center transition-opacity"
+              )}
+              aria-hidden="true"
+            >
+              <svg
+                className="h-3 w-3 text-gray-400"
+                fill="none"
+                viewBox="0 0 12 12"
+              >
+                <path
+                  d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </span>
+            <span
+              className={classNames(
+                enabled
+                  ? "opacity-100 ease-in duration-200"
+                  : "opacity-0 ease-out duration-100",
+                "absolute inset-0 h-full w-full flex items-center justify-center transition-opacity"
+              )}
+              aria-hidden="true"
+            >
+              <svg
+                className="h-3 w-3 text-green-600"
+                fill="currentColor"
+                viewBox="0 0 12 12"
+              >
+                <path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
+              </svg>
+            </span>
+          </span>
+        </Switch>
+      </div>
+
       <Table
         onPaginationApi={() => {}}
         columns={columns}
         pagination
-        dataSource={dailyQuotes}
+        dataSource={enabled ? memberDailyQuotes : leadDailyQuotes}
       />
 
       <button

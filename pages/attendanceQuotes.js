@@ -14,10 +14,17 @@ import {
   PlusIcon,
 } from "@heroicons/react/outline";
 import toast from "react-hot-toast";
+import { Switch } from "@headlessui/react";
+
+function classNames(...classes) {
+  return classes.filter(Boolean).join(" ");
+}
 
 const AttendanceQuotes = (props) => {
   const [loading, setLoading] = useState(false);
   const [attendnaceQuotes, setAttendanceQuotes] = useState([]);
+  const [absentAttendanceQuotes, setAbsentAttendanceQuotes] = useState([]);
+  const [presentAttendanceQuotes, setPresentAttendanceQuotes] = useState([]);
   const [viewAddModal, setViewAddModal] = useState(false);
   const [viewEditModal, setViewEditModal] = useState(false);
 
@@ -25,6 +32,8 @@ const AttendanceQuotes = (props) => {
   const [demoBatches, setDemoBatches] = useState([]);
 
   const [editQuote, setEditQuote] = useState({});
+
+  const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
     getAllPrograms();
@@ -46,6 +55,35 @@ const AttendanceQuotes = (props) => {
             };
           })
         );
+
+        const absentQuotes = data.attendanceQuotes.filter((item) => {
+          if (!parseInt(item.day_presence)) {
+            return {
+              ...item,
+              action: item,
+            };
+          }
+        });
+        setAbsentAttendanceQuotes(
+          absentQuotes.sort(function (a, b) {
+            return a.total_days_absent - b.total_days_absent;
+          })
+        );
+
+        const presentQuotes = data.attendanceQuotes.filter((item) => {
+          if (parseInt(item.day_presence)) {
+            return {
+              ...item,
+              action: item,
+            };
+          }
+        });
+        setPresentAttendanceQuotes(
+          presentQuotes.sort(function (a, b) {
+            return a.total_days_present - b.total_days_present;
+          })
+        );
+
         setLoading(false);
       });
   };
@@ -103,16 +141,17 @@ const AttendanceQuotes = (props) => {
   ];
 
   const columns = [
-    {
-      title: "Total Days Absent",
-      dataIndex: "total_days_absent",
-      key: "total_days_absent",
-    },
-    {
-      title: "Total Days Present",
-      dataIndex: "total_days_present",
-      key: "total_days_present",
-    },
+    enabled
+      ? {
+          title: "Total Days Absent",
+          dataIndex: "total_days_absent",
+          key: "total_days_absent",
+        }
+      : {
+          title: "Total Days Present",
+          dataIndex: "total_days_present",
+          key: "total_days_present",
+        },
     {
       title: "Day Presence",
       dataIndex: "day_presence",
@@ -167,6 +206,68 @@ const AttendanceQuotes = (props) => {
         Attendance Quotes
       </h1>
 
+      <div className="flex flex-row space-x-2 justify-center items-center">
+        <p className="font-light text-lg">Show Absent Quotes</p>
+
+        <Switch
+          checked={enabled}
+          onChange={setEnabled}
+          className={classNames(
+            enabled ? "bg-green-600" : "bg-gray-200",
+            "relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+          )}
+        >
+          <span className="sr-only">Use setting</span>
+          <span
+            className={classNames(
+              enabled ? "translate-x-5" : "translate-x-0",
+              "pointer-events-none relative inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200"
+            )}
+          >
+            <span
+              className={classNames(
+                enabled
+                  ? "opacity-0 ease-out duration-100"
+                  : "opacity-100 ease-in duration-200",
+                "absolute inset-0 h-full w-full flex items-center justify-center transition-opacity"
+              )}
+              aria-hidden="true"
+            >
+              <svg
+                className="h-3 w-3 text-gray-400"
+                fill="none"
+                viewBox="0 0 12 12"
+              >
+                <path
+                  d="M4 8l2-2m0 0l2-2M6 6L4 4m2 2l2 2"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </span>
+            <span
+              className={classNames(
+                enabled
+                  ? "opacity-100 ease-in duration-200"
+                  : "opacity-0 ease-out duration-100",
+                "absolute inset-0 h-full w-full flex items-center justify-center transition-opacity"
+              )}
+              aria-hidden="true"
+            >
+              <svg
+                className="h-3 w-3 text-green-600"
+                fill="currentColor"
+                viewBox="0 0 12 12"
+              >
+                <path d="M3.707 5.293a1 1 0 00-1.414 1.414l1.414-1.414zM5 8l-.707.707a1 1 0 001.414 0L5 8zm4.707-3.293a1 1 0 00-1.414-1.414l1.414 1.414zm-7.414 2l2 2 1.414-1.414-2-2-1.414 1.414zm3.414 2l4-4-1.414-1.414-4 4 1.414 1.414z" />
+              </svg>
+            </span>
+          </span>
+        </Switch>
+      </div>
+
       {loading ? (
         <RefreshIcon className="text-green-300 animate-spin h-8 w-8 mx-auto" />
       ) : (
@@ -174,7 +275,9 @@ const AttendanceQuotes = (props) => {
           onPaginationApi={() => {}}
           columns={columns}
           pagination
-          dataSource={attendnaceQuotes}
+          dataSource={
+            enabled ? absentAttendanceQuotes : presentAttendanceQuotes
+          }
         />
       )}
 
@@ -361,7 +464,7 @@ const AddAttendanceQuote = (props) => {
                     name="total_days_present"
                     id="total_days_present"
                     placeholder="Total Days Present"
-                    className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                    className="mt-1 p-2 text-lg focus:ring-green-500 focus:border-green-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
                   />
                 </div>
                 <div className="col-span-1">
@@ -382,7 +485,7 @@ const AddAttendanceQuote = (props) => {
                     name="total_days_absent"
                     id="total_days_absent"
                     placeholder="Total Days Absent"
-                    className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                    className="mt-1 p-2 text-lg focus:ring-green-500 focus:border-green-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
                   />
                 </div>
                 <div className="col-span-1 ">
@@ -418,7 +521,7 @@ const AddAttendanceQuote = (props) => {
                     name="message"
                     id="message"
                     placeholder="Message"
-                    className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                    className="mt-1 p-2 text-lg focus:ring-green-500 focus:border-green-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
                   />
                 </div>
                 <div className="col-span-1 ">
@@ -432,7 +535,7 @@ const AddAttendanceQuote = (props) => {
                     }
                     type="text"
                     placeholder="Status"
-                    className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                    className="mt-1 p-2 text-lg focus:ring-green-500 focus:border-green-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
                   />
                 </div>
 
