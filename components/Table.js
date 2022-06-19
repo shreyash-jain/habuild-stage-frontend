@@ -12,9 +12,9 @@ export default function Table(props) {
   };
 
   return (
-    <div className=" mt-4 py-2 align-middle inline-block min-w-full ">
+    <div className="flex flex-col mt-4 py-2 align-middle inline-block min-w-full ">
       <div className="shadow-lg ring-1 ring-black ring-opacity-5 md:rounded-lg">
-        <table className="min-w-full divide-y divide-gray-300">
+        <table className="min-w-full divide-y divide-gray-300 ">
           <thead className="bg-gray-50">
             <tr>
               {props.columns.map((item, index) => {
@@ -23,7 +23,7 @@ export default function Table(props) {
                     <th
                       key={index}
                       scope="col"
-                      className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-600 sm:pl-6"
+                      className="sticky top-0 z-10 hidden border-b border-gray-300 bg-gray-50 bg-opacity-75 px-3 py-3.5 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter sm:table-cell"
                     >
                       {item.headerRender()}
                     </th>
@@ -33,7 +33,7 @@ export default function Table(props) {
                     <th
                       key={index}
                       scope="col"
-                      className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-600 sm:pl-6"
+                      className="sticky top-0 z-10 hidden border-b border-gray-300 bg-gray-50 bg-opacity-75 px-3 py-3.5 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter sm:table-cell"
                     >
                       {item.title}
                     </th>

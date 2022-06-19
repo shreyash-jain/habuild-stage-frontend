@@ -71,7 +71,7 @@ const MemberInfoSidePanel = (props) => {
         "Lead Source": props.memberForAction.lead_source,
         Status: props.memberForAction.status,
         "Payment Status": props.memberForAction.payment_status,
-        "Pause Days": props.memberForAction.pause_days,
+        "Pause Days": props.memberForAction.total_pause_days,
       },
       Performance: {},
       Subscription: {},
