@@ -42,8 +42,8 @@ const Members = (props) => {
     setLoading(true);
     setCurrentPagePagination(pageNum);
 
-    // await fetch(`https://api.habuild.in/api/member/?page=${pageNum}&limit=100`)
-    await fetch(`http://localhost:4000/api/member/?page=${pageNum}&limit=100`)
+    await fetch(`https://api.habuild.in/api/member/?page=${pageNum}&limit=100`)
+    // await fetch(`http://localhost:4000/api/member/?page=${pageNum}&limit=100`)
       .then((res) => res.json())
       .then((data) => {
         console.log("DATA", data);
