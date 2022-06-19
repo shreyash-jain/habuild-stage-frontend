@@ -26,13 +26,16 @@ const Payments = (props) => {
   const [editPayment, setEditPayment] = useState([]);
   const [viewEditModal, setViewEditModal] = useState(false);
   const [viewAddModal, setViewAddModal] = useState(false);
+  const [totalRecords, setTotalRecords] = useState(0);
+  const [currentPagePagination, setCurrentPagePagination] = useState(1);
 
   useEffect(() => {
-    getPayments();
+    getPayments(1);
   }, []);
 
-  const getPayments = async () => {
-    await fetch(`https://api.habuild.in/api/payment/?limit=100000`)
+  const getPayments = async (pageNum) => {
+    setCurrentPagePagination(pageNum);
+    await fetch(`https://api.habuild.in/api/payment/?page=${pageNum}&limit=100`)
       .then((res) => res.json())
       .then((data) => {
         console.log("Payments", data);
@@ -44,6 +47,7 @@ const Payments = (props) => {
             };
           })
         );
+        setTotalRecords(data.data.totalPaymentsSize);
       });
   };
 
@@ -148,9 +152,12 @@ const Payments = (props) => {
       <h1 className="text-2xl font-semibold text-gray-900">Payments</h1>
 
       <Table
-        onPaginationApi={() => {}}
+        onPaginationApi={getPayments}
+        pagination
+        totalRecords={totalRecords}
         columns={columns}
         dataSource={payments}
+        currentPagePagination={currentPagePagination}
       />
 
       <button
@@ -279,13 +286,8 @@ const PaymentFormModal = (props) => {
   ];
 
   const formSubmit = (e) => {
-    let API = "https://api.habuild.in/api/daily_quote/add_daily_quotes";
+    let API = "https://api.habuild.in/api/payment/";
     let method = "POST";
-
-    if (props.mode == "edit") {
-      API = `https://api.habuild.in/api/daily_quote/update/${props.editQuote.id}`;
-      method = "PATCH";
-    }
 
     e.preventDefault();
     setApiLoading(true);
@@ -341,7 +343,7 @@ const PaymentFormModal = (props) => {
           toast.success(
             `Payment ${props.mode == "edit" ? "Updated" : "Created"}`
           );
-          props.getQuotes();
+          props.getPayments();
           props.setViewModal(false);
           console.log("Api Result", result);
         });
@@ -370,7 +372,7 @@ const PaymentFormModal = (props) => {
         }}
       >
         <h2 className="text-left text-xl font-bold text-gray-900">
-          {props.mode == "edit" ? "Edit" : "Add"} Payment
+          {props.mode == "edit" ? "Edit" : "Add"} Payment Log
         </h2>
 
         {paymentFormFields.map((item) => {
@@ -396,7 +398,7 @@ const PaymentFormModal = (props) => {
           className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:col-start-2 sm:text-sm"
           type="submit"
         >
-          {props.mode == "edit" ? "Edit" : "Add"} Quote
+          {props.mode == "edit" ? "Edit" : "Add"} Payment Log
           {apiLoading && (
             <RefreshIcon className="text-white animate-spin h-6 w-6 mx-auto" />
           )}

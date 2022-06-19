@@ -1,4 +1,4 @@
-import { useEffect, useState, Fragment } from "react";
+import React, { useEffect, useState, Fragment } from "react";
 import {
   Dialog,
   Disclosure,
@@ -30,17 +30,25 @@ const Members = (props) => {
   const [viewMemberInfo, setViewMemberInfo] = useState(false);
   const [memberForAction, setMemberAction] = useState({});
   const [showMenuSidebar, setShowMenuSidebar] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [currentPagePagination, setCurrentPagePagination] = useState(1);
+  const [totalRecords, setTotalRecords] = useState(0);
 
   useEffect(() => {
-    getMembers();
+    getMembers(1);
   }, []);
 
-  const getMembers = async () => {
-    await fetch(`https://api.habuild.in/api/member/`)
+  const getMembers = async (pageNum) => {
+    setLoading(true);
+    setCurrentPagePagination(pageNum);
+
+    // await fetch(`https://api.habuild.in/api/member/?page=${pageNum}&limit=100`)
+    await fetch(`http://localhost:4000/api/member/?page=${pageNum}&limit=100`)
       .then((res) => res.json())
       .then((data) => {
+        console.log("DATA", data);
         setMembers(
-          data.data.map((item) => {
+          data.data.members.map((item) => {
             return {
               ...item,
               isSelected: {
@@ -51,6 +59,8 @@ const Members = (props) => {
             };
           })
         );
+        setTotalRecords(data.data.totalRecords);
+        setLoading(false);
       });
   };
 
@@ -146,18 +156,18 @@ const Members = (props) => {
     },
     {
       title: "Subscription Status",
-      dataIndex: "subscription_status",
-      key: "subscription_status",
+      dataIndex: "status",
+      key: "status",
       render: (status) => {
         if (status == "ACTIVE") {
           return (
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-green-300 text-green-800">
+            <span className="text-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-green-300 text-green-800">
               {status}
             </span>
           );
         } else {
           return (
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-red-300 text-red-800">
+            <span className="text-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-red-300 text-red-800">
               {status}
             </span>
           );
@@ -166,23 +176,56 @@ const Members = (props) => {
     },
     {
       title: "Days Left",
-      dataIndex: "days_left",
-      key: "days_left",
+      dataIndex: "sub_end_date",
+      key: "sub_end_date",
+      render: (date) => {
+        if (date) {
+          const startDate = new Date().getTime();
+          const endDate = new Date(date).getTime();
+          const timeDiff = Math.abs(endDate - startDate);
+          const dayDiff = parseInt(timeDiff / (1000 * 60 * 60 * 24));
+          return dayDiff;
+        }
+      },
     },
     {
-      title: "Last Week Attendance",
-      dataIndex: "last_week_attendance",
-      key: "last_week_attendance",
+      title: "Current Week Attendance",
+      dataIndex: "current_week_attendance",
+      key: "current_week_attendance",
+      render: (attendance) => {
+        return (
+          <div className="flex relative -z-1 overflow-hidden">
+            {attendance?.map((item) => {
+              if (item.attended) {
+                return (
+                  <span key={item.day} title={item.day}>
+                    <CheckCircleIcon className="text-green-400 h-6" />
+                  </span>
+                );
+              } else {
+                return (
+                  <span key={item.day} title={item.day}>
+                    <XCircleIcon className="text-red-400 h-6" />
+                  </span>
+                );
+              }
+            })}
+          </div>
+        );
+      },
     },
     {
       title: "Plan Name",
-      dataIndex: "planName",
-      key: "planName",
+      dataIndex: "plan_name",
+      key: "plan_name",
+      render: (plans) => {
+        return JSON.stringify(plans).replace(/[^a-z0-9]/gi, " ");
+      },
     },
     {
-      title: "Batch Name",
-      dataIndex: "batchName",
-      key: "batchName",
+      title: "Preffered Batch",
+      dataIndex: "preffered_batch_id",
+      key: "preffered_batch_id",
     },
     {
       title: "Actions",
@@ -449,10 +492,13 @@ const Members = (props) => {
       </div>
 
       <Table
-        onPaginationApi={() => {}}
+        dataLoading={loading}
+        onPaginationApi={getMembers}
+        totalRecords={totalRecords}
         columns={columns}
         pagination
         dataSource={members}
+        currentPagePagination={currentPagePagination}
       />
 
       <button
