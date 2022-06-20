@@ -10,7 +10,7 @@ const StopWACommModal = (props) => {
   const apiCall = (status) => {
     setApiLoading(true);
 
-    const selectedLeadsIds = props.selectedLeads.map((item) => item.member_id);
+    const selectedLeadsIds = props.selectedLeads.map((item) => item.id);
 
     // console.log("Selected Leads ids", selectedLeadsIds);
 
@@ -59,12 +59,6 @@ const StopWACommModal = (props) => {
   };
 
   return (
-    // <Modal
-    //   apiLoading={apiLoading}
-    //   modalOpen={props.viewStopWACommModal}
-    //   setModalOpen={props.setViewStopWACommModal}
-    //   hideActionButtons
-    // >
     <div className="bg-white overflow-hidden shadow rounded-lg mt-4">
       <div className="px-4 py-5 sm:p-6">
         <div className="flex flex-col space-y-4 p-4 mt-4">
@@ -72,22 +66,22 @@ const StopWACommModal = (props) => {
 
           <button
             disabled={apiLoading}
-            // onClick={() => apiCall("PAUSED")}
+            onClick={() => apiCall("PAUSED")}
             className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:col-start-2 sm:text-sm"
             type="submit"
           >
-            Pause Membership
+            Stop Communication
             {apiLoading && (
               <RefreshIcon className="text-white animate-spin h-6 w-6 mx-auto" />
             )}
           </button>
           <button
             disabled={apiLoading}
-            // onClick={() => apiCall("ACTIVE")}
+            onClick={() => apiCall("ACTIVE")}
             className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:col-start-2 sm:text-sm"
             type="submit"
           >
-            Resume Membership
+            Start Communication
             {apiLoading && (
               <RefreshIcon className="text-white animate-spin h-6 w-6 mx-auto" />
             )}
@@ -95,8 +89,6 @@ const StopWACommModal = (props) => {
         </div>
       </div>
     </div>
-
-    // </Modal>
   );
 };
 

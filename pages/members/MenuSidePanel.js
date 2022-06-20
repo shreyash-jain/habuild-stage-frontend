@@ -24,11 +24,10 @@ import {
 import { format, parseISO } from "date-fns";
 import toast from "react-hot-toast";
 import Select from "react-select";
-import StopMembershipModal from "./StopMembershipModal";
+import StopWACommMember from "./StopWACommMember";
 
 const tabs = [
-  // { name: "Send WA Message", current: true },
-  { name: "Start/Stop Membership", current: true },
+  { name: "Start/Stop WA Communication", current: true },
   // { name: "View Attendance", current: false },
 ];
 
@@ -37,7 +36,7 @@ function classNames(...classes) {
 }
 
 const MenuSidePanel = (props) => {
-  const [currentTab, setCurrentTab] = useState("Start/Stop Membership");
+  const [currentTab, setCurrentTab] = useState("Start/Stop WA Communication");
   const [watiTemplates, setWatiTemplates] = useState([]);
   const [refetchLoading, setRefetchLoading] = useState(false);
 
@@ -154,15 +153,15 @@ const MenuSidePanel = (props) => {
           </nav>
         </div>
 
-        {currentTab == "Start/Stop Membership" && (
-          <StopMembershipModal
+        {currentTab == "Start/Stop WA Communication" && (
+          <StopWACommMember
             open={props.open}
             setOpen={props.setOpen}
             setSelectedLeads={props.setSelectedLeads}
-            // getPaginatedLeads={() =>
-            //   props.getPaginatedLeads(props.currentPagePagination)
-            // }
-            // selectedLeads={props.selectedLeads}
+            getPaginatedLeads={() =>
+              props.getPaginatedLeads(props.currentPagePagination)
+            }
+            selectedLeads={props.selectedLeads}
             selectedLeadsLength={props.selectedLeads?.length}
           />
         )}

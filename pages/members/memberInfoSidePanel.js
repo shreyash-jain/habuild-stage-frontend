@@ -20,6 +20,7 @@ import {
   PhoneIcon,
   SearchIcon,
 } from "@heroicons/react/solid";
+import { format } from "date-fns";
 
 const tabs = [
   { name: "Account", href: "#", current: true },
@@ -52,6 +53,15 @@ const tabs = [
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
+
+function CalcDaysToDate(fromDate, toDate) {
+  const startDate = new Date(fromDate).getTime();
+  const endDate = new Date(toDate).getTime();
+  const timeDiff = Math.abs(endDate - startDate);
+  const dayDiff = parseInt(timeDiff / (1000 * 60 * 60 * 24));
+  return dayDiff;
+}
+
 const MemberInfoSidePanel = (props) => {
   console.log("Props", props);
   const [profile, setProfile] = useState({
@@ -62,19 +72,56 @@ const MemberInfoSidePanel = (props) => {
   const [currentTab, setCurrentTab] = useState("Account");
 
   useEffect(() => {
+    const memberPerformance =
+      props.memberForAction.habuild_member_performance &&
+      props.memberForAction.habuild_member_performance[0];
+
     setProfile({
       name: props.memberForAction.name,
       Account: {
         "Member Id": props.memberForAction.id,
+        Name: props.memberForAction.name,
         "Phone No.": props.memberForAction.mobile_number,
         Email: props.memberForAction.email,
+        "Short Link": props.memberForAction.short_meeting_link,
         "Lead Source": props.memberForAction.lead_source,
         Status: props.memberForAction.status,
         "Payment Status": props.memberForAction.payment_status,
         "Pause Days": props.memberForAction.total_pause_days,
+        "Pause Days": props.memberForAction.total_pause_days,
+        "Meeting id 1 Link":
+          props.memberForAction.habuild_member_batches &&
+          props.memberForAction.habuild_member_batches[0]?.meet_link,
+        "Meeting id 2 Link":
+          props.memberForAction.habuild_member_batches &&
+          props.memberForAction.habuild_member_batches[1]?.meet_link,
+        "Meeting id 3 Link":
+          props.memberForAction.habuild_member_batches &&
+          props.memberForAction.habuild_member_batches[2]?.meet_link,
+        "Meeting id 4 Link":
+          props.memberForAction.habuild_member_batches &&
+          props.memberForAction.habuild_member_batches[3]?.meet_link,
       },
-      Performance: {},
-      Subscription: {},
+      Performance: {
+        "Total Days":
+          memberPerformance?.total_absent_days +
+          memberPerformance?.total_active_days,
+        "Total Attended Days": memberPerformance?.total_active_days,
+        "Total Absent Days": memberPerformance?.total_absent_days,
+        "Streak Leaves": memberPerformance?.streak_leaves,
+        "Total Active Week": memberPerformance?.total_active_weeks,
+      },
+      Subscription: {
+        "Member Since Date":
+          props.memberForAction.member_since_date?.split("T")[0],
+        "Current Preffered Batch ID": props.memberForAction.preffered_batch_id,
+        "Subscription End Date":
+          props.memberForAction.sub_end_date?.split("T")[0],
+        "Current Subscription": "",
+        "Days Remaining":
+          props.memberForAction?.sub_end_date &&
+          CalcDaysToDate(new Date(), props.memberForAction?.sub_end_date),
+      },
     });
   }, [props.memberForAction]);
 
