@@ -62,7 +62,7 @@ const StopWACommModal = (props) => {
     <div className="bg-white overflow-hidden shadow rounded-lg mt-4">
       <div className="px-4 py-5 sm:p-6">
         <div className="flex flex-col space-y-4 p-4 mt-4">
-          <div>{props.selectedLeadsLength} people selected</div>
+          <div>{props?.selectedLeadsLength} people selected</div>
 
           <button
             disabled={apiLoading}
