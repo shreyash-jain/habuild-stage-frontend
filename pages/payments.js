@@ -38,7 +38,7 @@ const Payments = (props) => {
     await fetch(`https://api.habuild.in/api/payment/?page=${pageNum}&limit=100`)
       .then((res) => res.json())
       .then((data) => {
-        console.log("Payments", data);
+        // console.log("Payments", data);
         setPayments(
           data.data.paymentDataArr.map((item) => {
             return {
@@ -328,14 +328,14 @@ const PaymentFormModal = (props) => {
       redirect: "follow",
     };
 
-    console.log(raw);
-    console.log(API);
-    console.log(method);
+    // console.log(raw);
+    // console.log(API);
+    // console.log(method);
 
     try {
       fetch(API, requestOptions)
         .then((response) => {
-          console.log("response", response);
+          // console.log("response", response);
           return response.text();
         })
         .then((result) => {
@@ -345,7 +345,7 @@ const PaymentFormModal = (props) => {
           );
           props.getPayments();
           props.setViewModal(false);
-          console.log("Api Result", result);
+          // console.log("Api Result", result);
         });
     } catch {
       (error) => {
@@ -353,7 +353,7 @@ const PaymentFormModal = (props) => {
         toast.error(
           `No payment ${props.mode == "edit" ? "Updated" : "Created"}`
         );
-        console.log("error", error);
+        // console.log("error", error);
       };
     }
   };
