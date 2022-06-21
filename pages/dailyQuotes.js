@@ -55,7 +55,7 @@ const DailyQuotes = (props) => {
     )
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
+        // console.log(data);
         setDailyQuotes(
           data.dailyQuotes.map((item) => {
             return {
@@ -202,7 +202,7 @@ const DailyQuotes = (props) => {
     },
   ];
 
-  console.log("Edit Quote", editQuote);
+  // console.log("Edit Quote", editQuote);
 
   return (
     <div>
@@ -414,14 +414,14 @@ const DailyQuoteFormModal = (props) => {
         redirect: "follow",
       };
 
-      console.log(raw);
-      console.log(API);
-      console.log(method);
+      // console.log(raw);
+      // console.log(API);
+      // console.log(method);
 
       try {
         fetch(API, requestOptions)
           .then((response) => {
-            console.log("response", response);
+            // console.log("response", response);
             return response.text();
           })
           .then((result) => {
@@ -431,7 +431,7 @@ const DailyQuoteFormModal = (props) => {
             );
             // props.getQuotes();
             // props.setViewModal(false);
-            console.log("Api Result", result);
+            // console.log("Api Result", result);
           });
       } catch {
         (error) => {
@@ -439,7 +439,7 @@ const DailyQuoteFormModal = (props) => {
           toast.error(
             `No quote ${props.mode == "edit" ? "Updated" : "Created"}`
           );
-          console.log("error", error);
+          // console.log("error", error);
         };
       }
       props.getQuotes();

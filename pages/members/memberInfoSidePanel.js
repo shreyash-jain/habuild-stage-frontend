@@ -64,7 +64,7 @@ function CalcDaysToDate(fromDate, toDate) {
 }
 
 const MemberInfoSidePanel = (props) => {
-  console.log("Props", props);
+  // console.log("Props", props);
   const [profile, setProfile] = useState({
     Account: {},
     Performance: {},

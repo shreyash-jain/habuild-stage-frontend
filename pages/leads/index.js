@@ -37,7 +37,7 @@ const filters = {
     { value: "desc", label: "Descending", checked: false },
   ],
   source: [
-    { value: "facebook", label: "Facebook", checked: false },
+    { value: "FACEBOOK", label: "Facebook", checked: false },
     { value: "googleads", label: "Google Leads", checked: true },
     { value: "crm", label: "CRM", checked: false },
     { value: "landing", label: "Landing Page", checked: false },
@@ -244,7 +244,7 @@ const Leads = (props) => {
       })
       .catch((err) => {
         toast.error("Error, please try refreshing.");
-        console.log(err);
+        // console.log(err);
         setLeads([]);
         setLoading(false);
       });
@@ -795,7 +795,7 @@ const AddCommModal = (props) => {
       .catch((error) => {
         setApiLoading(false);
         // toast.error(error);
-        console.log("error", error);
+        // console.log("error", error);
       });
   };
 
@@ -970,7 +970,6 @@ const FiltersModal = (props) => {
               {filters.source.map((option, optionIdx) => (
                 <div key={option.value} className="flex items-center">
                   <input
-                    disabled
                     id={option.value}
                     onChange={() =>
                       props.setFilterParams({

@@ -44,7 +44,7 @@ const GiftMembershipModal = (props) => {
       .catch((error) => {
         setApiLoading(false);
         // toast.error(error);
-        console.log("error", error);
+        // console.log("error", error);
       });
   };
 

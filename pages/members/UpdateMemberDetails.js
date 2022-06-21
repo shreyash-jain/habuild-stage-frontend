@@ -68,7 +68,7 @@ const UpdateMemberDetails = (props) => {
       .catch((error) => {
         setApiLoading(false);
         // toast.error(error);
-        console.log("error", error);
+        // console.log("error", error);
       });
   };
 
