@@ -106,7 +106,7 @@ const SendWAModal = (props) => {
       .catch((error) => {
         setApiLoading(false);
         // toast.error(error);
-        console.log("error", error);
+        // console.log("error", error);
       });
   };
 
@@ -224,7 +224,7 @@ const SendMessageToAllLeads = (props) => {
   const [selectedDemoBatches, setSelectedDemobatches] = useState([]);
 
   const selectBatches = (checked, id) => {
-    console.log("OnChange Called");
+    // console.log("OnChange Called");
     const newBatchIds = [...selectedDemoBatches];
 
     if (checked) {

@@ -31,7 +31,7 @@ const PauseMembership = (props) => {
     )
       .then((response) => response.json())
       .then((result) => {
-        console.log(result);
+        // console.log(result);
         setApiLoading(false);
         if (result.status == 500) {
           toast.error(result.message);
@@ -45,7 +45,7 @@ const PauseMembership = (props) => {
       .catch((error) => {
         setApiLoading(false);
         // toast.error(error);
-        console.log("error", error);
+        // console.log("error", error);
       });
   };
 

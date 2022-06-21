@@ -46,7 +46,7 @@ const AttendanceQuotes = (props) => {
     await fetch("https://api.habuild.in/api/attendance_quote/all?limit=1000")
       .then((res) => res.json())
       .then((data) => {
-        console.log("Data", data.attendanceQuotes);
+        // console.log("Data", data.attendanceQuotes);
         setAttendanceQuotes(
           data.attendanceQuotes.map((item) => {
             return {
@@ -110,7 +110,7 @@ const AttendanceQuotes = (props) => {
     await fetch(`https://api.habuild.in/api/attendance_quote/delete/${id}`, {
       method: "DELETE",
     }).then((res) => {
-      console.log("Data", res);
+      // console.log("Data", res);
       setLoading(false);
       getAttendanceQuotes();
     });
@@ -409,7 +409,7 @@ const AddAttendanceQuote = (props) => {
             toast.success(
               `Attendance Quote ${props.mode == "edit" ? "Updated" : "Created"}`
             );
-            console.log(result);
+            // console.log(result);
           });
       } catch {
         (error) => {
@@ -417,7 +417,7 @@ const AddAttendanceQuote = (props) => {
           toast.error(
             `No quote ${props.mode == "edit" ? "Updated" : "Created"}`
           );
-          console.log("error", error);
+          // console.log("error", error);
         };
       }
     }

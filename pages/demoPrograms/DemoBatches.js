@@ -187,7 +187,7 @@ const AddDemoBatchModal = (props) => {
       .catch((error) => {
         setApiLoading(false);
         toast.error("Error");
-        console.log("error", error);
+        // console.log("error", error);
       });
   };
 

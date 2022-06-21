@@ -42,6 +42,7 @@ const Members = (props) => {
   const [currentPagePagination, setCurrentPagePagination] = useState(1);
   const [totalRecords, setTotalRecords] = useState(0);
   const [selectedMembers, setSelectedMembers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     getMembers(1);
@@ -167,7 +168,7 @@ const Members = (props) => {
       })
       .catch((error) => {
         // toast.error(error);
-        console.log("error", error);
+        // console.log("error", error);
       });
   };
 
@@ -387,9 +388,92 @@ const Members = (props) => {
     },
   ];
 
+  const handleSearch = () => {
+    setLoading(true);
+    setSelectedMembers([]);
+    if (!searchTerm) {
+      return;
+    }
+
+    // fetch(`https://api.habuild.in/api/member/find/${searchTerm}`)
+    fetch(`http://localhost:4000/api/member/searchMember/${searchTerm}`)
+      .then((res) => res.json())
+      .then((data) => {
+        // console.log("Search data", data);
+        if (data.message) {
+          toast.error(JSON.stringify(data.message));
+          setLoading(false);
+          return;
+        }
+
+        setMembers(
+          data.data.map((item) => {
+            return {
+              ...item,
+              isSelected: {
+                identifier: item.id,
+                value: false,
+              },
+              action: item,
+            };
+          })
+        );
+
+        setLoading(false);
+      });
+  };
+
+  const handleSearchCancel = () => {
+    setSearchTerm("");
+    getMembers(1);
+  };
+
   return (
     <div>
       <h1 className="text-2xl font-semibold text-gray-900">Members</h1>
+
+      <div className="min-w-0 flex-1 md:px-4 lg:px-0 xl:col-span-6">
+        <div className="flex items-center py-4 md:max-w-3xl md:mx-auto lg:max-w-none lg:mx-0 xl:px-0">
+          <div className="w-full">
+            <label htmlFor="search" className="sr-only">
+              Search
+            </label>
+            <div className="relative">
+              <div className="pointer-events-none absolute inset-y-0 left-0 pl-3 flex items-center">
+                <SearchIcon
+                  className="h-5 w-5 text-gray-400"
+                  aria-hidden="true"
+                />
+              </div>
+              <input
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                id="search"
+                name="search"
+                className="w-full bg-white border border-gray-300 rounded-md py-2 pl-10 pr-3 text-sm placeholder-gray-500 focus:outline-none focus:text-gray-900 focus:placeholder-gray-400 focus:ring-1 focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                placeholder="Search Member by Phone number, name or email."
+                type="search"
+              />
+            </div>
+            {searchTerm && (
+              <>
+                <button
+                  onClick={handleSearch}
+                  className="font-medium px-4 py-2 rounded-md bg-white border-2 border-green-400 hover:bg-green-400 text-green-700 hover:text-white mt-2"
+                >
+                  Search
+                </button>
+                <button
+                  onClick={handleSearchCancel}
+                  className="ml-2 font-medium px-4 py-2 rounded-md bg-white border-2 border-red-400 hover:bg-red-400 text-red-700 hover:text-white mt-2"
+                >
+                  Cancel
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
 
       <Table
         dataLoading={loading}

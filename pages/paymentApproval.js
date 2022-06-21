@@ -35,20 +35,20 @@ const PaymentApproval = () => {
   }, []);
 
   const getMemberProgramsWithBatches = async () => {
-    // fetch(`https://api.habuild.in/api/program/`)
-    await fetch(`http://localhost:4000/api/program/`)
+    fetch(`https://api.habuild.in/api/program/`)
+      // await fetch(`http://localhost:4000/api/program/`)
       .then((res) => {
         return res.json();
       })
       .then(async (data) => {
-        console.log("Program Data", data);
+        // console.log("Program Data", data);
 
         const newArr = [];
 
         for (let i = 0; i < data.programs.length; i++) {
           await fetch(
-            // `https://api.habuild.in/api/batch/program/${data.programs[i].id}`
-            `http://localhost:4000/api/batch/program/${data.programs[i].id}`
+            `https://api.habuild.in/api/batch/program/${data.programs[i].id}`
+            // `http://localhost:4000/api/batch/program/${data.programs[i].id}`
           )
             .then((res) => {
               return res.json();
@@ -60,7 +60,7 @@ const PaymentApproval = () => {
               };
               newArr.push(obj);
 
-              console.log("NEw Arr Programs with Batches", newArr);
+              // console.log("NEw Arr Programs with Batches", newArr);
             });
         }
         setMemberProgramsWithBatches(newArr);
@@ -69,13 +69,13 @@ const PaymentApproval = () => {
 
   const getAllPaymentsToApprove = async () => {
     setLoading(true);
-    // await fetch(`https://api.habuild.in/api/payment/offline_payments`)
-    await fetch(`http://localhost:4000/api/payment/offline_payments`)
+    await fetch(`https://api.habuild.in/api/payment/offline_payments`)
+      // await fetch(`http://localhost:4000/api/payment/offline_payments`)
       .then((res) => {
         return res.json();
       })
       .then((data) => {
-        console.log("data", data);
+        // console.log("data", data);
         const data1 = data.payment_logs.map((item) => {
           return {
             ...item,
@@ -187,7 +187,7 @@ const PaymentApproval = () => {
     },
   ];
 
-  console.log("member Batches ", memberProgramsWithBatches);
+  // console.log("member Batches ", memberProgramsWithBatches);
 
   const computeSelectOptions = () => {
     const overallArr = [];
@@ -207,7 +207,8 @@ const PaymentApproval = () => {
 
   const approvePayment = async () => {
     await fetch(
-      `http://localhost:3000/api/payment/approve_payment?memberId=${paymentToDecide.habuild_members.id}&paymentId=${paymentToDecide.id}&batchId=${selectedBatchId}`
+      // `http://localhost:3000/api/payment/approve_payment?memberId=${paymentToDecide.habuild_members.id}&paymentId=${paymentToDecide.id}&batchId=${selectedBatchId}`
+      `https://api.habuild.in/api/payment/approve_payment?memberId=${paymentToDecide.habuild_members.id}&paymentId=${paymentToDecide.id}&batchId=${selectedBatchId}`
     )
       .then((res) => {
         return res.json();
@@ -215,7 +216,7 @@ const PaymentApproval = () => {
       .then((data) => {});
   };
 
-  console.log("PaymentTO Decide", paymentToDecide);
+  // console.log("PaymentTO Decide", paymentToDecide);
 
   return (
     <div>
