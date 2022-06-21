@@ -51,7 +51,7 @@ const GiftMembershipModal = (props) => {
   return (
     <Modal
       apiLoading={apiLoading}
-      modalOpen={props.modalOpen}
+      modalOpen={props.modalOpen || false}
       setModalOpen={props.setModalOpen}
       actionText="Gift"
       onActionButtonClick={giftMembership}
