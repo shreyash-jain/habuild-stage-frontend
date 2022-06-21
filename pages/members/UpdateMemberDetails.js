@@ -15,9 +15,11 @@ const UpdateMemberDetails = (props) => {
     setName(props.memberForAction.name);
     setPhone(props.memberForAction.mobile_number);
     setAddress(props.memberForAction.address);
-    setBirthDate(
-      format(parseISO(props.memberForAction.birthday), "yyyy-MM-dd")
-    );
+    if (props.memberForAction.birthday) {
+      setBirthDate(
+        format(parseISO(props.memberForAction.birthday), "yyyy-MM-dd")
+      );
+    }
     setHealthIssues(props.memberForAction.health_issue);
   }, [props.memberForAction]);
 

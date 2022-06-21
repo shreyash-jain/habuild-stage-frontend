@@ -166,7 +166,7 @@ const MemberInfoSidePanel = (props) => {
                       key={tab.name}
                       className={classNames(
                         currentTab == tab.name
-                          ? "border-pink-500 text-gray-900"
+                          ? "border-green-500 text-gray-900"
                           : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300",
                         "whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm cursor-pointer"
                       )}
