@@ -24,11 +24,18 @@ import { format, parseISO } from "date-fns";
 import toast from "react-hot-toast";
 import MemberInfoSidePanel from "./memberInfoSidePanel";
 import MenuSidePanel from "./MenuSidePanel";
+import GiftMembershipModal from "./GiftMembership";
+import StopMembership from "./stopMembership";
+import PauseMembership from "./pauseMembership";
+import UpdateMemberDetails from "./UpdateMemberDetails";
 
 const Members = (props) => {
   const [members, setMembers] = useState([]);
   const [viewMemberInfo, setViewMemberInfo] = useState(false);
+  const [viewUpdateMemberInfo, setViewUpdateMemberInfo] = useState(false);
   const [viewGiftMembershipModal, setViewGiftMembershipModal] = useState(false);
+  const [stopMembershipModal, setStopMembershipModal] = useState(false);
+  const [pauseMembershipModal, setPauseMembershipModal] = useState(false);
   const [memberForAction, setMemberForAction] = useState({});
   const [showMenuSidebar, setShowMenuSidebar] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -68,6 +75,13 @@ const Members = (props) => {
 
   const menuItems = [
     {
+      name: "Update Member Details",
+      onClick: (actionEntity) => {
+        setMemberForAction(actionEntity);
+        setViewUpdateMemberInfo(true);
+      },
+    },
+    {
       name: "View",
       onClick: (actionEntity) => {
         setMemberForAction(actionEntity);
@@ -85,7 +99,77 @@ const Members = (props) => {
         }
       },
     },
+    {
+      name: "Stop/Refund Membership",
+      onClick: (actionEntity) => {
+        if (actionEntity.status !== "INACTIVE") {
+          setMemberForAction(actionEntity);
+          setStopMembershipModal(true);
+        } else {
+          toast.error("Cannot Stop/Refund Membership of Inactive Members.");
+        }
+      },
+    },
+    {
+      name: "Resume Membership",
+      onClick: (actionEntity) => {
+        if (actionEntity.status == "PAUSED") {
+          resumeMembership(actionEntity);
+        } else {
+          toast.error("Can only resume membership for PAUSED members.");
+        }
+      },
+    },
+    {
+      name: "Pause Membership",
+      onClick: (actionEntity) => {
+        if (actionEntity.status == "ACTIVE") {
+          setMemberForAction(actionEntity);
+          setPauseMembershipModal(true);
+        } else {
+          toast.error("Can only PAUSE membership for ACTIVE members.");
+        }
+      },
+    },
   ];
+
+  const resumeMembership = (actionEntity) => {
+    if (
+      !window.confirm(
+        `Are you sure you want to Resume Membership for ${actionEntity.name}?`
+      )
+    ) {
+      return;
+    }
+
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    var requestOptions = {
+      method: "PATCH",
+      headers: myHeaders,
+      body: "",
+      redirect: "follow",
+    };
+    fetch(
+      `https://api.habuild.in/api/member/activate_membership?memberId=${actionEntity.id}`,
+      // `http://localhost:4000/api/member/activate_membership?memberId=${actionEntity.id}`,
+      requestOptions
+    )
+      .then((response) => response.json())
+      .then((result) => {
+        if (result.status == 500) {
+          toast.error(result?.message);
+        } else {
+          toast.success(result?.message);
+        }
+        props.getPaginatedLeads(props.currentPagePagination);
+        // console.log(result);
+      })
+      .catch((error) => {
+        // toast.error(error);
+        console.log("error", error);
+      });
+  };
 
   const handleSelect = (identifier) => {
     let newSelectedLeads = [...selectedMembers];
@@ -222,19 +306,17 @@ const Members = (props) => {
       dataIndex: "status",
       key: "status",
       render: (status) => {
-        if (status == "ACTIVE") {
-          return (
-            <span className="text-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-green-300 text-green-800">
-              {status}
-            </span>
-          );
-        } else {
-          return (
-            <span className="text-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-red-300 text-red-800">
-              {status}
-            </span>
-          );
-        }
+        return (
+          <span
+            className={`text-center px-2.5 py-0.5 rounded-md text-sm font-medium ${
+              status == "PAUSED" && "bg-yellow-300 text-yellow-800"
+            } ${status == "ACTIVE" && "bg-green-300 text-green-800"} ${
+              status == "INACTIVE" && "bg-red-300 text-red-800"
+            }  `}
+          >
+            {status}
+          </span>
+        );
       },
     },
     {
@@ -357,81 +439,31 @@ const Members = (props) => {
         setModalOpen={setViewGiftMembershipModal}
         memberForAction={memberForAction}
       />
+
+      <StopMembership
+        currentPagePagination={currentPagePagination}
+        getPaginatedLeads={getMembers}
+        modalOpen={stopMembershipModal}
+        setModalOpen={setStopMembershipModal}
+        memberForAction={memberForAction}
+      />
+
+      <PauseMembership
+        currentPagePagination={currentPagePagination}
+        getPaginatedLeads={getMembers}
+        modalOpen={pauseMembershipModal}
+        setModalOpen={setPauseMembershipModal}
+        memberForAction={memberForAction}
+      />
+
+      <UpdateMemberDetails
+        currentPagePagination={currentPagePagination}
+        getPaginatedLeads={getMembers}
+        modalOpen={viewUpdateMemberInfo}
+        setModalOpen={setViewUpdateMemberInfo}
+        memberForAction={memberForAction}
+      />
     </div>
-  );
-};
-
-const GiftMembershipModal = (props) => {
-  const { apiLoading, setApiLoading } = useState(false);
-  const [numDays, setNumDays] = useState(0);
-
-  const giftMembership = () => {
-    setApiLoading(true);
-
-    if (!numDays) {
-      setApiLoading(false);
-      toast.error("Number of Days cannot be 0");
-      return;
-    }
-
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    var raw = JSON.stringify({
-      email: props.memberForAction.email,
-      noOfDays: numDays,
-      batchId: props.memberForAction.preffered_batch_id,
-    });
-    var requestOptions = {
-      method: "PATCH",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
-    };
-    fetch("https://api.habuild.in/api/member/gift_membership", requestOptions)
-      .then((response) => response.json())
-      .then((result) => {
-        setApiLoading(false);
-        if (result.status == 500) {
-          toast.error(result.message);
-        } else {
-          toast.success(result.message);
-        }
-        props.getPaginatedLeads(props.currentPagePagination);
-        props.setSelectedLeads([]);
-        props.setOpen(false);
-        // console.log(result);
-      })
-      .catch((error) => {
-        setApiLoading(false);
-        // toast.error(error);
-        console.log("error", error);
-      });
-  };
-
-  return (
-    <Modal
-      apiLoading={apiLoading}
-      modalOpen={props.modalOpen}
-      setModalOpen={props.setModalOpen}
-      actionText="Gift"
-      onActionButtonClick={giftMembership}
-      // hideActionButtons
-    >
-      <div className="space-y-4">
-        <div className="flex flex-row">
-          <h2 className="text-xl text-gray-700">Gifting Membership to...</h2>
-          <h1 className="font-bold text-xl text-gray-800">
-            {props.memberForAction.name}
-          </h1>
-        </div>
-        <label>No. of Days</label>
-        <input
-          onChange={(e) => setNumDays(e.target.value)}
-          className="p-2 border border-gray-600 rounded-md ml-2"
-          type={"number"}
-        />
-      </div>
-    </Modal>
   );
 };
 
