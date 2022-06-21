@@ -26,7 +26,7 @@ import MemberInfoSidePanel from "./memberInfoSidePanel";
 import MenuSidePanel from "./MenuSidePanel";
 import GiftMembershipModal from "./GiftMembership";
 import StopMembership from "./stopMembership";
-import PauseMembership from "./pauseMembership";
+import PauseMembership from "./PauseMembership";
 import UpdateMemberDetails from "./UpdateMemberDetails";
 
 const Members = (props) => {
