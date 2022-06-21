@@ -52,7 +52,7 @@ const PauseMembership = (props) => {
   return (
     <Modal
       apiLoading={apiLoading}
-      modalOpen={props.modalOpen}
+      modalOpen={props.modalOpen || false}
       setModalOpen={props.setModalOpen}
       actionText="Pause membership"
       onActionButtonClick={pauseMembership}
@@ -62,7 +62,7 @@ const PauseMembership = (props) => {
         <div className="flex flex-row">
           <h2 className="text-xl text-gray-600">Pause Membership for...</h2>
           <h1 className="font-bold text-xl text-gray-800">
-            {props.memberForAction.name}
+            {props?.memberForAction?.name}
           </h1>
         </div>
 

@@ -75,7 +75,7 @@ const UpdateMemberDetails = (props) => {
   return (
     <Modal
       apiLoading={apiLoading}
-      modalOpen={props.modalOpen}
+      modalOpen={props.modalOpen || false}
       setModalOpen={props.setModalOpen}
       actionText="Update"
       onActionButtonClick={updateDetails}
@@ -87,7 +87,7 @@ const UpdateMemberDetails = (props) => {
             Update Member Details for -{" "}
           </h2>
           <h1 className="font-bold text-xl text-gray-800">
-            {props.memberForAction.name}
+            {props?.memberForAction?.name}
           </h1>
         </div>
         <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
