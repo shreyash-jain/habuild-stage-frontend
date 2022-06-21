@@ -395,8 +395,8 @@ const Members = (props) => {
       return;
     }
 
-    fetch(`https://api.habuild.in/api/member/find/${searchTerm}`)
-    // fetch(`http://localhost:4000/api/member/searchMember/${searchTerm}`)
+    fetch(`https://api.habuild.in/api/member/searchMember/${searchTerm}`)
+      // fetch(`http://localhost:4000/api/member/searchMember/${searchTerm}`)
       .then((res) => res.json())
       .then((data) => {
         // console.log("Search data", data);
