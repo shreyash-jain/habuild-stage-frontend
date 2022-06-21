@@ -61,7 +61,7 @@ const GiftMembershipModal = (props) => {
         <div className="flex flex-row">
           <h2 className="text-xl text-gray-700">Gifting Membership to...</h2>
           <h1 className="font-bold text-xl text-gray-800">
-            {props.memberForAction.name}
+            {props?.memberForAction?.name}
           </h1>
         </div>
         <label>No. of Days</label>
