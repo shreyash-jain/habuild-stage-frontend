@@ -65,24 +65,39 @@ const DailyQuotes = (props) => {
           })
         );
 
+        const filteredMemberQuotes = data.dailyQuotes.filter((item) => {
+          if (item.type == "MEMBER") {
+            return {
+              ...item,
+              action: item,
+            };
+          }
+        });
+
         setMemberDailyQuotes(
-          data.dailyQuotes.filter((item) => {
-            if (item.type == "MEMBER") {
-              return {
-                ...item,
-                action: item,
-              };
-            }
+          filteredMemberQuotes.map((item) => {
+            return {
+              ...item,
+              action: item,
+            };
           })
         );
+
+        const filteredLeadQuotes = data.dailyQuotes.filter((item) => {
+          if (item.type !== "MEMBER") {
+            return {
+              ...item,
+              action: item,
+            };
+          }
+        });
+
         setLeadDailyQuotes(
-          data.dailyQuotes.filter((item) => {
-            if (item.type !== "MEMBER") {
-              return {
-                ...item,
-                action: item,
-              };
-            }
+          filteredLeadQuotes.map((item) => {
+            return {
+              ...item,
+              action: item,
+            };
           })
         );
       });
@@ -201,8 +216,6 @@ const DailyQuotes = (props) => {
       },
     },
   ];
-
-  // console.log("Edit Quote", editQuote);
 
   return (
     <div>
@@ -334,25 +347,27 @@ const DailyQuoteFormModal = (props) => {
   ]);
 
   useEffect(() => {
-    if (props.mode == "edit") {
-      const newArr = [
-        {
-          date: props.editQuote.date?.split("T")[0],
-          demo_batch_id: props.editQuote.demo_batch_id,
-          highlight: props.editQuote.highlight,
-          highlight_2: props.editQuote.highlight_2,
-          program_id: props.editQuote.program_id,
-          quote_1: props.editQuote.quote_1,
-          quote_2: props.editQuote.quote_2,
-          quote_3: props.editQuote.quote_3,
-          status: props.editQuote.status,
-          tip: props.editQuote.tip,
-        },
-      ];
+    if (props.editQuote) {
+      if (props.mode == "edit") {
+        const newArr = [
+          {
+            date: props.editQuote?.date?.split("T")[0],
+            demo_batch_id: props.editQuote.demo_batch_id,
+            highlight: props.editQuote.highlight,
+            highlight_2: props.editQuote.highlight_2,
+            program_id: props.editQuote.program_id,
+            quote_1: props.editQuote.quote_1,
+            quote_2: props.editQuote.quote_2,
+            quote_3: props.editQuote.quote_3,
+            status: props.editQuote.status,
+            tip: props.editQuote.tip,
+          },
+        ];
 
-      setQuoteFormArray(newArr);
+        setQuoteFormArray(newArr);
+      }
     }
-  }, [props.viewModal]);
+  }, [props.editQuote]);
 
   const handleQuoteFormChange = (fieldName, index, value) => {
     const newArr = [...quoteFormArray];
