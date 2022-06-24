@@ -3,6 +3,7 @@ import { useEffect, useState, Fragment } from "react";
 import { RefreshIcon } from "@heroicons/react/outline";
 
 import toast from "react-hot-toast";
+import { LeadsApis } from "../../constants/apis";
 
 const StopWACommModal = (props) => {
   const [apiLoading, setApiLoading] = useState();
@@ -33,11 +34,7 @@ const StopWACommModal = (props) => {
       body: raw,
       redirect: "follow",
     };
-    // fetch("http://localhost:4000/api/lead/updateLeadCommStatus", requestOptions)
-    fetch(
-      "https://api.habuild.in/api/lead/updateLeadCommStatus",
-      requestOptions
-    )
+    fetch(LeadsApis.UPDATE_COMM_STATUS(), requestOptions)
       .then((response) => response.json())
       .then((result) => {
         setApiLoading(false);

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import LayoutSidebar from "../components/LayoutSidebar";
 import { ShieldCheckIcon, RefreshIcon, XIcon } from "@heroicons/react/outline";
+import { HealthCheckApis } from "../constants/apis";
 
 const Dashboard = () => {
   const [serverHealthy, setServerHealthy] = useState(false);
@@ -12,7 +13,7 @@ const Dashboard = () => {
 
   const apiCall = () => {
     setLoading(true);
-    fetch("https://api.habuild.in/api/health_check/")
+    fetch(HealthCheckApis.GET())
       // fetch("http://localhost:4000/api/health_check/")
       .then((res) => res.json())
       .then((data) => {

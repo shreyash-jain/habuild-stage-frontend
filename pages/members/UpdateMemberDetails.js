@@ -2,6 +2,7 @@ import React, { useEffect, useState, Fragment } from "react";
 import Modal from "../../components/Modal";
 import toast from "react-hot-toast";
 import { format, parseISO } from "date-fns";
+import { MembersApis } from "../../constants/apis";
 
 const UpdateMemberDetails = (props) => {
   const [apiLoading, setApiLoading] = useState(false);
@@ -49,10 +50,7 @@ const UpdateMemberDetails = (props) => {
       body: raw,
       redirect: "follow",
     };
-    fetch(
-      `https://api.habuild.in/api/member/updateMemberDetails/${props.memberForAction.id}`,
-      requestOptions
-    )
+    fetch(MembersApis.UPDATE(props.memberForAction.id), requestOptions)
       .then((response) => response.json())
       .then((result) => {
         setApiLoading(false);

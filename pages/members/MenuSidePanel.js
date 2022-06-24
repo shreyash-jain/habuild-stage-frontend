@@ -3,6 +3,7 @@ import SidePannel from "../../components/SidePannel";
 import toast from "react-hot-toast";
 import StopWACommMember from "./StopWACommMember";
 import MemberSendWAModal from "./MemberSendWAModal";
+import { DemoProgramsApis, WatiTemplatesApis } from "../../constants/apis";
 
 const tabs = [
   { name: "Send WA Message", current: false },
@@ -28,8 +29,7 @@ const MenuSidePanel = (props) => {
   const withDemoBatches = (demoPrograms) => {
     const demoProgramsWithDemoBatches = demoPrograms.map(async (item) => {
       const demobatches = await fetch(
-        // `http://localhost:4000/api/demoprogram/demo_batches?id=${item.id}`
-        `https://api.habuild.in/api/demoprogram/demo_batches?id=${item.id}`
+        DemoProgramsApis.GET_DEMO_BATCHES_FROM_PROGRAM(item.id)
       )
         .then((res) => res.json())
         .then((data) => {
@@ -49,10 +49,7 @@ const MenuSidePanel = (props) => {
   };
 
   const getAllDemoPrograms = async () => {
-    const demoPrograms = await fetch(
-      // `http://localhost:4000/api/demoprogram/?page=1&limit=10`
-      `https://api.habuild.in/api/demoprogram/?page=1&limit=10`
-    )
+    const demoPrograms = await fetch(DemoProgramsApis.GET())
       .then((res) => {
         return res.json();
       })
@@ -66,7 +63,7 @@ const MenuSidePanel = (props) => {
   };
 
   const fetchTemplates = async (calledFrom) => {
-    await fetch("https://api.habuild.in/webhook/templates")
+    await fetch(WatiTemplatesApis.GET())
       .then((res) => res.json())
       .then((data) => {
         setWatiTemplates(data.data);
@@ -79,7 +76,7 @@ const MenuSidePanel = (props) => {
 
   const refetchTemplates = async () => {
     setRefetchLoading(true);
-    await fetch("https://api.habuild.in/webhook/templates_from_wati", {
+    await fetch(WatiTemplatesApis.REFETCH, {
       method: "PATCH",
     }).then((res) => {
       fetchTemplates("fromRefetch");

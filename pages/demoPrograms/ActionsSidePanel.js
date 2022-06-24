@@ -1,5 +1,6 @@
 import { useEffect, useState, Fragment } from "react";
 import SidePannel from "../../components/SidePannel";
+import { DemoProgramsApis } from "../../constants/apis";
 import DemoBatches from "./DemoBatches";
 import ManageAds from "./ManageAds";
 
@@ -51,10 +52,8 @@ const ActionsSidePanel = (props) => {
 
   const getDemoBatches = async () => {
     await fetch(
-      // `http://localhost:4000/api/demoprogram/demo_batches?id=${props.demoProgram.id}`
-      `https://api.habuild.in/api/demoprogram/demo_batches?id=${props.demoProgram.id}`
+      DemoProgramsApis.GET_DEMO_BATCHES_FROM_PROGRAM(props.demoProgram.id)
     )
-      // await fetch(`https://api.habuild.in/api/demoprogram/demo_batches`)
       .then((res) => res.json())
       .then((data) => {
         setDemoBatches(data.data);
@@ -62,10 +61,7 @@ const ActionsSidePanel = (props) => {
   };
 
   const getDemoAds = async () => {
-    await fetch(
-      // `https://api.habuild.in/api/demoprogram/ads/all?id=${props.demoProgram.id}`
-      `https://api.habuild.in/api/demoprogram/ads/all?id=${props.demoProgram.id}`
-    )
+    await fetch(DemoProgramsApis.GET_DEMO_PROGRAM_ADS(props.demoProgram.id))
       .then((res) => res.json())
       .then((data) => {
         setDemoAds(data.data);

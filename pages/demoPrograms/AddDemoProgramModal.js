@@ -6,6 +6,7 @@ import { RefreshIcon } from "@heroicons/react/outline";
 import { format, parseISO } from "date-fns";
 import toast from "react-hot-toast";
 import Select from "react-select";
+import { DemoProgramsApis } from "../../constants/apis";
 
 const AddDemoProgramModal = (props) => {
   const [name, setName] = useState("");
@@ -86,12 +87,7 @@ const AddDemoProgramModal = (props) => {
       body: raw,
       redirect: "follow",
     };
-    // fetch("https://api.habuild.in/api/demoProgram/createDemoProgram", requestOptions)
-    fetch(
-      // "http://localhost:4000/api/demoprogram/createDemoProgram",
-      "https://api.habuild.in/api/demoprogram/createDemoProgram",
-      requestOptions
-    )
+    fetch(DemoProgramsApis.CREATE(), requestOptions)
       .then((response) => {
         // console.log("Repsobnse", response);
         return response.text();

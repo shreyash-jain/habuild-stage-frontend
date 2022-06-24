@@ -15,6 +15,11 @@ import {
 } from "@heroicons/react/outline";
 import toast from "react-hot-toast";
 import { Switch } from "@headlessui/react";
+import {
+  AttendanceQuotesApis,
+  DemoBatchesApis,
+  ProgramsApis,
+} from "../constants/apis";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -43,7 +48,7 @@ const AttendanceQuotes = (props) => {
 
   const getAttendanceQuotes = async () => {
     setLoading(true);
-    await fetch("https://api.habuild.in/api/attendance_quote/all?limit=1000")
+    await fetch(AttendanceQuotesApis.GET_ATTENDANCE_QUOTES())
       .then((res) => res.json())
       .then((data) => {
         // console.log("Data", data.attendanceQuotes);
@@ -89,7 +94,7 @@ const AttendanceQuotes = (props) => {
   };
 
   const getDemoBatches = async () => {
-    await fetch(`https://api.habuild.in/api/demobatches`)
+    await fetch(DemoBatchesApis.GET_DEMO_BATCHES())
       .then((res) => res.json())
       .then((data) => {
         // console.log("Data", data);
@@ -98,7 +103,7 @@ const AttendanceQuotes = (props) => {
   };
 
   const getAllPrograms = async () => {
-    await fetch(`https://api.habuild.in/api/program/`)
+    await fetch(ProgramsApis.GET_PROGRAMS())
       .then((res) => res.json())
       .then((data) => {
         setPrograms(data.programs);
@@ -107,7 +112,7 @@ const AttendanceQuotes = (props) => {
 
   const deleteAttendanceQuote = async (id) => {
     setLoading(true);
-    await fetch(`https://api.habuild.in/api/attendance_quote/delete/${id}`, {
+    await fetch(AttendanceQuotesApis.DELETE(id), {
       method: "DELETE",
     }).then((res) => {
       // console.log("Data", res);
@@ -358,11 +363,11 @@ const AddAttendanceQuote = (props) => {
   };
 
   const formSubmit = () => {
-    let API = "https://api.habuild.in/api/attendance_quote/add";
+    let API = AttendanceQuotesApis.CREATE();
     let method = "POST";
 
     if (props.mode == "edit") {
-      API = `https://api.habuild.in/api/attendance_quote/update/${props.editQuote.id}`;
+      API = AttendanceQuotesApis.UPDATE(props.editQuote.id);
       method = "PATCH";
     }
 

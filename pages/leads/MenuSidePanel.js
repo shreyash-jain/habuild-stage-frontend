@@ -26,6 +26,11 @@ import toast from "react-hot-toast";
 import Select from "react-select";
 import SendWAModal from "./SendWAModal";
 import StopWACommModal from "./StopWACommModal";
+import {
+  DemoProgramsApis,
+  MembersApis,
+  WatiTemplatesApis,
+} from "../../constants/apis";
 
 const tabs = [
   { name: "Send WA Message", current: true },
@@ -52,8 +57,7 @@ const MenuSidePanel = (props) => {
   const withDemoBatches = (demoPrograms) => {
     const demoProgramsWithDemoBatches = demoPrograms.map(async (item) => {
       const demobatches = await fetch(
-        // `http://localhost:4000/api/demoprogram/demo_batches?id=${item.id}`
-        `https://api.habuild.in/api/demoprogram/demo_batches?id=${item.id}`
+        DemoProgramsApis.GET_DEMO_BATCHES_FROM_PROGRAM(item.id)
       )
         .then((res) => res.json())
         .then((data) => {
@@ -73,10 +77,7 @@ const MenuSidePanel = (props) => {
   };
 
   const getAllDemoPrograms = async () => {
-    const demoPrograms = await fetch(
-      // `http://localhost:4000/api/demoprogram/?page=1&limit=10`
-      `https://api.habuild.in/api/demoprogram/?page=1&limit=10`
-    )
+    const demoPrograms = await fetch(DemoProgramsApis.GET())
       .then((res) => {
         return res.json();
       })
@@ -90,7 +91,7 @@ const MenuSidePanel = (props) => {
   };
 
   const fetchTemplates = async (calledFrom) => {
-    await fetch("https://api.habuild.in/webhook/templates")
+    await fetch(WatiTemplatesApis.GET())
       .then((res) => res.json())
       .then((data) => {
         setWatiTemplates(data.data);
@@ -103,7 +104,7 @@ const MenuSidePanel = (props) => {
 
   const refetchTemplates = async () => {
     setRefetchLoading(true);
-    await fetch("https://api.habuild.in/webhook/templates_from_wati", {
+    await fetch(WatiTemplatesApis.REFETCH(), {
       method: "PATCH",
     }).then((res) => {
       fetchTemplates("fromRefetch");
@@ -206,7 +207,10 @@ const ViewAttendance = (props) => {
     setApiLoading(true);
 
     await fetch(
-      `https://api.habuild.in/api/member/attended/members?batch_id=${selectedDemoBatch}&day=${daysAttended}`
+      MembersApis.GET_ATTENDANCE({
+        batchId: selectedDemoBatch,
+        daysAttended,
+      })
     )
       .then((res) => res.json())
       .then((data) => {

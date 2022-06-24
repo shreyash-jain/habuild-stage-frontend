@@ -1,6 +1,7 @@
 import React, { useEffect, useState, Fragment } from "react";
 import Modal from "../../components/Modal";
 import toast from "react-hot-toast";
+import { MembersApis } from "../../constants/apis";
 
 const PauseMembership = (props) => {
   const [apiLoading, setApiLoading] = useState(false);
@@ -26,7 +27,11 @@ const PauseMembership = (props) => {
       redirect: "follow",
     };
     fetch(
-      `https://api.habuild.in/api/member/pause_membership?noOfDaysAsked=${numDays}&memberId=${props.memberForAction.id}&startDate=${pauseStartDate}`,
+      MembersApis.PAUSE_MEMBERSHIP({
+        numDays,
+        memberId: props.memberForAction.id,
+        pauseStartDate,
+      }),
       requestOptions
     )
       .then((response) => response.json())

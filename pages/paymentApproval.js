@@ -8,6 +8,7 @@ import FlyoutMenu from "../components/FlyoutMenu";
 
 import { format, parseISO } from "date-fns";
 import Select from "react-select";
+import { ProgramsApis, BatchesApis, PaymentApis } from "../constants/apis";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -35,8 +36,7 @@ const PaymentApproval = () => {
   }, []);
 
   const getMemberProgramsWithBatches = async () => {
-    fetch(`https://api.habuild.in/api/program/`)
-      // await fetch(`http://localhost:4000/api/program/`)
+    fetch(ProgramsApis.GET_PROGRAMS())
       .then((res) => {
         return res.json();
       })
@@ -46,10 +46,7 @@ const PaymentApproval = () => {
         const newArr = [];
 
         for (let i = 0; i < data.programs.length; i++) {
-          await fetch(
-            `https://api.habuild.in/api/batch/program/${data.programs[i].id}`
-            // `http://localhost:4000/api/batch/program/${data.programs[i].id}`
-          )
+          await fetch(BatchesApis.GET_BATCH_FROM_PROGRAM(data.programs[i].id))
             .then((res) => {
               return res.json();
             })
@@ -69,8 +66,7 @@ const PaymentApproval = () => {
 
   const getAllPaymentsToApprove = async () => {
     setLoading(true);
-    await fetch(`https://api.habuild.in/api/payment/offline_payments`)
-      // await fetch(`http://localhost:4000/api/payment/offline_payments`)
+    await fetch(PaymentApis.GET_OFFLINE_PAYMENTS())
       .then((res) => {
         return res.json();
       })
@@ -207,8 +203,11 @@ const PaymentApproval = () => {
 
   const approvePayment = async () => {
     await fetch(
-      // `http://localhost:3000/api/payment/approve_payment?memberId=${paymentToDecide.habuild_members.id}&paymentId=${paymentToDecide.id}&batchId=${selectedBatchId}`
-      `https://api.habuild.in/api/payment/approve_payment?memberId=${paymentToDecide.habuild_members.id}&paymentId=${paymentToDecide.id}&batchId=${selectedBatchId}`
+      PaymentApis.APPROVE_PAYMENT({
+        memberId: paymentToDecide.habuild_members.id,
+        paymentId: paymentToDecide.id,
+        selectedBatchId,
+      })
     )
       .then((res) => {
         return res.json();
