@@ -55,10 +55,9 @@ const Members = (props) => {
   }, []);
 
   const getMemberBatches = async () => {
-    const getPrograms = Programs.getPrograms();
 
     // await fetch(`https://api.habuild.in/api/program/`)
-    await fetch(getPrograms)
+    await fetch(Programs.getPrograms())
       .then((res) => res.json())
       .then(async (data) => {
         if (data.programs.length > 0) {
