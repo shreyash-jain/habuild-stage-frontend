@@ -43,10 +43,43 @@ const Members = (props) => {
   const [totalRecords, setTotalRecords] = useState(0);
   const [selectedMembers, setSelectedMembers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [memberProgramsWithBatches, setMemberProgramsWithBatches] = useState(
+    []
+  );
+  const [memberBatches, setMemberBatches] = useState([]);
 
   useEffect(() => {
     getMembers(1);
+    getMemberBatches();
   }, []);
+
+  const getMemberBatches = async () => {
+    await fetch(`https://api.habuild.in/api/program/`)
+      .then((res) => res.json())
+      .then(async (data) => {
+        if (data.programs.length > 0) {
+          const programsWithBatches = [];
+          let allBatches = [];
+
+          for (let i = 0; i < data.programs.length; i++) {
+            await fetch(
+              `https://api.habuild.in/api/batch/program/${data.programs[i].id}`
+            )
+              .then((res) => res.json())
+              .then((data1) => {
+                programsWithBatches.push({
+                  ...data.programs[i],
+                  batches: data1.batch,
+                });
+                allBatches = [...allBatches, ...data1.batch];
+              });
+          }
+
+          setMemberProgramsWithBatches(programsWithBatches);
+          setMemberBatches(allBatches);
+        }
+      });
+  };
 
   const getMembers = async (pageNum) => {
     setLoading(true);
@@ -342,7 +375,7 @@ const Members = (props) => {
         return (
           <div className="flex relative -z-1 overflow-hidden">
             {attendance?.map((item) => {
-              if (item.attended) {
+              if (item) {
                 return (
                   <span key={item.day} title={item.day}>
                     <CheckCircleIcon className="text-green-400 h-6" />
@@ -372,6 +405,12 @@ const Members = (props) => {
       title: "Preffered Batch",
       dataIndex: "preffered_batch_id",
       key: "preffered_batch_id",
+      render: (prefferedBatchId) => {
+        const prefferedBatch = memberBatches.find(
+          (item) => item.id === prefferedBatchId
+        );
+        return <span>{prefferedBatch.name}</span>;
+      },
     },
     {
       title: "Actions",
@@ -514,6 +553,7 @@ const Members = (props) => {
         open={showMenuSidebar}
         setOpen={setShowMenuSidebar}
         // demoBatches={demoBatches}
+        memberProgramsWithBatches={memberProgramsWithBatches}
       />
 
       <GiftMembershipModal
