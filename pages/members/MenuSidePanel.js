@@ -1,34 +1,12 @@
 import { useEffect, useState, Fragment } from "react";
-import {
-  Dialog,
-  Disclosure,
-  Menu,
-  Popover,
-  Transition,
-} from "@headlessui/react";
-import LayoutSidebar from "../../components/LayoutSidebar";
-import Table from "../../components/Table";
-import FlyoutMenu from "../../components/FlyoutMenu";
-import Modal from "../../components/Modal";
-import FancySelect from "../../components/FancySelect";
 import SidePannel from "../../components/SidePannel";
-import {
-  MenuAlt1Icon,
-  RefreshIcon,
-  XCircleIcon,
-  CheckCircleIcon,
-  ChevronDownIcon,
-  SearchIcon,
-  FilterIcon,
-} from "@heroicons/react/outline";
-import { format, parseISO } from "date-fns";
 import toast from "react-hot-toast";
-import Select from "react-select";
 import StopWACommMember from "./StopWACommMember";
+import MemberSendWAModal from "./MemberSendWAModal";
 
 const tabs = [
+  { name: "Send WA Message", current: false },
   { name: "Start/Stop WA Communication", current: true },
-  // { name: "View Attendance", current: false },
 ];
 
 function classNames(...classes) {
@@ -36,7 +14,7 @@ function classNames(...classes) {
 }
 
 const MenuSidePanel = (props) => {
-  const [currentTab, setCurrentTab] = useState("Start/Stop WA Communication");
+  const [currentTab, setCurrentTab] = useState("Send WA Message");
   const [watiTemplates, setWatiTemplates] = useState([]);
   const [refetchLoading, setRefetchLoading] = useState(false);
 
@@ -163,6 +141,22 @@ const MenuSidePanel = (props) => {
             }
             selectedLeads={props.selectedLeads}
             selectedLeadsLength={props.selectedLeads?.length}
+          />
+        )}
+
+        {currentTab == "Send WA Message" && (
+          <MemberSendWAModal
+            open={props.open}
+            setOpen={props.setOpen}
+            setSelectedLeads={props.setSelectedLeads}
+            getPaginatedLeads={() =>
+              props.getPaginatedLeads(props.currentPagePagination)
+            }
+            selectedLeads={props.selectedLeads}
+            selectedLeadsLength={props.selectedLeads?.length}
+            memberProgramsWithBatches={props.memberProgramsWithBatches}
+            watiTemplates={watiTemplates}
+            refetchTemplates={refetchTemplates}
           />
         )}
       </div>

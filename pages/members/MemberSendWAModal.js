@@ -39,7 +39,7 @@ const SendWAModal = (props) => {
         // batch_ids: ["4"],
         template_name: selectedTemplate.identifier,
       };
-      api = "https://api.habuild.in/api/notification/whatsapp/batch";
+      api = "https://api.habuild.in/api/notification/whatsapp/members/batch";
     } else {
       const member_ids = props.selectedLeads?.map((item) => {
         return item.member_id;
@@ -48,7 +48,7 @@ const SendWAModal = (props) => {
         member_ids,
         template_name: selectedTemplate.identifier,
       };
-      api = "https://api.habuild.in/api/notification/whatsapp";
+      api = "https://api.habuild.in/api/notification/whatsapp/members";
     }
 
     var myHeaders = new Headers();
@@ -172,7 +172,7 @@ const SendWAModal = (props) => {
               <SendMessageToAllLeads
                 apiLoading={apiLoading}
                 sendMessageApi={sendMessageApi}
-                demoPrograms={props.demoPrograms}
+                memberProgramsWithBatches={props.memberProgramsWithBatches}
               />
 
               {/* <button
@@ -230,49 +230,49 @@ const SendMessageToAllLeads = (props) => {
 
   return (
     <div className="flex flex-col space-y-4">
-      {props.demoPrograms?.map((demoProgram, personIdx) => (
-        <fieldset key={demoProgram.id} className="rounded-md p-4 shadow-md">
+      {props.memberProgramsWithBatches?.map((program, personIdx) => (
+        <fieldset key={program.id} className="rounded-md p-4 shadow-md">
           <div className="relative flex items-start py-4">
             <div className="min-w-0 flex-1 text-sm">
               <legend className="text-lg font-medium text-gray-900">
-                {demoProgram.name}
+                {program.title}
               </legend>
             </div>
             <div className="ml-3 flex items-center h-5">
               <input
                 onChange={(e) =>
-                  selectAllBatches(e.target.checked, demoProgram.demobatches)
+                  selectAllBatches(e.target.checked, program.batches)
                 }
-                id={`demoProgram-${demoProgram.id}`}
-                name={`demoProgram-${demoProgram.id}`}
+                id={`demoProgram-${program.id}`}
+                name={`demoProgram-${program.id}`}
                 type="checkbox"
                 className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
               />
             </div>
           </div>
-          {demoProgram.demobatches?.map((demoBatch) => {
-            const checked = selectedDemoBatches.includes(demoBatch.id);
+          {program.batches?.map((batch) => {
+            const checked = selectedDemoBatches.includes(batch.id);
             return (
               <div
-                key={demoBatch.id}
+                key={batch.id}
                 className="mt-4 border-b border-gray-200 divide-y divide-gray-200"
               >
                 <div className="relative flex items-start py-4">
                   <div className="min-w-0 flex-1 text-sm">
                     <label
-                      htmlFor={`person-${demoBatch.id}`}
+                      htmlFor={`person-${batch.id}`}
                       className="font-medium text-gray-700 select-none"
                     >
-                      {demoBatch.name}
+                      {batch.name}
                     </label>
                   </div>
                   <div className="ml-3 flex items-center h-5">
                     <input
                       onChange={(e) =>
-                        selectBatches(e.target.checked, demoBatch.id)
+                        selectBatches(e.target.checked, batch.id)
                       }
-                      id={`person-${demoBatch.id}`}
-                      name={`person-${demoBatch.id}`}
+                      id={`person-${batch.id}`}
+                      name={`person-${batch.id}`}
                       checked={checked}
                       type="checkbox"
                       className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
@@ -295,7 +295,7 @@ const SendMessageToAllLeads = (props) => {
         }}
         className="px-4 py-2 font-medium rounded-md bg-green-300 text-green-700 hover:bg-green-700 hover:text-white"
       >
-        Send Message to All Leads
+        Send Message to All Members
       </button>
     </div>
   );

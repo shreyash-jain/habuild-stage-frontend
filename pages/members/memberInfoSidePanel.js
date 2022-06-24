@@ -71,6 +71,7 @@ const MemberInfoSidePanel = (props) => {
     Subscription: {},
   });
   const [currentTab, setCurrentTab] = useState("Account");
+  // const [  ] = useState()
 
   useEffect(() => {
     const memberPerformance =
@@ -84,7 +85,7 @@ const MemberInfoSidePanel = (props) => {
         Name: props.memberForAction.name,
         "Phone No.": props.memberForAction.mobile_number,
         Email: props.memberForAction.email,
-        "Short Link": props.memberForAction.short_meeting_link,
+        "Short Link": "https://" + props.memberForAction.short_meeting_link,
         "Lead Source": props.memberForAction.lead_source,
         Status: props.memberForAction.status,
         "Payment Status": props.memberForAction.payment_status,
@@ -124,7 +125,29 @@ const MemberInfoSidePanel = (props) => {
           CalcDaysToDate(new Date(), props.memberForAction?.sub_end_date),
       },
     });
+
+    // getMemberShortlinks();
   }, [props.memberForAction]);
+
+  const getMemberShortlinks = async () => {
+    // var raw = JSON.stringify({
+    //   shortUrl: props.memberForAction.short_meeting_link,
+    // });
+    // var requestOptions = {
+    //   method: "GET",
+    //   body: raw,
+    //   redirect: "follow",
+    // };
+
+    await fetch(
+      `https://api.habuild.in/api/shortener/getLongUrl`,
+      requestOptions
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Short URL Data", data);
+      });
+  };
 
   return (
     <SidePannel
@@ -183,7 +206,7 @@ const MemberInfoSidePanel = (props) => {
           <div className="mt-6 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <dl className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-4">
               {Object.keys(profile[currentTab]).map((field) => {
-                if (field.includes("Meeting")) {
+                if (field.includes("Meeting") || field.includes("Short Link")) {
                   return (
                     <div key={field} className="sm:col-span-4">
                       <dt className="text-sm font-medium text-gray-500">
