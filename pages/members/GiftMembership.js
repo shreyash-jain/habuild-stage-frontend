@@ -1,6 +1,7 @@
 import React, { useEffect, useState, Fragment } from "react";
 import Modal from "../../components/Modal";
 import toast from "react-hot-toast";
+import { MembersApis } from "../../constants/apis";
 
 const GiftMembershipModal = (props) => {
   const [apiLoading, setApiLoading] = useState(false);
@@ -28,7 +29,7 @@ const GiftMembershipModal = (props) => {
       body: raw,
       redirect: "follow",
     };
-    fetch("https://api.habuild.in/api/member/gift_membership", requestOptions)
+    fetch(MembersApis.GIFT_MEMBERSHIP(), requestOptions)
       .then((response) => response.json())
       .then((result) => {
         setApiLoading(false);

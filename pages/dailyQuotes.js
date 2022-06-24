@@ -23,6 +23,11 @@ import {
 import { format, parseISO } from "date-fns";
 import toast from "react-hot-toast";
 import { Switch } from "@headlessui/react";
+import {
+  DailyQuotesApis,
+  DemoBatchesApis,
+  ProgramsApis,
+} from "../constants/apis";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -50,9 +55,7 @@ const DailyQuotes = (props) => {
   }, []);
 
   const getDailyQuotes = async () => {
-    await fetch(
-      "https://api.habuild.in/api/daily_quote/all_daily_quotes?limit=1000"
-    )
+    await fetch(DailyQuotesApis.GET())
       .then((res) => res.json())
       .then((data) => {
         // console.log(data);
@@ -104,7 +107,7 @@ const DailyQuotes = (props) => {
   };
 
   const getDemoBatches = async () => {
-    await fetch(`https://api.habuild.in/api/demobatches`)
+    await fetch(DemoBatchesApis.GET_DEMO_BATCHES())
       .then((res) => res.json())
       .then((data) => {
         // console.log("Data", data);
@@ -113,7 +116,7 @@ const DailyQuotes = (props) => {
   };
 
   const getAllPrograms = async () => {
-    await fetch(`https://api.habuild.in/api/program/`)
+    await fetch(ProgramsApis.GET_PROGRAMS())
       .then((res) => res.json())
       .then((data) => {
         setPrograms(data.programs);
@@ -378,11 +381,11 @@ const DailyQuoteFormModal = (props) => {
   };
 
   const formSubmit = (e) => {
-    let API = "https://api.habuild.in/api/daily_quote/add_daily_quotes";
+    let API = DailyQuotesApis.CREATE();
     let method = "POST";
 
     if (props.mode == "edit") {
-      API = `https://api.habuild.in/api/daily_quote/update/${props.editQuote.id}`;
+      API = DailyQuotesApis.UPDATE(props.editQuote.id);
       method = "PATCH";
     }
 

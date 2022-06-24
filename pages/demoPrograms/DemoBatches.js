@@ -5,7 +5,11 @@ import { RefreshIcon } from "@heroicons/react/outline";
 import toast from "react-hot-toast";
 import Table from "../../components/Table";
 import FlyoutMenu from "../../components/FlyoutMenu";
-
+import {
+  DemoBatchesApis,
+  DemoProgramsApis,
+  ProgramsApis,
+} from "../../constants/apis";
 import { format, parseISO } from "date-fns";
 
 const DemoBatches = (props) => {
@@ -34,7 +38,7 @@ const DemoBatches = (props) => {
   }, [props.demoBatches?.length]);
 
   const getAllPrograms = async () => {
-    await fetch(`https://api.habuild.in/api/program/`)
+    await fetch(ProgramsApis.GET_PROGRAMS())
       .then((res) => res.json())
       .then((data) => {
         setPrograms(data.programs);
@@ -47,13 +51,9 @@ const DemoBatches = (props) => {
     }
 
     setDeleteLoading(true);
-    await fetch(
-      `https://api.habuild.in/api/demobatches/delDemoBatch?id=${demoBatch.id}`,
-      // `http://localhost:4000/api/demobatches/delDemoBatch?id=${demoBatch.id}`,
-      {
-        method: "DELETE",
-      }
-    ).then((res) => {
+    await fetch(DemoBatchesApis.DELETE(demoBatch.id), {
+      method: "DELETE",
+    }).then((res) => {
       setDeleteLoading(false);
       props.getDemoBatches();
       if (res.status == 404) {
@@ -172,11 +172,7 @@ const AddDemoBatchModal = (props) => {
       body: raw,
       redirect: "follow",
     };
-    fetch(
-      // `http://localhost:4000/api/demoprogram/addBatch?id=${props.demoProgram.id}`,
-      `https://api.habuild.in/api/demoprogram/addBatch?id=${props.demoProgram.id}`,
-      requestOptions
-    )
+    fetch(DemoProgramsApis.CREATE_BATCH(props.demoProgram.id), requestOptions)
       .then((response) => response.text())
       .then((result) => {
         setApiLoading(false);

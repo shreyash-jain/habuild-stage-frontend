@@ -22,6 +22,7 @@ import {
 } from "@heroicons/react/solid";
 import { format } from "date-fns";
 import Link from "next/link";
+import { ShortenerApis } from "../../constants/apis";
 
 const tabs = [
   { name: "Account", href: "#", current: true },
@@ -139,10 +140,7 @@ const MemberInfoSidePanel = (props) => {
     //   redirect: "follow",
     // };
 
-    await fetch(
-      `https://api.habuild.in/api/shortener/getLongUrl`,
-      requestOptions
-    )
+    await fetch(ShortenerApis.GET_LONG_URL(), requestOptions)
       .then((res) => res.json())
       .then((data) => {
         console.log("Short URL Data", data);

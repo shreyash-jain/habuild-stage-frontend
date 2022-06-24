@@ -28,6 +28,7 @@ import GiftMembershipModal from "./GiftMembership";
 import StopMembership from "./stopMembership";
 import PauseMembership from "./PauseMembership";
 import UpdateMemberDetails from "./UpdateMemberDetails";
+import { ProgramsApis, BatchesApis, MembersApis } from "../../constants/apis";
 
 const Members = (props) => {
   const [members, setMembers] = useState([]);
@@ -54,17 +55,18 @@ const Members = (props) => {
   }, []);
 
   const getMemberBatches = async () => {
-    await fetch(`https://api.habuild.in/api/program/`)
+    // await fetch(`https://api.habuild.in/api/program/`)
+    await fetch(ProgramsApis.GET_PROGRAMS())
       .then((res) => res.json())
       .then(async (data) => {
         if (data.programs.length > 0) {
           const programsWithBatches = [];
           let allBatches = [];
 
+          console.log("Program Data", data);
+
           for (let i = 0; i < data.programs.length; i++) {
-            await fetch(
-              `https://api.habuild.in/api/batch/program/${data.programs[i].id}`
-            )
+            await fetch(BatchesApis.GET_BATCH_FROM_PROGRAM(data.programs[i].id))
               .then((res) => res.json())
               .then((data1) => {
                 programsWithBatches.push({
@@ -76,6 +78,7 @@ const Members = (props) => {
           }
 
           setMemberProgramsWithBatches(programsWithBatches);
+          console.log("All batches", allBatches);
           setMemberBatches(allBatches);
         }
       });
@@ -85,8 +88,7 @@ const Members = (props) => {
     setLoading(true);
     setCurrentPagePagination(pageNum);
 
-    await fetch(`https://api.habuild.in/api/member/?page=${pageNum}&limit=100`)
-      // await fetch(`http://localhost:4000/api/member/?page=${pageNum}&limit=100`)
+    await fetch(MembersApis.GET(pageNum))
       .then((res) => res.json())
       .then((data) => {
         console.log("DATA", data);
@@ -184,11 +186,7 @@ const Members = (props) => {
       body: "",
       redirect: "follow",
     };
-    fetch(
-      `https://api.habuild.in/api/member/activate_membership?memberId=${actionEntity.id}`,
-      // `http://localhost:4000/api/member/activate_membership?memberId=${actionEntity.id}`,
-      requestOptions
-    )
+    fetch(MembersApis.ACTIVATE_MEMBERSHIP(actionEntity.id), requestOptions)
       .then((response) => response.json())
       .then((result) => {
         if (result.status == 500) {
@@ -409,7 +407,7 @@ const Members = (props) => {
         const prefferedBatch = memberBatches.find(
           (item) => item.id === prefferedBatchId
         );
-        return <span>{prefferedBatch.name}</span>;
+        return <span>{prefferedBatch?.name || prefferedBatchId}</span>;
       },
     },
     {
@@ -434,8 +432,7 @@ const Members = (props) => {
       return;
     }
 
-    fetch(`https://api.habuild.in/api/member/searchMember/${searchTerm}`)
-      // fetch(`http://localhost:4000/api/member/searchMember/${searchTerm}`)
+    fetch(MembersApis.SEARCH(searchTerm))
       .then((res) => res.json())
       .then((data) => {
         // console.log("Search data", data);

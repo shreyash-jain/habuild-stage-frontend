@@ -9,6 +9,7 @@ import FlyoutMenu from "../../components/FlyoutMenu";
 import { format, parseISO } from "date-fns";
 import ActionsSidePanel from "./ActionsSidePanel";
 import AddDemoProgramModal from "./AddDemoProgramModal";
+import { DemoProgramsApis, ProgramsApis } from "../../constants/apis";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -35,7 +36,7 @@ const DemoPrograms = () => {
   }, []);
 
   const getAllPrograms = async () => {
-    await fetch(`https://api.habuild.in/api/program/`)
+    await fetch(ProgramsApis.GET_PROGRAMS())
       .then((res) => res.json())
       .then((data) => {
         setPrograms(data.programs);
@@ -44,8 +45,7 @@ const DemoPrograms = () => {
 
   const getAllDemoPrograms = async () => {
     setLoading(true);
-    await fetch(`https://api.habuild.in/api/demoprogram/?page=1&limit=10`)
-      // await fetch(`http://localhost:4000/api/demoprogram/?page=1&limit=10`)
+    await fetch(DemoProgramsApis.GET())
       .then((res) => {
         return res.json();
       })
@@ -84,13 +84,9 @@ const DemoPrograms = () => {
     }
 
     setDeleteLoading(true);
-    await fetch(
-      `https://api.habuild.in/api/demoprogram/deleteDemoProgram?id=${demoProgram.id}`,
-      // `http://localhost:4000/api/demoprogram/deleteDemoProgram?id=${demoProgram.id}`,
-      {
-        method: "DELETE",
-      }
-    ).then((res) => {
+    await fetch(DemoProgramsApis.DELETE(demoProgram.id), {
+      method: "DELETE",
+    }).then((res) => {
       setDeleteLoading(false);
       getAllDemoPrograms();
       if (res.status == 404) {

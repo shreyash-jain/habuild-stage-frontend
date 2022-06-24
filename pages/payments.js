@@ -20,6 +20,7 @@ import {
 } from "@heroicons/react/outline";
 import { format, parseISO } from "date-fns";
 import toast from "react-hot-toast";
+import { PaymentApis } from "../constants/apis";
 
 const Payments = (props) => {
   const [payments, setPayments] = useState([]);
@@ -35,7 +36,7 @@ const Payments = (props) => {
 
   const getPayments = async (pageNum) => {
     setCurrentPagePagination(pageNum);
-    await fetch(`https://api.habuild.in/api/payment/?page=${pageNum}&limit=100`)
+    await fetch(PaymentApis.GET_PAYMENTS(pageNum))
       .then((res) => res.json())
       .then((data) => {
         // console.log("Payments", data);
@@ -286,7 +287,7 @@ const PaymentFormModal = (props) => {
   ];
 
   const formSubmit = (e) => {
-    let API = "https://api.habuild.in/api/payment/";
+    let API = PaymentApis.CREATE();
     let method = "POST";
 
     e.preventDefault();

@@ -1,6 +1,7 @@
 import React, { useEffect, useState, Fragment } from "react";
 import Modal from "../../components/Modal";
 import toast from "react-hot-toast";
+import { MembersApis } from "../../constants/apis";
 
 const StopMembership = (props) => {
   const [apiLoading, setApiLoading] = useState(false);
@@ -8,7 +9,7 @@ const StopMembership = (props) => {
   const [amount, setAmount] = useState("");
   const [refundCheck, setRefundCheck] = useState(false);
 
-  const giftMembership = () => {
+  const stopMembership = () => {
     setApiLoading(true);
 
     if (refundCheck) {
@@ -32,10 +33,7 @@ const StopMembership = (props) => {
       body: raw,
       redirect: "follow",
     };
-    fetch(
-      `https://api.habuild.in/api/member/stop_membership/${props.memberForAction.id}`,
-      requestOptions
-    )
+    fetch(MembersApis.STOP_MEMBERSHIP(props.memberForAction.id), requestOptions)
       .then((response) => response.json())
       .then((result) => {
         setApiLoading(false);
@@ -62,7 +60,7 @@ const StopMembership = (props) => {
       modalOpen={props.modalOpen || false}
       setModalOpen={props.setModalOpen}
       actionText="Stop/Refund membership"
-      onActionButtonClick={giftMembership}
+      onActionButtonClick={stopMembership}
       // hideActionButtons
     >
       <div className="space-y-4">

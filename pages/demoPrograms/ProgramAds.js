@@ -5,7 +5,7 @@ import { RefreshIcon } from "@heroicons/react/outline";
 import toast from "react-hot-toast";
 import Table from "../../components/Table";
 import FlyoutMenu from "../../components/FlyoutMenu";
-
+import { DemoBatchesApis, ProgramsApis } from "../../constants/apis";
 import { format, parseISO } from "date-fns";
 
 const DemoBatches = (props) => {
@@ -54,7 +54,7 @@ const DemoBatches = (props) => {
   // };
 
   const getAllPrograms = async () => {
-    await fetch(`https://api.habuild.in/api/program/`)
+    await fetch(ProgramsApis.GET_PROGRAMS())
       .then((res) => res.json())
       .then((data) => {
         setPrograms(data.programs);
@@ -185,8 +185,7 @@ const AddDemoBatchModal = (props) => {
       body: raw,
       redirect: "follow",
     };
-    fetch("https://api.habuild.in/api/demobatches", requestOptions)
-      // fetch("http://localhost:4000/api/demobatches", requestOptions)
+    fetch(DemoBatchesApis.CREATE(), requestOptions)
       .then((response) => response.text())
       .then((result) => {
         setApiLoading(false);

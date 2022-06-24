@@ -2,6 +2,7 @@ import { useEffect, useState, Fragment } from "react";
 import { RefreshIcon } from "@heroicons/react/outline";
 import toast from "react-hot-toast";
 import Select from "react-select";
+import { NotificationApis } from "../../constants/apis";
 
 const SendWAModal = (props) => {
   const [apiLoading, setApiLoading] = useState(false);
@@ -39,7 +40,7 @@ const SendWAModal = (props) => {
         // batch_ids: ["4"],
         template_name: selectedTemplate.identifier,
       };
-      api = "https://api.habuild.in/api/notification/whatsapp/batch";
+      api = NotificationApis.LEAD_SEND_TO_BATCH();
     } else {
       const member_ids = props.selectedLeads?.map((item) => {
         return item.member_id;
@@ -48,7 +49,7 @@ const SendWAModal = (props) => {
         member_ids,
         template_name: selectedTemplate.identifier,
       };
-      api = "https://api.habuild.in/api/notification/whatsapp";
+      api = NotificationApis.SEND_TO_LEADS();
     }
 
     var myHeaders = new Headers();

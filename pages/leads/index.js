@@ -25,6 +25,12 @@ import { format, parseISO } from "date-fns";
 import toast from "react-hot-toast";
 import Select from "react-select";
 import MenuSidePanel from "./MenuSidePanel";
+import {
+  DemoBatchesApis,
+  DemoProgramsApis,
+  LeadsApis,
+  MembersApis,
+} from "../../constants/apis";
 
 const filters = {
   status: [
@@ -128,7 +134,7 @@ const Leads = (props) => {
   }, []);
 
   const getDemobatches = async () => {
-    await fetch(`https://api.habuild.in/api/demobatches/`)
+    await fetch(DemoBatchesApis.GET_DEMO_BATCHES())
       .then((res) => res.json())
       .then((data) => {
         setDemoBatches(data.demoBatches);
@@ -136,8 +142,7 @@ const Leads = (props) => {
   };
 
   const getAllDemoPrograms = async () => {
-    await fetch(`https://api.habuild.in/api/demoprogram/?page=1&limit=10`)
-      // await fetch(`http://localhost:4000/api/demoprogram/?page=1&limit=10`)
+    await fetch(DemoProgramsApis.GET())
       .then((res) => {
         return res.json();
       })
@@ -151,8 +156,7 @@ const Leads = (props) => {
     setCurrentPagePagination(pageNum);
     // console.log("Page Num!!!!", pageNum);
 
-    let api = `https://api.habuild.in/api/lead/?page=${pageNum}&limit=100`;
-    // let api = `http://localhost:4000/api/lead/?page=${pageNum}&limit=100`;
+    let api = LeadsApis.GET(pageNum);
 
     if (Object.keys(filterParams).length > 0) {
       for (var i = 0; i < Object.keys(filterParams).length; i++) {
@@ -283,12 +287,8 @@ const Leads = (props) => {
     setLeadForAction(actionEntity);
 
     const idToUse = actionEntity.member_id || actionEntity.id;
-    // await fetch(
-    //   `http://localhost:4000/api/member/getCommunicationLogs/${idToUse}`
-    // )
-    await fetch(
-      `https://api.habuild.in/api/member/getCommunicationLogs/${idToUse}`
-    )
+
+    await fetch(MembersApis.GET_COMM_LOGS(idToUse))
       .then((res) => res.json())
       .then((data) => {
         setMemberComms(data);
@@ -484,7 +484,7 @@ const Leads = (props) => {
       return;
     }
 
-    fetch(`https://api.habuild.in/api/lead/find/${searchTerm}`)
+    fetch(LeadsApis.SEARCH(searchTerm))
       .then((res) => res.json())
       .then((data) => {
         if (data.message) {
@@ -780,8 +780,7 @@ const AddCommModal = (props) => {
       redirect: "follow",
     };
     // console.log(requestOptions);
-    fetch("https://api.habuild.in/api/lead/communication", requestOptions)
-      // fetch("http://localhost:4000/api/lead/communication", requestOptions)
+    fetch(LeadsApis.CREATE_COMM(), requestOptions)
       .then((response) => response.text())
       .then((result) => {
         setApiLoading(false);
@@ -1190,7 +1189,7 @@ const AddLeadModal = (props) => {
       body: raw,
       redirect: "follow",
     };
-    fetch("https://api.habuild.in/api/lead?action_point=crm", requestOptions)
+    fetch(LeadsApis.CREATE(), requestOptions)
       .then((response) => response.text())
       .then((result) => {
         setApiLoading(false);

@@ -7,6 +7,7 @@ import Table from "../../components/Table";
 import FlyoutMenu from "../../components/FlyoutMenu";
 
 import { format, parseISO } from "date-fns";
+import { HabuildAdsApis } from "../../constants/apis";
 
 const DemoAds = (props) => {
   const [viewAddModal, setViewAddModal] = useState(false);
@@ -33,13 +34,9 @@ const DemoAds = (props) => {
     }
 
     setDeleteLoading(true);
-    await fetch(
-      // `http://localhost:4000/api/habuild_ads/ads/del?id=${demoAd.id}`,
-      `https://api.habuild.in/api/habuild_ads/ads/del?id=${demoAd.id}`,
-      {
-        method: "DELETE",
-      }
-    ).then((res) => {
+    await fetch(HabuildAdsApis.DELETE(demoAd.id), {
+      method: "DELETE",
+    }).then((res) => {
       setDeleteLoading(false);
       props.getDemoAds();
       if (res.status == 404) {
@@ -145,8 +142,7 @@ const AddDemoAdModal = (props) => {
       body: raw,
       redirect: "follow",
     };
-    // fetch(`http://localhost:4000/api/habuild_ads/ads/add`, requestOptions)
-    fetch(`https://api.habuild.in/api/habuild_ads/ads/add`, requestOptions)
+    fetch(HabuildAdsApis.CREATE(), requestOptions)
       .then((response) => response.text())
       .then((result) => {
         setApiLoading(false);
