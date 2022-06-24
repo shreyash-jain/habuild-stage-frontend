@@ -156,7 +156,7 @@ const Leads = (props) => {
     setCurrentPagePagination(pageNum);
     // console.log("Page Num!!!!", pageNum);
 
-    let api = LeadsApis.GET();
+    let api = LeadsApis.GET(pageNum);
 
     if (Object.keys(filterParams).length > 0) {
       for (var i = 0; i < Object.keys(filterParams).length; i++) {
