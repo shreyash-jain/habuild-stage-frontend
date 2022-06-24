@@ -28,6 +28,7 @@ import GiftMembershipModal from "./GiftMembership";
 import StopMembership from "./stopMembership";
 import PauseMembership from "./PauseMembership";
 import UpdateMemberDetails from "./UpdateMemberDetails";
+import { Programs } from "../../constants/apis";
 
 const Members = (props) => {
   const [members, setMembers] = useState([]);
@@ -54,12 +55,17 @@ const Members = (props) => {
   }, []);
 
   const getMemberBatches = async () => {
-    await fetch(`https://api.habuild.in/api/program/`)
+    const getPrograms = Programs.getPrograms();
+
+    // await fetch(`https://api.habuild.in/api/program/`)
+    await fetch(getPrograms)
       .then((res) => res.json())
       .then(async (data) => {
         if (data.programs.length > 0) {
           const programsWithBatches = [];
           let allBatches = [];
+
+          console.log("Program Data", data);
 
           for (let i = 0; i < data.programs.length; i++) {
             await fetch(
@@ -76,6 +82,7 @@ const Members = (props) => {
           }
 
           setMemberProgramsWithBatches(programsWithBatches);
+          console.log("All batches", allBatches);
           setMemberBatches(allBatches);
         }
       });
@@ -409,7 +416,7 @@ const Members = (props) => {
         const prefferedBatch = memberBatches.find(
           (item) => item.id === prefferedBatchId
         );
-        return <span>{prefferedBatch.name}</span>;
+        return <span>{prefferedBatch?.name || prefferedBatchId}</span>;
       },
     },
     {
