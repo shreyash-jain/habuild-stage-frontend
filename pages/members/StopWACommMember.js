@@ -34,7 +34,7 @@ const StopWACommModal = (props) => {
       body: raw,
       redirect: "follow",
     };
-    fetch(LeadsApis.UPDATE_COMM_STATUS, requestOptions)
+    fetch(LeadsApis.UPDATE_COMM_STATUS(), requestOptions)
       .then((response) => response.json())
       .then((result) => {
         setApiLoading(false);
