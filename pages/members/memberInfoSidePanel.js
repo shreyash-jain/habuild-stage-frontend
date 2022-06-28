@@ -65,7 +65,6 @@ function CalcDaysToDate(fromDate, toDate) {
 }
 
 const MemberInfoSidePanel = (props) => {
-  // console.log("Props", props);
   const [profile, setProfile] = useState({
     Account: {},
     Performance: {},
@@ -92,6 +91,8 @@ const MemberInfoSidePanel = (props) => {
         "Payment Status": props.memberForAction.payment_status,
         "Pause Days": props.memberForAction.total_pause_days,
         "Pause Days": props.memberForAction.total_pause_days,
+        "Pause Rejoin Date": props.memberForAction.pause_rejoin_date,
+        "Pause Start Date": props.memberForAction.pause_start_date,
         "Meeting id 1 Link":
           props.memberForAction.habuild_member_batches &&
           props.memberForAction.habuild_member_batches[0]?.meet_link,

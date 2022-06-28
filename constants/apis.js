@@ -85,8 +85,8 @@ export const MembersApis = {
   GIFT_MEMBERSHIP: () => `${API_BASE_URL}/api/member/gift_membership`,
   ACTIVATE_MEMBERSHIP: (memberId) =>
     `${API_BASE_URL}/api/member/activate_membership?memberId=${memberId}`,
-  SEARCH: (searchTerm) =>
-    `${API_BASE_URL}/api/member/searchMember/${searchTerm}`,
+  SEARCH: (searchTerm, searchFor) =>
+    `${API_BASE_URL}/api/member/searchMember/${searchTerm}/${searchFor}`,
   PAUSE_MEMBERSHIP: (params) =>
     `${API_BASE_URL}/api/member/pause_membership?noOfDaysAsked=${params.numDays}&memberId=${params.memberId}&startDate=${params.pauseStartDate}`,
   STOP_MEMBERSHIP: (memberId) =>
