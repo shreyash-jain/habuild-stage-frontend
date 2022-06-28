@@ -503,7 +503,7 @@ const Members = (props) => {
                   id="country"
                   name="country"
                   autoComplete="country"
-                  className="focus:ring-indigo-500 focus:border-indigo-500 h-full py-0 pl-1 pr-4 border-transparent bg-transparent text-gray-500 sm:text-sm rounded-md"
+                  className="focus:ring-indigo-500 focus:border-indigo-500 h-full py-0 pl-1 border-transparent bg-transparent text-gray-500 sm:text-sm rounded-md"
                 >
                   <option>Name</option>
                   <option>Email</option>
