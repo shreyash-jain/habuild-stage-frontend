@@ -48,6 +48,7 @@ const Members = (props) => {
     []
   );
   const [memberBatches, setMemberBatches] = useState([]);
+  const [searchFor, setSearchFor] = useState("Name");
 
   useEffect(() => {
     getMembers(1);
@@ -428,11 +429,11 @@ const Members = (props) => {
   const handleSearch = () => {
     setLoading(true);
     setSelectedMembers([]);
-    if (!searchTerm) {
+    if (!searchTerm || !searchFor) {
       return;
     }
 
-    fetch(MembersApis.SEARCH(searchTerm))
+    fetch(MembersApis.SEARCH(searchTerm, searchFor))
       .then((res) => res.json())
       .then((data) => {
         // console.log("Search data", data);
@@ -474,7 +475,7 @@ const Members = (props) => {
             <label htmlFor="search" className="sr-only">
               Search
             </label>
-            <div className="relative">
+            {/* <div className="relative">
               <div className="pointer-events-none absolute inset-y-0 left-0 pl-3 flex items-center">
                 <SearchIcon
                   className="h-5 w-5 text-gray-400"
@@ -489,6 +490,36 @@ const Members = (props) => {
                 className="w-full bg-white border border-gray-300 rounded-md py-2 pl-10 pr-3 text-sm placeholder-gray-500 focus:outline-none focus:text-gray-900 focus:placeholder-gray-400 focus:ring-1 focus:ring-green-500 focus:border-green-500 sm:text-sm"
                 placeholder="Search Member by Phone number, name or email."
                 type="search"
+              />
+            </div> */}
+            <div className="mt-1 relative rounded-md shadow-sm">
+              <div className="absolute inset-y-0 left-0 flex items-center">
+                <label htmlFor="country" className="sr-only">
+                  Country
+                </label>
+                <select
+                  value={searchFor}
+                  onChange={(e) => setSearchFor(e.target.value)}
+                  id="country"
+                  name="country"
+                  autoComplete="country"
+                  className="focus:ring-indigo-500 focus:border-indigo-500 h-full py-0 pl-1 pr-4 border-transparent bg-transparent text-gray-500 sm:text-sm rounded-md"
+                >
+                  <option>Name</option>
+                  <option>Email</option>
+                  <option>Mobile</option>
+                  <option>Member Id</option>
+                </select>
+              </div>
+
+              <input
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                type="text"
+                id="search"
+                name="search"
+                className="w-full bg-white border border-gray-300 rounded-md py-2 pl-24 pr-3 text-sm placeholder-gray-500 focus:outline-none focus:text-gray-900 focus:placeholder-gray-400 focus:ring-1 focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                placeholder="Search Member by Phone number, name or email."
               />
             </div>
             {searchTerm && (
