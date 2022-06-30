@@ -76,7 +76,7 @@ const MenuSidePanel = (props) => {
 
   const refetchTemplates = async () => {
     setRefetchLoading(true);
-    await fetch(WatiTemplatesApis.REFETCH, {
+    await fetch(WatiTemplatesApis.REFETCH(), {
       method: "PATCH",
     }).then((res) => {
       fetchTemplates("fromRefetch");
