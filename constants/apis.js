@@ -110,4 +110,6 @@ export const NotificationApis = {
 
 export const ShortenerApis = {
   GET_LONG_URL: () => `${API_BASE_URL}/api/shortener/getLongUrl`,
+  GET_CURRENT_YT_LINK: () => `${API_BASE_URL}/api/shortener/getproxyUrl`,
+  UPDATE_CURRENT_YT_LINK: () => `${API_BASE_URL}/api/shortener/updateProxyUrl`,
 };
