@@ -48,6 +48,11 @@ const Dashboard = () => {
       return;
     }
 
+    if (currentYTUrl.length < 15) {
+      toast.error("Please Enter valid URL");
+      return;
+    }
+
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     var raw = JSON.stringify({
