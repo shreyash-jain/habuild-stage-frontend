@@ -107,11 +107,11 @@ const Payments = (props) => {
       dataIndex: "order_id",
       key: "order_id",
     },
-    {
-      title: "Pg Request",
-      dataIndex: "pg_request",
-      key: "pg_request",
-    },
+    // {
+    //   title: "Pg Request",
+    //   dataIndex: "pg_request",
+    //   key: "pg_request",
+    // },
     {
       title: "Pg Response",
       dataIndex: "pg_response",
@@ -249,13 +249,13 @@ const PaymentFormModal = (props) => {
       name: "order_id",
       setterMethod: setOrderId,
     },
-    {
-      label: "PG Request",
-      value: pg_request,
-      type: "text",
-      name: "pg_request",
-      setterMethod: setPgRequest,
-    },
+    // {
+    //   label: "PG Request",
+    //   value: pg_request,
+    //   type: "text",
+    //   name: "pg_request",
+    //   setterMethod: setPgRequest,
+    // },
     {
       label: "PG Response",
       value: pg_response,

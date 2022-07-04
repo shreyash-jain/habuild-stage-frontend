@@ -2,6 +2,7 @@ import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 
 export default function Modal(props) {
+  console.log("Modal Props", props);
   return (
     <Transition.Root show={props.modalOpen} as={Fragment}>
       <Dialog

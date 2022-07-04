@@ -1,10 +1,23 @@
 import { useState, useEffect } from "react";
-import LayoutSidebar from "../components/LayoutSidebar";
-import { ShieldCheckIcon, RefreshIcon, XIcon } from "@heroicons/react/outline";
-import { HealthCheckApis } from "../constants/apis";
+import LayoutSidebar from "../../components/LayoutSidebar";
+import Table from "../../components/Table";
+import {
+  ShieldCheckIcon,
+  RefreshIcon,
+  XIcon,
+  MenuAlt1Icon,
+} from "@heroicons/react/outline";
+import { HealthCheckApis } from "../../constants/apis";
 import Link from "next/link";
-import { ShortenerApis } from "../constants/apis";
+import {
+  ShortenerApis,
+  SchedulerApis,
+  ProgramsApis,
+  BatchesApis,
+} from "../../constants/apis";
 import toast from "react-hot-toast";
+import { format, parseISO } from "date-fns";
+import MenuSidePanel from "./MenuSidePanel";
 
 const Dashboard = () => {
   const [serverHealthy, setServerHealthy] = useState(false);
@@ -15,11 +28,54 @@ const Dashboard = () => {
   const [currentDbYTUrl, setCurrentDbYTUrl] = useState(
     "https://youtube.com/example"
   );
+  const [schedulerInfos, setSchedulerInfos] = useState([]);
+  const [showMenuSidebar, setShowMenuSidebar] = useState(false);
+  const [memberProgramsWithBatches, setMemberProgramsWithBatches] = useState(
+    []
+  );
 
   useEffect(() => {
     apiCall();
     getCurrentYoutubeUrl();
+    getSchedulersInfos();
+    getMemberBatches();
   }, []);
+
+  const getMemberBatches = async () => {
+    // await fetch(`https://api.habuild.in/api/program/`)
+    await fetch(ProgramsApis.GET_PROGRAMS())
+      .then((res) => res.json())
+      .then(async (data) => {
+        if (data.programs.length > 0) {
+          const programsWithBatches = [];
+
+          for (let i = 0; i < data.programs.length; i++) {
+            await fetch(BatchesApis.GET_BATCH_FROM_PROGRAM(data.programs[i].id))
+              .then((res) => res.json())
+              .then((data1) => {
+                programsWithBatches.push({
+                  ...data.programs[i],
+                  batches: data1.batch,
+                });
+              });
+          }
+
+          setMemberProgramsWithBatches(programsWithBatches);
+        }
+      });
+  };
+
+  const getSchedulersInfos = () => {
+    setLoading(true);
+
+    fetch(SchedulerApis.GET())
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        setSchedulerInfos(data.message);
+        setLoading(false);
+      });
+  };
 
   const apiCall = () => {
     setLoading(true);
@@ -76,6 +132,76 @@ const Dashboard = () => {
         }
       });
   };
+
+  const columns = [
+    {
+      title: "Scheduler Id",
+      dataIndex: "scId",
+      key: "scId",
+    },
+    {
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+    },
+    {
+      title: "Last Run",
+      dataIndex: "status",
+      key: "status",
+      render: (status) => {
+        if (!status) {
+          return <p className="text-gray-800">Status not Found</p>;
+        }
+        return (
+          <span
+            className={`text-center px-2.5 py-0.5 rounded-md text-sm font-medium ${
+              status == "SUCCESS"
+                ? "bg-green-300 text-green-800"
+                : "bg-red-300 text-red-800"
+            }  `}
+          >
+            {status}
+          </span>
+        );
+      },
+    },
+    {
+      title: "Last Run Date",
+      dataIndex: "latestDate",
+      key: "latestDate",
+      render: (date) => {
+        if (!date) {
+          return "-";
+        }
+
+        return format(new Date(date), "yyyy-MM-dd");
+      },
+    },
+    {
+      title: "Last Start Time",
+      dataIndex: "startDate",
+      key: "startDate",
+      render: (date) => {
+        if (!date) {
+          return "-";
+        }
+
+        return date.split("T")[1];
+      },
+    },
+    {
+      title: "Last Stop Time",
+      dataIndex: "stopDate",
+      key: "stopDate",
+      render: (date) => {
+        if (!date) {
+          return "-";
+        }
+
+        return date.split("T")[1];
+      },
+    },
+  ];
 
   return (
     <div>
@@ -140,6 +266,33 @@ const Dashboard = () => {
           </Link>
         </div>
       </div>
+
+      <h1 className="mb-0 mt-8 text-lg font-medium text-gray-900">
+        Schedulers Info
+      </h1>
+
+      <Table
+        dataLoading={loading}
+        // onPaginationApi={getMembers}
+        // totalRecords={totalRecords}
+        columns={columns}
+        // pagination
+        dataSource={schedulerInfos}
+        // currentPagePagination={currentPagePagination}
+      />
+
+      <button
+        onClick={() => setShowMenuSidebar(true)}
+        className="transition duration-300 font-medium px-4 py-2 rounded-md bg-green-300 hover:bg-green-500 text-green-700 hover:text-white fixed bottom-2 right-40"
+      >
+        <MenuAlt1Icon className="w-6 h-6" />
+      </button>
+
+      <MenuSidePanel
+        open={showMenuSidebar}
+        setOpen={setShowMenuSidebar}
+        memberProgramsWithBatches={memberProgramsWithBatches}
+      />
     </div>
   );
 };

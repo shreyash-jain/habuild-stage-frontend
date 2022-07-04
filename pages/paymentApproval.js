@@ -30,6 +30,8 @@ const PaymentApproval = () => {
     []
   );
 
+  const [viewAddModal, setViewAddModal] = useState(false);
+
   useEffect(() => {
     getAllPaymentsToApprove();
     getMemberProgramsWithBatches();
@@ -221,12 +223,12 @@ const PaymentApproval = () => {
     <div>
       <h1 className="text-2xl font-semibold text-gray-900">Payment Approval</h1>
 
-      {/* <button
+      <button
         onClick={() => setViewAddModal(true)}
         className="font-medium px-4 py-2 rounded-md bg-green-300 hover:bg-green-500 text-green-700 hover:text-white fixed bottom-2 right-2"
       >
-        Add Demo Program +
-      </button> */}
+        Add Payment +
+      </button>
 
       {loading ? (
         <RefreshIcon className="text-white animate-spin h-6 w-6 mx-auto" />
@@ -300,7 +302,185 @@ const PaymentApproval = () => {
         getAllDemoPrograms={getAllDemoPrograms}
         programs={programs}
       /> */}
+
+      <AddPaymentForApproval
+        viewModal={viewAddModal}
+        setViewModal={setViewAddModal}
+      />
     </div>
+  );
+};
+
+const AddPaymentForApproval = (props) => {
+  const [apiLoading, setApiLoading] = useState(false);
+  const [csvArray, setCsvArray] = useState([]);
+
+  const paymentFormFields = [
+    {
+      label: "Name",
+      value: "",
+      type: "text",
+      name: "name",
+      setterMethod: () => {},
+    },
+    {
+      label: "Mobile Number",
+      value: "",
+      type: "text",
+      name: "namemobileNumber",
+      setterMethod: () => {},
+    },
+    {
+      label: "Email",
+      value: "",
+      type: "text",
+      name: "email",
+      setterMethod: () => {},
+    },
+    {
+      label: "Amount",
+      value: "",
+      type: "radio",
+      name: "amount",
+      setterMethod: () => {},
+      options: [
+        {
+          label: "849",
+          value: "",
+          type: "radio",
+          name: "amount",
+        },
+        {
+          label: "1799",
+          value: "",
+          type: "radio",
+          name: "amount",
+        },
+        {
+          label: "2499",
+          value: "",
+          type: "radio",
+          name: "amount",
+        },
+        {
+          label: "3999",
+          value: "",
+          type: "radio",
+          name: "amount",
+        },
+      ],
+    },
+  ];
+
+  const processCSV = (str, delim = ",") => {
+    const headers = str.slice(0, str.indexOf("\n")).split(delim);
+    const rows = str.slice(str.indexOf("\n") + 1).split("\n");
+
+    const newArray = rows.map((row) => {
+      const values = row.split(delim);
+      const eachObject = headers.reduce((obj, header, i) => {
+        obj[header] = values[i];
+        return obj;
+      }, {});
+      return eachObject;
+    });
+
+    console.log("New Arrr", newArray);
+
+    setCsvArray(newArray);
+  };
+
+  const csvHandler = (file) => {
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+      const text = e.target.result;
+      console.log(text);
+      processCSV(text);
+    };
+
+    reader.readAsText(file);
+  };
+
+  return (
+    <Modal
+      apiLoading={apiLoading}
+      modalOpen={props.viewModal}
+      setModalOpen={props.setViewModal}
+      actionText="Add Payment"
+    >
+      <form
+        className="flex flex-col w-full space-y-5"
+        onSubmit={(e) => {
+          formSubmit(e);
+        }}
+      >
+        <h2 className="text-left text-xl font-bold text-gray-900">
+          Payment For Approval
+        </h2>
+
+        {paymentFormFields.map((item) => {
+          if (item.type == "radio") {
+            return (
+              <div key={item.label} className="col-span-3">
+                <label className="block text-sm font-medium text-gray-700">
+                  {item.label}
+                </label>
+                {item.options.map((item1) => {
+                  return (
+                    <div className="flex flex-row space-x-4">
+                      <label className="block text-sm font-medium text-gray-700">
+                        {item1.label}
+                      </label>
+                      <input
+                        value={item1.value}
+                        onChange={(e) => item.setterMethod(e.target.value)}
+                        type={item1.type}
+                        name={item1.name}
+                        id={item1.name}
+                        placeholder={item1.label}
+                      ></input>
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          }
+
+          return (
+            <div key={item.label} className="col-span-6 sm:col-span-3">
+              <label className="block text-sm font-medium text-gray-700">
+                {item.label}
+              </label>
+              <input
+                value={item.value}
+                onChange={(e) => item.setterMethod(e.target.value)}
+                type={item.type}
+                name={item.name}
+                id={item.name}
+                placeholder={item.label}
+                className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+              />
+            </div>
+          );
+        })}
+
+        <label className="block text-sm font-medium text-gray-700 border-t border-gray-300 pt-4">
+          Upload from CSV
+        </label>
+        <input
+          type="file"
+          accept=".csv"
+          id="csvFile"
+          onChange={(e) => {
+            setApiLoading(true);
+            csvHandler(e.target.files[0]);
+          }}
+        ></input>
+
+        {csvArray.length > 0 && <p>{csvArray.length} Rows read from CSV.</p>}
+      </form>
+    </Modal>
   );
 };
 

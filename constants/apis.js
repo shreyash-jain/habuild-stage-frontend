@@ -113,3 +113,7 @@ export const ShortenerApis = {
   GET_CURRENT_YT_LINK: () => `${API_BASE_URL}/api/shortener/getproxyUrl`,
   UPDATE_CURRENT_YT_LINK: () => `${API_BASE_URL}/api/shortener/updateProxyUrl`,
 };
+
+export const SchedulerApis = {
+  GET: () => `${API_BASE_URL}/api/schedulerHandler/getSchedulerStatus`,
+};
