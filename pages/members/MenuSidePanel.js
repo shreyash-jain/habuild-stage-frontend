@@ -23,44 +23,7 @@ const MenuSidePanel = (props) => {
 
   useEffect(() => {
     fetchTemplates();
-    getAllDemoPrograms();
   }, []);
-
-  const withDemoBatches = (demoPrograms) => {
-    const demoProgramsWithDemoBatches = demoPrograms.map(async (item) => {
-      const demobatches = await fetch(
-        DemoProgramsApis.GET_DEMO_BATCHES_FROM_PROGRAM(item.id)
-      )
-        .then((res) => res.json())
-        .then((data) => {
-          return data.data;
-        });
-
-      return {
-        ...item,
-        action: item,
-        demobatches,
-      };
-    });
-
-    Promise.all(demoProgramsWithDemoBatches).then((data) =>
-      setDemoPrograms(data)
-    );
-  };
-
-  const getAllDemoPrograms = async () => {
-    const demoPrograms = await fetch(DemoProgramsApis.GET())
-      .then((res) => {
-        return res.json();
-      })
-      .then((data) => {
-        // console.log("DATAAAA", data.data);
-        // withDemoBatches(data.data);
-        return data.data;
-      });
-
-    withDemoBatches(demoPrograms);
-  };
 
   const fetchTemplates = async (calledFrom) => {
     await fetch(WatiTemplatesApis.GET())
