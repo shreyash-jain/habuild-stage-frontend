@@ -428,7 +428,7 @@ const AddPaymentForApproval = (props) => {
                 </label>
                 {item.options.map((item1) => {
                   return (
-                    <div className="flex flex-row space-x-4">
+                    <div key={item1.label} className="flex flex-row space-x-4">
                       <label className="block text-sm font-medium text-gray-700">
                         {item1.label}
                       </label>
