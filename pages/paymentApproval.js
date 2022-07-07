@@ -1,18 +1,16 @@
 import { useState, useEffect } from "react";
 import LayoutSidebar from "../components/LayoutSidebar";
 import Modal from "../components/Modal";
-import { RefreshIcon } from "@heroicons/react/outline";
+import { DownloadIcon, RefreshIcon } from "@heroicons/react/outline";
 import toast from "react-hot-toast";
 import Table from "../components/Table";
-import FlyoutMenu from "../components/FlyoutMenu";
-
-import { format, parseISO } from "date-fns";
 import Select from "react-select";
 import {
   ProgramsApis,
   BatchesApis,
   PaymentApis,
   MembersApis,
+  PlanApis,
 } from "../constants/apis";
 
 function classNames(...classes) {
@@ -37,10 +35,21 @@ const PaymentApproval = () => {
 
   const [viewAddModal, setViewAddModal] = useState(false);
 
+  const [plans, setPlans] = useState([]);
+
   useEffect(() => {
     getAllPaymentsToApprove();
     getMemberProgramsWithBatches();
+    getAllPlans();
   }, []);
+
+  const getAllPlans = () => {
+    fetch(PlanApis.GET())
+      .then((res) => res.json())
+      .then((data) => {
+        setPlans(data);
+      });
+  };
 
   const getMemberProgramsWithBatches = async () => {
     fetch(ProgramsApis.GET_PROGRAMS())
@@ -79,11 +88,18 @@ const PaymentApproval = () => {
       })
       .then((data) => {
         const data1 = data.payment_logs.map((item) => {
+          const planNameToShow = plans.filter((item1) => {
+            if (item.amount == item1.amount) {
+              return item1.name;
+            }
+          });
+
           return {
             ...item,
             mobile_number: item.habuild_members.mobile_number,
             email: item.habuild_members.email,
             action: item,
+            planName: planNameToShow[0]?.name,
           };
         });
 
@@ -152,8 +168,11 @@ const PaymentApproval = () => {
     },
     {
       title: "Plan",
-      dataIndex: "Plan",
-      key: "Plan",
+      dataIndex: "planName",
+      key: "planName",
+      render: (planName) => {
+        return <p className="font-medium">{planName}</p>;
+      },
     },
     {
       title: "Actions",
@@ -323,6 +342,7 @@ const PaymentApproval = () => {
         viewModal={viewAddModal}
         setViewModal={setViewAddModal}
         getAllPaymentsToApprove={getAllPaymentsToApprove}
+        plans={plans}
       />
     </div>
   );
@@ -335,21 +355,22 @@ const AddPaymentForApproval = (props) => {
   const [mobileNumber, setMobileNumber] = useState("");
   const [email, setEmail] = useState("");
   const [amount, setAmount] = useState("");
+  const [mobileSearching, setMobileSearching] = useState(false);
 
   const paymentFormFields = [
+    // {
+    //   label: "Mobile Number",
+    //   value: mobileNumber,
+    //   type: "number",
+    //   name: "mobileNumber",
+    //   setterMethod: setMobileNumber,
+    // },
     {
       label: "Name",
       value: name,
       type: "text",
       name: "name",
       setterMethod: setName,
-    },
-    {
-      label: "Mobile Number",
-      value: mobileNumber,
-      type: "text",
-      name: "mobileNumber",
-      setterMethod: setMobileNumber,
     },
     {
       label: "Email",
@@ -364,36 +385,15 @@ const AddPaymentForApproval = (props) => {
       type: "radio",
       name: "amount",
       setterMethod: setAmount,
-      options: [
-        {
-          label: "849",
-          value: "849",
+      options: props.plans.map((item) => {
+        return {
+          label: item.amount,
+          value: item.amount,
           type: "radio",
           name: "amount",
           setterMethod: setAmount,
-        },
-        {
-          label: "1799",
-          value: "1799",
-          type: "radio",
-          name: "amount",
-          setterMethod: setAmount,
-        },
-        {
-          label: "2499",
-          value: "2499",
-          type: "radio",
-          name: "amount",
-          setterMethod: setAmount,
-        },
-        {
-          label: "3999",
-          value: "3999",
-          type: "radio",
-          name: "amount",
-          setterMethod: setAmount,
-        },
-      ],
+        };
+      }),
     },
   ];
 
@@ -434,11 +434,6 @@ const AddPaymentForApproval = (props) => {
   const formSubmit = (e, fromCSV, data) => {
     setApiLoading(true);
 
-    console.log(amount);
-    console.log(name);
-    console.log(mobileNumber);
-    console.log(email);
-
     let dataObj = {};
 
     if (!fromCSV) {
@@ -455,7 +450,6 @@ const AddPaymentForApproval = (props) => {
         Email: email,
         Amount: amount,
         "Payment App ": "NA",
-        Plan: "NA",
       };
     } else {
       dataObj = data;
@@ -477,6 +471,8 @@ const AddPaymentForApproval = (props) => {
     // console.log(raw);
     // console.log(API);
     // console.log(method);
+
+    console.log(requestOptions);
 
     try {
       fetch(API, requestOptions)
@@ -504,6 +500,25 @@ const AddPaymentForApproval = (props) => {
     }
   };
 
+  const populateMemberInfoFromMobile = () => {
+    setMobileSearching(true);
+
+    fetch(MembersApis.SEARCH(mobileNumber, "Mobile"))
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data.data[0]) {
+          setMobileSearching(false);
+
+          toast.error("No Member found for Mobile No.");
+
+          return;
+        }
+        setName(data.data[0].name);
+        setEmail(data.data[0].email);
+        setMobileNumber(data.data[0].mobile_number);
+      });
+  };
+
   return (
     <Modal
       apiLoading={apiLoading}
@@ -521,6 +536,27 @@ const AddPaymentForApproval = (props) => {
         <h2 className="text-left text-xl font-bold text-gray-900">
           Payment For Approval
         </h2>
+
+        {mobileSearching ? (
+          <RefreshIcon className="w-6 h-6 animate-spin" />
+        ) : null}
+
+        <input
+          className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+          value={mobileNumber}
+          onChange={(e) => setMobileNumber(e.target.value)}
+          type="number"
+          name="mobileNumber"
+          placeholder="Mobile Number"
+        />
+
+        <button
+          type="button"
+          onClick={populateMemberInfoFromMobile}
+          className="px-4 py-2 text-white rounded-md bg-green-500 hover:bg-green-700 max-w-fit"
+        >
+          Populate Info by Mobile Number
+        </button>
 
         {paymentFormFields.map((item) => {
           if (item.type == "radio") {
@@ -571,13 +607,24 @@ const AddPaymentForApproval = (props) => {
         <label className="block text-sm font-medium text-gray-700 border-t border-gray-300 pt-4">
           Upload from CSV
         </label>
+
+        <a
+          href="/assets/payments_for_approval_template.csv"
+          download={"payments_for_approval_template.csv"}
+          className="flex flex-row px-3 py-1 text-sm font-medium rounded-md border border-gray-500 max-w-fit hover:bg-gray-200"
+        >
+          <DownloadIcon className="w-4 h-4 mr-2" /> Download Template
+        </a>
+
         <input
           type="file"
           accept=".csv"
           id="csvFile"
           onChange={(e) => {
-            setApiLoading(true);
-            csvHandler(e.target.files[0]);
+            if (e.target.files[0]) {
+              setApiLoading(true);
+              csvHandler(e.target.files[0]);
+            }
           }}
         ></input>
 
