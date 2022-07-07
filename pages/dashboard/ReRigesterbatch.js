@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
+import { ReRegisterApis } from "../../constants/apis";
 
 const ReRegisterBatch = (props) => {
-  const [selectedDemoBatches, setSelectedDemobatches] = useState([]);
+  const [selectedBatches, setSelectedbatches] = useState([]);
 
   const selectBatches = (checked, id) => {
     // console.log("OnChange Called");
-    const newBatchIds = [...selectedDemoBatches];
+    const newBatchIds = [...selectedBatches];
 
     if (checked) {
       newBatchIds.push(id);
@@ -14,11 +15,11 @@ const ReRegisterBatch = (props) => {
       newBatchIds.splice(indexToRemove, 1);
     }
 
-    setSelectedDemobatches(newBatchIds);
+    setSelectedbatches(newBatchIds);
   };
 
   const selectAllBatches = (checked, demoBatches) => {
-    const newBatchIds = [...selectedDemoBatches];
+    const newBatchIds = [...selectedBatches];
 
     if (checked) {
       for (let i = 0; i < demoBatches.length; i++) {
@@ -28,7 +29,15 @@ const ReRegisterBatch = (props) => {
       newBatchIds = [];
     }
 
-    setSelectedDemobatches(newBatchIds);
+    setSelectedbatches(newBatchIds);
+  };
+
+  const onClick = () => {
+    fetch(ReRegisterApis.BATCH)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("DATAAAA", data);
+      });
   };
 
   return (
@@ -54,7 +63,7 @@ const ReRegisterBatch = (props) => {
             </div>
           </div>
           {program.batches?.map((batch) => {
-            const checked = selectedDemoBatches.includes(batch.id);
+            const checked = selectedBatches.includes(batch.id);
             return (
               <div
                 key={batch.id}
@@ -89,13 +98,7 @@ const ReRegisterBatch = (props) => {
       ))}
 
       <button
-        // onClick={() => {
-        //   if (!props.apiLoading) {
-        //     if (window.confirm("Are you sure you want to do this?")) {
-        //       props.sendMessageApi("all", selectedDemoBatches);
-        //     }
-        //   }
-        // }}
+        onClick={onClick}
         className="px-4 py-2 font-medium rounded-md bg-green-300 text-green-700 hover:bg-green-700 hover:text-white"
       >
         Re Register Batches

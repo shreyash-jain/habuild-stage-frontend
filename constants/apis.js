@@ -60,6 +60,8 @@ export const PaymentApis = {
   GET_PAYMENTS: (pageNum) =>
     `${API_BASE_URL}/api/payment/?page=${pageNum}&limit=100`,
   CREATE: () => `${API_BASE_URL}/api/payment/`,
+  CREATE_OFFLINE_PAYMENT: () =>
+    `${API_BASE_URL}/api/payment/createScreenshotPayment`,
 };
 
 export const HabuildAdsApis = {
@@ -116,4 +118,9 @@ export const ShortenerApis = {
 
 export const SchedulerApis = {
   GET: () => `${API_BASE_URL}/api/schedulerHandler/getSchedulerStatus`,
+};
+
+export const ReRegisterApis = {
+  BATCH: () => `${API_BASE_URL}/api/member/registerBatchOnZoom`,
+  MEMBER: () => `${API_BASE_URL}/api/member/registerMemberOnZoom`,
 };
