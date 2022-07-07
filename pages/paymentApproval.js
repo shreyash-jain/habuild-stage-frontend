@@ -209,17 +209,28 @@ const PaymentApproval = () => {
   };
 
   const approvePayment = async () => {
-    await fetch(
-      PaymentApis.APPROVE_PAYMENT({
-        memberId: paymentToDecide.habuild_members.id,
-        paymentId: paymentToDecide.id,
-        selectedBatchId,
-      })
-    )
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    var raw = JSON.stringify({
+      memberId: paymentToDecide.habuild_members.id,
+      paymentId: paymentToDecide.id,
+      batchId: selectedBatchId,
+      utr: utr,
+    });
+    var requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+
+    await fetch(PaymentApis.APPROVE_PAYMENT(), requestOptions)
       .then((res) => {
         return res.json();
       })
-      .then((data) => {});
+      .then((data) => {
+        getAllPaymentsToApprove();
+      });
   };
 
   // console.log("PaymentTO Decide", paymentToDecide);
