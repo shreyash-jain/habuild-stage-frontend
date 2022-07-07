@@ -43,7 +43,7 @@ const SendWAModal = (props) => {
       api = NotificationApis.MEMBERS_SEND_TO_BATCH();
     } else {
       const member_ids = props.selectedLeads?.map((item) => {
-        return item.member_id;
+        return item.id;
       });
       vars = {
         member_ids,
