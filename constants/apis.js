@@ -55,8 +55,7 @@ export const HealthCheckApis = {
 
 export const PaymentApis = {
   GET_OFFLINE_PAYMENTS: () => `${API_BASE_URL}/api/payment/offline_payments`,
-  APPROVE_PAYMENT: () =>
-    `${API_BASE_URL}/api/payment/approve_payment`,
+  APPROVE_PAYMENT: () => `${API_BASE_URL}/api/payment/approve_payment`,
   GET_PAYMENTS: (pageNum) =>
     `${API_BASE_URL}/api/payment/?page=${pageNum}&limit=100`,
   CREATE: () => `${API_BASE_URL}/api/payment/`,
@@ -123,4 +122,8 @@ export const SchedulerApis = {
 export const ReRegisterApis = {
   BATCH: () => `${API_BASE_URL}/api/member/registerBatchOnZoom`,
   MEMBER: () => `${API_BASE_URL}/api/member/registerMemberOnZoom`,
+};
+
+export const PlanApis = {
+  GET: () => `${API_BASE_URL}/api/plan/`,
 };
