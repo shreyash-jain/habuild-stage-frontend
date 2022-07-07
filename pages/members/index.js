@@ -494,15 +494,15 @@ const Members = (props) => {
             </div> */}
             <div className="mt-1 relative rounded-md shadow-sm">
               <div className="absolute inset-y-0 left-0 flex items-center">
-                <label htmlFor="country" className="sr-only">
-                  Country
+                <label htmlFor="searchFor" className="sr-only">
+                  searchFor
                 </label>
                 <select
                   value={searchFor}
                   onChange={(e) => setSearchFor(e.target.value)}
-                  id="country"
-                  name="country"
-                  autoComplete="country"
+                  id="searchFor"
+                  name="searchFor"
+                  autoComplete="searchFor"
                   className="focus:ring-indigo-500 focus:border-indigo-500 h-full py-0 pl-1 border-transparent bg-transparent text-gray-500 sm:text-sm rounded-md"
                 >
                   <option>Name</option>

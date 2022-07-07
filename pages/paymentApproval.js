@@ -8,7 +8,12 @@ import FlyoutMenu from "../components/FlyoutMenu";
 
 import { format, parseISO } from "date-fns";
 import Select from "react-select";
-import { ProgramsApis, BatchesApis, PaymentApis } from "../constants/apis";
+import {
+  ProgramsApis,
+  BatchesApis,
+  PaymentApis,
+  MembersApis,
+} from "../constants/apis";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -73,7 +78,6 @@ const PaymentApproval = () => {
         return res.json();
       })
       .then((data) => {
-        // console.log("data", data);
         const data1 = data.payment_logs.map((item) => {
           return {
             ...item,
@@ -82,6 +86,7 @@ const PaymentApproval = () => {
             action: item,
           };
         });
+
         setPaymentsToApprove(data1);
         setLoading(false);
       });
@@ -306,6 +311,7 @@ const PaymentApproval = () => {
       <AddPaymentForApproval
         viewModal={viewAddModal}
         setViewModal={setViewAddModal}
+        getAllPaymentsToApprove={getAllPaymentsToApprove}
       />
     </div>
   );
@@ -314,59 +320,67 @@ const PaymentApproval = () => {
 const AddPaymentForApproval = (props) => {
   const [apiLoading, setApiLoading] = useState(false);
   const [csvArray, setCsvArray] = useState([]);
+  const [name, setName] = useState("");
+  const [mobileNumber, setMobileNumber] = useState("");
+  const [email, setEmail] = useState("");
+  const [amount, setAmount] = useState("");
 
   const paymentFormFields = [
     {
       label: "Name",
-      value: "",
+      value: name,
       type: "text",
       name: "name",
-      setterMethod: () => {},
+      setterMethod: setName,
     },
     {
       label: "Mobile Number",
-      value: "",
+      value: mobileNumber,
       type: "text",
-      name: "namemobileNumber",
-      setterMethod: () => {},
+      name: "mobileNumber",
+      setterMethod: setMobileNumber,
     },
     {
       label: "Email",
-      value: "",
+      value: email,
       type: "text",
       name: "email",
-      setterMethod: () => {},
+      setterMethod: setEmail,
     },
     {
       label: "Amount",
-      value: "",
+      value: amount,
       type: "radio",
       name: "amount",
-      setterMethod: () => {},
+      setterMethod: setAmount,
       options: [
         {
           label: "849",
-          value: "",
+          value: "849",
           type: "radio",
           name: "amount",
+          setterMethod: setAmount,
         },
         {
           label: "1799",
-          value: "",
+          value: "1799",
           type: "radio",
           name: "amount",
+          setterMethod: setAmount,
         },
         {
           label: "2499",
-          value: "",
+          value: "2499",
           type: "radio",
           name: "amount",
+          setterMethod: setAmount,
         },
         {
           label: "3999",
-          value: "",
+          value: "3999",
           type: "radio",
           name: "amount",
+          setterMethod: setAmount,
         },
       ],
     },
@@ -388,6 +402,10 @@ const AddPaymentForApproval = (props) => {
     console.log("New Arrr", newArray);
 
     setCsvArray(newArray);
+
+    for (let i = 0; i < newArray.length; i++) {
+      formSubmit({}, true, newArray[i]);
+    }
   };
 
   const csvHandler = (file) => {
@@ -402,12 +420,86 @@ const AddPaymentForApproval = (props) => {
     reader.readAsText(file);
   };
 
+  const formSubmit = (e, fromCSV, data) => {
+    setApiLoading(true);
+
+    console.log(amount);
+    console.log(name);
+    console.log(mobileNumber);
+    console.log(email);
+
+    let dataObj = {};
+
+    if (!fromCSV) {
+      e.preventDefault();
+
+      if (!amount || !name || !mobileNumber || !email) {
+        alert("Please enter all details.");
+        setApiLoading(false);
+        return;
+      }
+
+      dataObj = {
+        "Mobile Number": mobileNumber,
+        Email: email,
+        Amount: amount,
+        "Payment App ": "NA",
+        Plan: "NA",
+      };
+    } else {
+      dataObj = data;
+    }
+
+    let API = PaymentApis.CREATE_OFFLINE_PAYMENT();
+    let method = "POST";
+
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    var raw = JSON.stringify(dataObj);
+    var requestOptions = {
+      method: method,
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+
+    // console.log(raw);
+    // console.log(API);
+    // console.log(method);
+
+    try {
+      fetch(API, requestOptions)
+        .then((response) => {
+          // console.log("response", response);
+          return response.text();
+        })
+        .then((result) => {
+          setApiLoading(false);
+          toast.success(
+            `Payment ${props.mode == "edit" ? "Updated" : "Created"}`
+          );
+          props.getAllPaymentsToApprove();
+          props.setViewModal(false);
+          // console.log("Api Result", result);
+        });
+    } catch {
+      (error) => {
+        setApiLoading(false);
+        toast.error(
+          `No payment ${props.mode == "edit" ? "Updated" : "Created"}`
+        );
+        console.log("error", error);
+      };
+    }
+  };
+
   return (
     <Modal
       apiLoading={apiLoading}
       modalOpen={props.viewModal}
       setModalOpen={props.setViewModal}
       actionText="Add Payment"
+      onActionButtonClick={formSubmit}
     >
       <form
         className="flex flex-col w-full space-y-5"
