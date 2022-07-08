@@ -54,7 +54,7 @@ export default function Table(props) {
                         return (
                           <td
                             key={index}
-                            className="sm:pl-6 pl-4 py-4 whitespace-nowrap"
+                            className="pl-2 py-4 whitespace-nowrap"
                           >
                             {column.render(dataSource[column.dataIndex])}
                           </td>
@@ -63,7 +63,7 @@ export default function Table(props) {
                         return (
                           <td
                             key={index}
-                            className="sm:pl-6 pl-4 py-4 whitespace-nowrap"
+                            className="pl-2 py-4 whitespace-nowrap"
                           >
                             <div className="flex text-left">
                               <div className="text-sm font-medium text-gray-900">
