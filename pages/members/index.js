@@ -1,26 +1,14 @@
 import React, { useEffect, useState, Fragment } from "react";
-import {
-  Dialog,
-  Disclosure,
-  Menu,
-  Popover,
-  Transition,
-} from "@headlessui/react";
+
 import LayoutSidebar from "../../components/LayoutSidebar";
 import Table from "../../components/Table";
 import FlyoutMenu from "../../components/FlyoutMenu";
-import Modal from "../../components/Modal";
 import {
-  RefreshIcon,
   XCircleIcon,
   CheckCircleIcon,
-  ChevronDownIcon,
-  SearchIcon,
-  FilterIcon,
   MenuAlt1Icon,
   ExternalLinkIcon,
 } from "@heroicons/react/outline";
-import { format, parseISO } from "date-fns";
 import toast from "react-hot-toast";
 import MemberInfoSidePanel from "./memberInfoSidePanel";
 import MenuSidePanel from "./MenuSidePanel";
@@ -29,6 +17,7 @@ import StopMembership from "./stopMembership";
 import PauseMembership from "./PauseMembership";
 import UpdateMemberDetails from "./UpdateMemberDetails";
 import { ProgramsApis, BatchesApis, MembersApis } from "../../constants/apis";
+import Image from "next/image";
 
 const Members = (props) => {
   const [members, setMembers] = useState([]);
@@ -398,6 +387,35 @@ const Members = (props) => {
       key: "plan_name",
       render: (plans) => {
         return JSON.stringify(plans).replace(/[^a-z0-9]/gi, " ");
+      },
+    },
+    {
+      title: "Channel",
+      dataIndex: "channel",
+      key: "channel",
+      render: (channel) => {
+        if (channel === "ZOOM") {
+          return (
+            <Image
+              layout="responsive"
+              width={20}
+              height={8}
+              src="/assets/zoom_logo.png"
+            />
+          );
+        }
+        if (channel === "YOUTUBE") {
+          return (
+            <Image
+              layout="responsive"
+              width={30}
+              height={7}
+              src="/assets/youtube_logo.jpg"
+            />
+          );
+        }
+
+        return "-";
       },
     },
     {
