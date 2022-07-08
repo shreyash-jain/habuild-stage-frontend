@@ -174,7 +174,7 @@ const Dashboard = () => {
           return "-";
         }
 
-        return format(new Date(date), "yyyy-MM-dd");
+        return date.split("T")[0];
       },
     },
     {
