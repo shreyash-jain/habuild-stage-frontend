@@ -415,11 +415,24 @@ const AddPaymentForApproval = (props) => {
     setCsvArray(newArray);
 
     for (let i = 0; i < newArray.length; i++) {
-      formSubmit({}, true, newArray[i]);
+      const dataObj = {
+        Amount: newArray[i]["Amount\r"]?.replace(/\D/g, ""),
+        Email: newArray[i].Email,
+        ["Mobile Number"]: newArray[i]["Mobile Number"],
+        Name: newArray[i].Name,
+      };
+
+      if (dataObj.Amount !== undefined) {
+        formSubmit({}, true, dataObj);
+      }
     }
+    props.getAllPaymentsToApprove();
+    props.setViewModal(false);
+    setApiLoading(false);
   };
 
   const csvHandler = (file) => {
+    setApiLoading(true);
     const reader = new FileReader();
 
     reader.onload = function (e) {
@@ -481,21 +494,25 @@ const AddPaymentForApproval = (props) => {
           return response.text();
         })
         .then((result) => {
-          setApiLoading(false);
-          toast.success(
-            `Payment ${props.mode == "edit" ? "Updated" : "Created"}`
-          );
-          props.getAllPaymentsToApprove();
-          props.setViewModal(false);
+          if (fromCSV) {
+            setApiLoading(false);
+            toast.success(
+              `Payment ${props.mode == "edit" ? "Updated" : "Created"}`
+            );
+            props.getAllPaymentsToApprove();
+            props.setViewModal(false);
+          }
           // console.log("Api Result", result);
         });
     } catch {
       (error) => {
-        setApiLoading(false);
-        toast.error(
-          `No payment ${props.mode == "edit" ? "Updated" : "Created"}`
-        );
         console.log("error", error);
+        if (!fromCSV) {
+          setApiLoading(false);
+          toast.error(
+            `No payment ${props.mode == "edit" ? "Updated" : "Created"}`
+          );
+        }
       };
     }
   };
