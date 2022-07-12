@@ -428,6 +428,7 @@ const AddPaymentForApproval = (props) => {
         selectedBatch: remove_backslash_characters(
           newArray[i]["Selected Batch\r"]
         ),
+        ["Payment App "]: "NA",
       };
 
       if (dataObj.Amount !== undefined) {
@@ -512,6 +513,7 @@ const AddPaymentForApproval = (props) => {
             props.getAllPaymentsToApprove();
             props.setViewModal(false);
           }
+          props.getAllPaymentsToApprove();
           // console.log("Api Result", result);
         });
     } catch {
