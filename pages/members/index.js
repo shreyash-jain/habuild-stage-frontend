@@ -386,7 +386,11 @@ const Members = (props) => {
       dataIndex: "plan_name",
       key: "plan_name",
       render: (plans) => {
-        return JSON.stringify(plans).replace(/[^a-z0-9]/gi, " ");
+        if (plans) {
+          return JSON.stringify(plans).replace(/[^a-z0-9]/gi, " ");
+        } else {
+          return "NA";
+        }
       },
     },
     {
