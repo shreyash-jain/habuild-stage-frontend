@@ -45,7 +45,6 @@ const StopMembership = (props) => {
         props.getPaginatedLeads(props.currentPagePagination);
         props.setModalOpen(false);
         setRefundCheck(false);
-        // console.log(result);
       })
       .catch((error) => {
         setApiLoading(false);

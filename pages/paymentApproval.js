@@ -12,6 +12,7 @@ import {
   MembersApis,
   PlanApis,
 } from "../constants/apis";
+import { remove_backslash_characters } from "../utils/stringUtility";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -26,7 +27,6 @@ const PaymentApproval = () => {
   const [imageToShow, setImageToShow] = useState("");
 
   const [paymentToDecide, setPaymentToDecide] = useState({});
-  const [selectedBatchId, setSelectedBatchId] = useState("");
   const [utr, setUtr] = useState("");
 
   const [memberProgramsWithBatches, setMemberProgramsWithBatches] = useState(
@@ -106,6 +106,13 @@ const PaymentApproval = () => {
         setPaymentsToApprove(data1);
         setLoading(false);
       });
+  };
+
+  const denyPayment = () => {
+    if (!window.confirm("Are you sure?")) {
+      setPaymentToDecide({});
+      return;
+    }
   };
 
   // const beforeOpenActionPanel = (actionEntity) => {
@@ -199,6 +206,10 @@ const PaymentApproval = () => {
             </button>
             <button
               type="button"
+              onClick={() => {
+                setPaymentToDecide(actionEntity);
+                denyPayment();
+              }}
               className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-grey-800 hover:text-white bg-red-400 hover:bg-red-600 focus:outline-none "
             >
               Deny
@@ -233,7 +244,6 @@ const PaymentApproval = () => {
     var raw = JSON.stringify({
       memberId: paymentToDecide.habuild_members.id,
       paymentId: paymentToDecide.id,
-      batchId: selectedBatchId,
       utr: utr,
     });
     var requestOptions = {
@@ -249,6 +259,7 @@ const PaymentApproval = () => {
       })
       .then((data) => {
         getAllPaymentsToApprove();
+        setShowScreenshotModal(false);
       });
   };
 
@@ -307,14 +318,6 @@ const PaymentApproval = () => {
 
         <h2>Amount - {paymentToDecide.amount}</h2>
 
-        <Select
-          onChange={(option) => {
-            setSelectedBatchId(option.value);
-          }}
-          options={computeSelectOptions()}
-          placeholder="Select Batch"
-        ></Select>
-
         <input
           className="px-2 py-1 rounded-md w-full mt-4 border border-gray-400"
           placeholder="UTR"
@@ -343,6 +346,7 @@ const PaymentApproval = () => {
         setViewModal={setViewAddModal}
         getAllPaymentsToApprove={getAllPaymentsToApprove}
         plans={plans}
+        computeSelectOptions={computeSelectOptions}
       />
     </div>
   );
@@ -356,6 +360,7 @@ const AddPaymentForApproval = (props) => {
   const [email, setEmail] = useState("");
   const [amount, setAmount] = useState("");
   const [mobileSearching, setMobileSearching] = useState(false);
+  const [selectedBatchName, setSelectedBatchName] = useState("");
 
   const paymentFormFields = [
     // {
@@ -416,10 +421,13 @@ const AddPaymentForApproval = (props) => {
 
     for (let i = 0; i < newArray.length; i++) {
       const dataObj = {
-        Amount: newArray[i]["Amount\r"]?.replace(/\D/g, ""),
+        Amount: newArray[i].Amount?.replace(/\D/g, ""),
         Email: newArray[i].Email,
         ["Mobile Number"]: newArray[i]["Mobile Number"],
         Name: newArray[i].Name,
+        selectedBatch: remove_backslash_characters(
+          newArray[i]["Selected Batch\r"]
+        ),
       };
 
       if (dataObj.Amount !== undefined) {
@@ -452,7 +460,7 @@ const AddPaymentForApproval = (props) => {
     if (!fromCSV) {
       e.preventDefault();
 
-      if (!amount || !name || !mobileNumber || !email) {
+      if (!amount || !name || !mobileNumber || !email || !selectedBatchName) {
         alert("Please enter all details.");
         setApiLoading(false);
         return;
@@ -463,6 +471,8 @@ const AddPaymentForApproval = (props) => {
         Email: email,
         Amount: amount,
         "Payment App ": "NA",
+        Name: name,
+        selectedBatch: selectedBatchName,
       };
     } else {
       dataObj = data;
@@ -494,7 +504,7 @@ const AddPaymentForApproval = (props) => {
           return response.text();
         })
         .then((result) => {
-          if (fromCSV) {
+          if (!fromCSV) {
             setApiLoading(false);
             toast.success(
               `Payment ${props.mode == "edit" ? "Updated" : "Created"}`
@@ -518,14 +528,18 @@ const AddPaymentForApproval = (props) => {
   };
 
   const populateMemberInfoFromMobile = () => {
+    if (!mobileNumber) {
+      return;
+    }
+
     setMobileSearching(true);
 
     fetch(MembersApis.SEARCH(mobileNumber, "Mobile"))
       .then((res) => res.json())
       .then((data) => {
+        setMobileSearching(false);
         if (!data.data[0]) {
           setMobileSearching(false);
-
           toast.error("No Member found for Mobile No.");
 
           return;
@@ -620,6 +634,14 @@ const AddPaymentForApproval = (props) => {
             </div>
           );
         })}
+
+        <Select
+          onChange={(option) => {
+            setSelectedBatchName(option.label);
+          }}
+          options={props.computeSelectOptions()}
+          placeholder="Select Batch"
+        ></Select>
 
         <label className="block text-sm font-medium text-gray-700 border-t border-gray-300 pt-4">
           Upload from CSV

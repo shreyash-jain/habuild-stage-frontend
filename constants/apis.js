@@ -56,6 +56,7 @@ export const HealthCheckApis = {
 export const PaymentApis = {
   GET_OFFLINE_PAYMENTS: () => `${API_BASE_URL}/api/payment/offline_payments`,
   APPROVE_PAYMENT: () => `${API_BASE_URL}/api/payment/approve_payment`,
+  DENY_PAYMENT: (memberId) => `${API_BASE_URL}/api/payment/deny_payment?memberId=${memberId}`,
   GET_PAYMENTS: (pageNum) =>
     `${API_BASE_URL}/api/payment/?page=${pageNum}&limit=100`,
   CREATE: () => `${API_BASE_URL}/api/payment/`,
