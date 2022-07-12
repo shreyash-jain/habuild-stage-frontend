@@ -575,15 +575,8 @@ const Members = (props) => {
       />
 
       <button
-        // onClick={() => setViewAddLeadModal(true)}
-        className="font-medium px-4 py-2 rounded-md bg-green-300 hover:bg-green-500 text-green-700 hover:text-white fixed bottom-2 right-2"
-      >
-        Add Member +
-      </button>
-
-      <button
         onClick={() => setShowMenuSidebar(true)}
-        className="transition duration-300 font-medium px-4 py-2 rounded-md bg-green-300 hover:bg-green-500 text-green-700 hover:text-white fixed bottom-2 right-40"
+        className="transition duration-300 font-medium px-4 py-2 rounded-md bg-green-300 hover:bg-green-500 text-green-700 hover:text-white fixed bottom-2 right-5"
       >
         <MenuAlt1Icon className="w-6 h-6" />
       </button>
