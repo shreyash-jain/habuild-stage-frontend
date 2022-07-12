@@ -1,28 +1,10 @@
 import SidePannel from "../../components/SidePannel";
 import { Fragment, useEffect, useState } from "react";
-import { Dialog, Transition } from "@headlessui/react";
-import {
-  CalendarIcon,
-  CogIcon,
-  HomeIcon,
-  MapIcon,
-  MenuIcon,
-  SearchCircleIcon,
-  SpeakerphoneIcon,
-  UserGroupIcon,
-  ViewGridAddIcon,
-  XIcon,
-} from "@heroicons/react/outline";
-import {
-  ChevronLeftIcon,
-  FilterIcon,
-  MailIcon,
-  PhoneIcon,
-  SearchIcon,
-} from "@heroicons/react/solid";
-import { format } from "date-fns";
+
+
 import Link from "next/link";
 import { ShortenerApis } from "../../constants/apis";
+import {remove_backslash_characters} from "../../utils/stringUtility"
 
 const tabs = [
   { name: "Account", href: "#", current: true },
@@ -121,7 +103,7 @@ const MemberInfoSidePanel = (props) => {
         "Current Preffered Batch ID": props.memberForAction.preffered_batch_id,
         "Subscription End Date":
           props.memberForAction.sub_end_date?.split("T")[0],
-        "Current Subscription": "",
+        "Current Subscription": remove_backslash_characters(JSON.stringify(props.memberForAction.plan_name).replace(/[^a-z0-9]/gi, " ")),
         "Days Remaining":
           props.memberForAction?.sub_end_date &&
           CalcDaysToDate(new Date(), props.memberForAction?.sub_end_date),
