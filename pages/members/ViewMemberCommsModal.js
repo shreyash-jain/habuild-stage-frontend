@@ -8,10 +8,10 @@ const ViewMemberCommsModal = (props) => {
   const [memberComms, setMemberComms] = useState([]);
 
   useEffect(() => {
-    if (props.memberForAction.id) {
+    if (props.memberForAction?.id) {
       getComms();
     }
-  }, [props.memberForAction.id]);
+  }, [props.memberForAction?.id]);
 
   const getComms = async () => {
     await fetch(MembersApis.GET_COMM_LOGS(props.memberForAction?.id))
@@ -44,7 +44,6 @@ const ViewMemberCommsModal = (props) => {
     },
   ];
 
-  console.log(memberComms);
 
   return (
     <Modal
