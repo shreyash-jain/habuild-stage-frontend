@@ -44,10 +44,9 @@ const ViewMemberCommsModal = (props) => {
     },
   ];
 
-
   return (
     <Modal
-      modalOpen={props.modalOpen}
+      modalOpen={props.modalOpen ? props.modalOpen : false}
       setModalOpen={props.setModalOpen}
       hideActionButtons
     >
