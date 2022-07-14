@@ -16,8 +16,16 @@ import GiftMembershipModal from "./GiftMembership";
 import StopMembership from "./stopMembership";
 import PauseMembership from "./PauseMembership";
 import UpdateMemberDetails from "./UpdateMemberDetails";
-import { ProgramsApis, BatchesApis, MembersApis } from "../../constants/apis";
+import ChangeMemberChannel from "./ChangeMemberChannel";
+import ChangePrefferedBatch from "./ChangePrefferedBatch";
+import {
+  ProgramsApis,
+  BatchesApis,
+  MembersApis,
+  ReRegisterApis,
+} from "../../constants/apis";
 import Image from "next/image";
+import ViewMemberCommsModal from "./ViewMemberCommsModal";
 
 const Members = (props) => {
   const [members, setMembers] = useState([]);
@@ -26,6 +34,7 @@ const Members = (props) => {
   const [viewGiftMembershipModal, setViewGiftMembershipModal] = useState(false);
   const [stopMembershipModal, setStopMembershipModal] = useState(false);
   const [pauseMembershipModal, setPauseMembershipModal] = useState(false);
+  const [changeChannelModal, setChangeChannelModal] = useState(false);
   const [memberForAction, setMemberForAction] = useState({});
   const [showMenuSidebar, setShowMenuSidebar] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -38,6 +47,10 @@ const Members = (props) => {
   );
   const [memberBatches, setMemberBatches] = useState([]);
   const [searchFor, setSearchFor] = useState("Name");
+
+  const [viewCommsModal, setViewCommsModal] = useState(false);
+  const [viewChangePrefferedBatchModal, setViewChangePrefferedBatchModal] =
+    useState(false);
 
   useEffect(() => {
     getMembers(1);
@@ -101,6 +114,20 @@ const Members = (props) => {
 
   const menuItems = [
     {
+      name: "View Member Comms",
+      onClick: (actionEntity) => {
+        setMemberForAction(actionEntity);
+        setViewCommsModal(true);
+      },
+    },
+    {
+      name: "Change Member Channel",
+      onClick: (actionEntity) => {
+        setMemberForAction(actionEntity);
+        setChangeChannelModal(true);
+      },
+    },
+    {
       name: "Update Member Details",
       onClick: (actionEntity) => {
         setMemberForAction(actionEntity);
@@ -157,7 +184,48 @@ const Members = (props) => {
         }
       },
     },
+    {
+      name: "Re-Register Member",
+      onClick: (actionEntity) => {
+        if (actionEntity.status == "ACTIVE") {
+          memberReRegister(actionEntity);
+        } else {
+          toast.error("Can only Re-Register an ACTIVE member.");
+        }
+      },
+    },
+    {
+      name: "Change Preffered Batch",
+      onClick: (actionEntity) => {
+        if (actionEntity.status !== "INACTIVE") {
+          setMemberForAction(actionEntity);
+          setViewChangePrefferedBatchModal(true);
+        } else {
+          toast.error("Can only change batch for an ACTIVE member.");
+        }
+      },
+    },
   ];
+
+  const memberReRegister = (memberObj) => {
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    var raw = JSON.stringify({
+      memberId: memberObj.id,
+    });
+    var requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+
+    fetch(ReRegisterApis.MEMBER(), requestOptions)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("ReRegister DATAAAA", data);
+      });
+  };
 
   const resumeMembership = (actionEntity) => {
     if (
@@ -184,7 +252,7 @@ const Members = (props) => {
         } else {
           toast.success(result?.message);
         }
-        props.getPaginatedLeads(props.currentPagePagination);
+        getMembers(currentPagePagination);
         // console.log(result);
       })
       .catch((error) => {
@@ -382,18 +450,6 @@ const Members = (props) => {
       },
     },
     {
-      title: "Plan Name",
-      dataIndex: "plan_name",
-      key: "plan_name",
-      render: (plans) => {
-        if (plans) {
-          return JSON.stringify(plans).replace(/[^a-z0-9]/gi, " ");
-        } else {
-          return "NA";
-        }
-      },
-    },
-    {
       title: "Channel",
       dataIndex: "channel",
       key: "channel",
@@ -422,6 +478,19 @@ const Members = (props) => {
         return "-";
       },
     },
+    {
+      title: "Plan Name",
+      dataIndex: "plan_name",
+      key: "plan_name",
+      render: (plans) => {
+        if (plans) {
+          return JSON.stringify(plans).replace(/[^a-z0-9]/gi, " ");
+        } else {
+          return "NA";
+        }
+      },
+    },
+
     {
       title: "Preffered Batch",
       dataIndex: "preffered_batch_id",
@@ -629,6 +698,28 @@ const Members = (props) => {
         modalOpen={viewUpdateMemberInfo}
         setModalOpen={setViewUpdateMemberInfo}
         memberForAction={memberForAction}
+      />
+
+      <ChangeMemberChannel
+        modalOpen={changeChannelModal}
+        setModalOpen={setChangeChannelModal}
+        memberForAction={memberForAction}
+        getPaginatedLeads={getMembers}
+        currentPagePagination={currentPagePagination}
+      />
+
+      <ViewMemberCommsModal
+        memberForAction={memberForAction}
+        modalOpen={viewCommsModal}
+        setModalOpen={setViewCommsModal}
+      />
+
+      <ChangePrefferedBatch
+        memberForAction={memberForAction}
+        modalOpen={viewChangePrefferedBatchModal}
+        setModalOpen={setViewChangePrefferedBatchModal}
+        memberProgramsWithBatches={memberProgramsWithBatches}
+        memberBatches={memberBatches}
       />
     </div>
   );

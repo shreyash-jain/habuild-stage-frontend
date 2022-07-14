@@ -56,7 +56,8 @@ export const HealthCheckApis = {
 export const PaymentApis = {
   GET_OFFLINE_PAYMENTS: () => `${API_BASE_URL}/api/payment/offline_payments`,
   APPROVE_PAYMENT: () => `${API_BASE_URL}/api/payment/approve_payment`,
-  DENY_PAYMENT: (memberId) => `${API_BASE_URL}/api/payment/deny_payment?memberId=${memberId}`,
+  DENY_PAYMENT: (memberId) =>
+    `${API_BASE_URL}/api/payment/deny_payment?memberId=${memberId}`,
   GET_PAYMENTS: (pageNum) =>
     `${API_BASE_URL}/api/payment/?page=${pageNum}&limit=100`,
   CREATE: () => `${API_BASE_URL}/api/payment/`,
@@ -95,6 +96,10 @@ export const MembersApis = {
     `${API_BASE_URL}/api/member/stop_membership/${memberId}`,
   UPDATE: (memberId) =>
     `${API_BASE_URL}/api/member/updateMemberDetails/${memberId}`,
+  UPDATE_CHANNEL: (memberId) =>
+    `${API_BASE_URL}/api/member/${memberId}/preferred_channel`,
+  UPDATE_PREFFERED_BATCH: () =>
+    `${API_BASE_URL}/api/member/updatePreferredBatch`,
 };
 
 export const WatiTemplatesApis = {
@@ -112,6 +117,7 @@ export const NotificationApis = {
 
 export const ShortenerApis = {
   GET_LONG_URL: () => `${API_BASE_URL}/api/shortener/getLongUrl`,
+  UPDATE_LONG_URL: () => `${API_BASE_URL}/api/shortener/updateLongUrl`,
   GET_CURRENT_YT_LINK: () => `${API_BASE_URL}/api/shortener/getproxyUrl`,
   UPDATE_CURRENT_YT_LINK: () => `${API_BASE_URL}/api/shortener/updateProxyUrl`,
 };
