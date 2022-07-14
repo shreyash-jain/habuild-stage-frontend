@@ -1,10 +1,11 @@
 import SidePannel from "../../components/SidePannel";
 import { Fragment, useEffect, useState } from "react";
 
-
 import Link from "next/link";
 import { ShortenerApis } from "../../constants/apis";
-import {remove_backslash_characters} from "../../utils/stringUtility"
+import { remove_backslash_characters } from "../../utils/stringUtility";
+import { RefreshIcon } from "@heroicons/react/outline";
+import toast from "react-hot-toast";
 
 const tabs = [
   { name: "Account", href: "#", current: true },
@@ -53,7 +54,10 @@ const MemberInfoSidePanel = (props) => {
     Subscription: {},
   });
   const [currentTab, setCurrentTab] = useState("Account");
-  // const [  ] = useState()
+  const [memberShortLink, setMemberShortLink] = useState("");
+  const [shortLinkLoader, setShortLinkLoader] = useState(false);
+  const [longUrlForShortUrl, setLongUrlForShortUrl] = useState("");
+  const [currentLongUrl, setCurrentLongUrl] = useState("");
 
   useEffect(() => {
     const memberPerformance =
@@ -103,30 +107,87 @@ const MemberInfoSidePanel = (props) => {
         "Current Preffered Batch ID": props.memberForAction.preffered_batch_id,
         "Subscription End Date":
           props.memberForAction.sub_end_date?.split("T")[0],
-        "Current Subscription": remove_backslash_characters(JSON.stringify(props.memberForAction.plan_name)?.replace(/[^a-z0-9]/gi, " ")),
+        "Current Subscription": remove_backslash_characters(
+          JSON.stringify(props.memberForAction.plan_name)?.replace(
+            /[^a-z0-9]/gi,
+            " "
+          )
+        ),
         "Days Remaining":
           props.memberForAction?.sub_end_date &&
           CalcDaysToDate(new Date(), props.memberForAction?.sub_end_date),
       },
     });
-
-    // getMemberShortlinks();
+    setMemberShortLink("https://" + props.memberForAction.short_meeting_link);
+    if (props.memberForAction.short_meeting_link) {
+      getMemberShortlinks(
+        "https://" + props.memberForAction.short_meeting_link
+      );
+    }
   }, [props.memberForAction]);
 
-  const getMemberShortlinks = async () => {
-    // var raw = JSON.stringify({
-    //   shortUrl: props.memberForAction.short_meeting_link,
-    // });
-    // var requestOptions = {
-    //   method: "GET",
-    //   body: raw,
-    //   redirect: "follow",
-    // };
+  const getMemberShortlinks = async (shortLink) => {
+    if (!shortLink) {
+      return;
+    }
+
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    setShortLinkLoader(true);
+    var raw = JSON.stringify({
+      shortUrl: shortLink,
+    });
+    var requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
 
     await fetch(ShortenerApis.GET_LONG_URL(), requestOptions)
       .then((res) => res.json())
       .then((data) => {
+        setShortLinkLoader(false);
+        setCurrentLongUrl(data.long_url);
+        setLongUrlForShortUrl(data.long_url);
         console.log("Short URL Data", data);
+      });
+  };
+
+  const updateLongUrl = async () => {
+    if (!window.confirm("Are you sure?")) {
+      return;
+    }
+
+    setShortLinkLoader(true);
+
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    setShortLinkLoader(true);
+    var raw = JSON.stringify({
+      shortUrl: memberShortLink,
+      newLongUrl: longUrlForShortUrl,
+    });
+    var requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+
+    await fetch(ShortenerApis.UPDATE_LONG_URL(), requestOptions)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.ok) {
+          toast.success("Updated Long URL");
+          getMemberShortlinks(memberShortLink);
+        } else {
+          toast.error("Failed to update Long URL");
+        }
+
+        setShortLinkLoader(false);
       });
   };
 
@@ -262,8 +323,70 @@ const MemberInfoSidePanel = (props) => {
           </div> */}
         </article>
 
-        <div className="mt-6 ">
-          <h1>ShortLink Info</h1>
+        <div className="my-24 rounded-md border border-gray-100 p-3 shadow-sm">
+          <h1 className="font-medium text-gray-500 mb-4">ShortLink Info</h1>
+
+          {shortLinkLoader ? (
+            <RefreshIcon className="text-green-300 animate-spin h-12 w-12 mx-auto" />
+          ) : (
+            <div>
+              <div className="block">
+                <label
+                  htmlFor="memberShortLink"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Member Short Link
+                </label>
+                <Link className="overflow-hidden" href={memberShortLink}>
+                  <a
+                    style={{
+                      textDecoration: "underline",
+                      color: "blue",
+                    }}
+                  >
+                    {memberShortLink}
+                  </a>
+                </Link>
+              </div>
+
+              <div className="mt-12">
+                <label
+                  htmlFor="longUrl"
+                  className=" block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
+                >
+                  Long URL
+                </label>
+                <Link href={currentLongUrl}>
+                  <a
+                    style={{
+                      width: "50%",
+                      textDecoration: "underline",
+                      color: "blue",
+                    }}
+                  >
+                    {currentLongUrl}
+                  </a>
+                </Link>
+                <div className="mt-4 sm:mt-0 sm:col-span-2">
+                  <textarea
+                    rows={6}
+                    value={longUrlForShortUrl}
+                    onChange={(e) => setLongUrlForShortUrl(e.target.value)}
+                    type="text"
+                    name="longUrl"
+                    className="p-2 rounded-md border border-gray-400 w-full"
+                  />
+                </div>
+              </div>
+
+              <button
+                onClick={updateLongUrl}
+                className="font-medium px-3 py-2 rounded-md bg-green-300 hover:bg-green-500 hover:text-white text-green-700"
+              >
+                Update Long URL
+              </button>
+            </div>
+          )}
         </div>
       </main>
     </SidePannel>

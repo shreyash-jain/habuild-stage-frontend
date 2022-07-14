@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { ReRegisterApis } from "../../constants/apis";
+import { RefreshIcon } from "@heroicons/react/outline";
 
 const ReRegisterBatch = (props) => {
   const [selectedBatches, setSelectedbatches] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const selectBatches = (checked, id) => {
     // console.log("OnChange Called");
@@ -33,9 +36,33 @@ const ReRegisterBatch = (props) => {
   };
 
   const onClick = () => {
-    fetch(ReRegisterApis.BATCH)
+    setLoading(true);
+    if (selectedBatches.length == 0) {
+      setLoading(false);
+      toast.error("Please select atleast one batch to reregister.");
+      return;
+    }
+
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    var raw = JSON.stringify({
+      batchIds: selectedBatches,
+    });
+    var requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+
+    fetch(ReRegisterApis.BATCH(), requestOptions)
       .then((res) => res.json())
       .then((data) => {
+        setLoading(false);
+        if (data.status == 500) {
+          toast.error("Failed to Re-Register batches.");
+        }
+        toast.success("Re-Registered batches Successfully.");
         console.log("DATAAAA", data);
       });
   };
@@ -97,12 +124,16 @@ const ReRegisterBatch = (props) => {
         </fieldset>
       ))}
 
-      <button
-        onClick={onClick}
-        className="px-4 py-2 font-medium rounded-md bg-green-300 text-green-700 hover:bg-green-700 hover:text-white"
-      >
-        Re Register Batches
-      </button>
+      {loading ? (
+        <RefreshIcon className="text-green-300 animate-spin h-8 w-8 mx-auto" />
+      ) : (
+        <button
+          onClick={onClick}
+          className="px-4 py-2 font-medium rounded-md bg-green-300 text-green-700 hover:bg-green-700 hover:text-white"
+        >
+          Re Register Batches
+        </button>
+      )}
     </div>
   );
 };
