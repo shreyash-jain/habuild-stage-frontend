@@ -514,7 +514,7 @@ const AddPaymentForApproval = (props) => {
             props.setViewModal(false);
           }
           props.getAllPaymentsToApprove();
-          // console.log("Api Result", result);
+          console.log("Api Result", result);
         });
     } catch {
       (error) => {
