@@ -6,6 +6,7 @@ import { ShortenerApis } from "../../constants/apis";
 import { remove_backslash_characters } from "../../utils/stringUtility";
 import { RefreshIcon } from "@heroicons/react/outline";
 import toast from "react-hot-toast";
+import { addDaysToDate } from "../../utils/dateutils";
 
 const tabs = [
   { name: "Account", href: "#", current: true },
@@ -105,24 +106,24 @@ const MemberInfoSidePanel = (props) => {
         "Member Since Date":
           props.memberForAction.member_since_date?.split("T")[0],
         "Current Preffered Batch ID": props.memberForAction.preffered_batch_id,
-        "Subscription End Date":
-          props.memberForAction.sub_end_date?.split("T")[0],
+        "Subscription End Date": addDaysToDate(
+          new Date(),
+          props.memberForAction?.total_remaining_days
+        ).toDateString(),
         "Current Subscription": remove_backslash_characters(
           JSON.stringify(props.memberForAction.plan_name)?.replace(
             /[^a-z0-9]/gi,
             " "
           )
         ),
-        "Days Remaining":
-          props.memberForAction?.sub_end_date &&
-          CalcDaysToDate(new Date(), props.memberForAction?.sub_end_date),
+        "Days Remaining": props.memberForAction?.total_remaining_days,
       },
     });
     setMemberShortLink("https://" + props.memberForAction.short_meeting_link);
     if (props.memberForAction.short_meeting_link) {
-      getMemberShortlinks(
-        "https://" + props.memberForAction.short_meeting_link
-      );
+      // getMemberShortlinks(
+      //   "https://" + props.memberForAction.short_meeting_link
+      // );
     }
   }, [props.memberForAction]);
 

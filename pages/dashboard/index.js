@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import LayoutSidebar from "../../components/LayoutSidebar";
 import Table from "../../components/Table";
+import Modal from "../../components/Modal";
 import {
   ShieldCheckIcon,
   RefreshIcon,
@@ -33,6 +34,8 @@ const Dashboard = () => {
   const [memberProgramsWithBatches, setMemberProgramsWithBatches] = useState(
     []
   );
+  const [showSchedulerInfoModal, setShowSchedulerInfoModal] = useState(false);
+  const [unsuccessfullSchedulers, setUnsuccessfullSchedulers] = useState([]);
 
   useEffect(() => {
     apiCall();
@@ -73,6 +76,15 @@ const Dashboard = () => {
       .then((data) => {
         console.log(data);
         setSchedulerInfos(data.message);
+
+        const notSuccessfulSchedulers = data.message.filter((item) => {
+          if (item.status !== "SUCCESS") {
+            return item;
+          }
+        });
+
+        setUnsuccessfullSchedulers(notSuccessfulSchedulers);
+
         setLoading(false);
       });
   };
@@ -206,8 +218,8 @@ const Dashboard = () => {
   return (
     <div>
       <h1 className="text-2xl font-semibold text-gray-900">My Dashboard</h1>
-      <div className="p-4 flex flex-row space-x-4">
-        <div className="rounded-md shadow-md p-4  max-w-fit">
+      <div className="mt-4 flex flex-row space-x-4">
+        <div className="border border-gray-100 rounded-md shadow-md p-4  max-w-fit">
           <h1 className=" font-semibold text-gray-600">
             Server Health Check
             {loading && (
@@ -239,7 +251,7 @@ const Dashboard = () => {
           </button>
         </div>
 
-        <div className="rounded-md shadow-md p-4 flex flex-col w-1/2 space-y-2">
+        <div className="border border-gray-100 rounded-md shadow-md p-4 flex flex-col w-1/2 space-y-2">
           <input
             type="text"
             className="px-2 py-1 rounded-md border-gray-400 border w-full text-gray-800"
@@ -267,19 +279,44 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <h1 className="mb-0 mt-8 text-lg font-medium text-gray-900">
-        Schedulers Info
-      </h1>
+      <div className="mt-8 border border-gray-100 shadow-md rounded-md p-2 max-w-fit">
+        <h1 className="text-lg font-medium text-gray-900">Schedulers Info</h1>
+        <h1 className="text-lg font-medium text-red-500">
+          {unsuccessfullSchedulers.length} Unsuccessfull Schedulers
+        </h1>
+        <div className="text-gray-700">
+          {unsuccessfullSchedulers.map((item) => {
+            return (
+              <span classname="mr-2">
+                {item.name} - {item.status ? item.status : "Status not found"}
+              </span>
+            );
+          })}
+        </div>
 
-      <Table
-        dataLoading={loading}
-        // onPaginationApi={getMembers}
-        // totalRecords={totalRecords}
-        columns={columns}
-        // pagination
-        dataSource={schedulerInfos}
-        // currentPagePagination={currentPagePagination}
-      />
+        <button
+          onClick={() => setShowSchedulerInfoModal(true)}
+          className="hover:text-white hover:bg-green-600 mt-2 rounded-md px-3 py-1 font-medium text-green-700 bg-green-300"
+        >
+          View All
+        </button>
+      </div>
+
+      <Modal
+        modalOpen={showSchedulerInfoModal}
+        setModalOpen={setShowSchedulerInfoModal}
+        hideActionButtons
+      >
+        <Table
+          dataLoading={loading}
+          // onPaginationApi={getMembers}
+          // totalRecords={totalRecords}
+          columns={columns}
+          // pagination
+          dataSource={schedulerInfos}
+          // currentPagePagination={currentPagePagination}
+        />
+      </Modal>
 
       <button
         onClick={() => setShowMenuSidebar(true)}
