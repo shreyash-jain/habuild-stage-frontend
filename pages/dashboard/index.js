@@ -287,7 +287,7 @@ const Dashboard = () => {
         <div className="text-gray-700">
           {unsuccessfullSchedulers.map((item) => {
             return (
-              <span classname="mr-2">
+              <span key={item.id}>
                 {item.name} - {item.status ? item.status : "Status not found"}
               </span>
             );
