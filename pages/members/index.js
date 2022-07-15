@@ -411,15 +411,11 @@ const Members = (props) => {
     },
     {
       title: "Days Left",
-      dataIndex: "sub_end_date",
-      key: "sub_end_date",
-      render: (date) => {
-        if (date) {
-          const startDate = new Date().getTime();
-          const endDate = new Date(date).getTime();
-          const timeDiff = Math.abs(endDate - startDate);
-          const dayDiff = parseInt(timeDiff / (1000 * 60 * 60 * 24));
-          return dayDiff;
+      dataIndex: "total_remaining_days",
+      key: "total_remaining_days",
+      render: (days) => {
+        if (days) {
+          return days;
         }
       },
     },
