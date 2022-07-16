@@ -227,7 +227,13 @@ const Members = (props) => {
     fetch(ReRegisterApis.MEMBER(), requestOptions)
       .then((res) => res.json())
       .then((data) => {
-        console.log("ReRegister DATAAAA", data);
+        // console.log("ReRegister DATAAAA", data);
+
+        if (data.status == 500) {
+          toast.error("Failed to Re-Register Member");
+        } else {
+          toast.success("Successfully Re-Registered");
+        }
       });
   };
 
