@@ -23,6 +23,7 @@ import MenuSidePanel from "./MenuSidePanel";
 const Dashboard = () => {
   const [serverHealthy, setServerHealthy] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [schedulersInfoLoading, setSchedulersInfoLoading] = useState(true);
   const [currentYTUrl, setCurrentYTUrl] = useState(
     "https://youtube.com/example"
   );
@@ -69,7 +70,7 @@ const Dashboard = () => {
   };
 
   const getSchedulersInfos = () => {
-    setLoading(true);
+    setSchedulersInfoLoading(true);
 
     fetch(SchedulerApis.GET())
       .then((res) => res.json())
@@ -85,7 +86,7 @@ const Dashboard = () => {
 
         setUnsuccessfullSchedulers(notSuccessfulSchedulers);
 
-        setLoading(false);
+        setSchedulersInfoLoading(false);
       });
   };
 
@@ -282,27 +283,34 @@ const Dashboard = () => {
       <div className="mt-8 border border-gray-100 shadow-md rounded-md p-2 max-w-fit">
         <h1 className="text-lg font-medium text-gray-900">Schedulers Info</h1>
 
-        {unsuccessfullSchedulers.length > 0 && (
-          <h1 className="text-lg font-medium text-red-500">
-            {unsuccessfullSchedulers.length} Unsuccessfull Schedulers
-          </h1>
-        )}
-        <div className="text-gray-700">
-          {unsuccessfullSchedulers.map((item) => {
-            return (
-              <span key={item.id}>
-                {item.name} - {item.status ? item.status : "Status not found"}
-              </span>
-            );
-          })}
-        </div>
+        {schedulersInfoLoading ? (
+          <RefreshIcon className="text-green-400 animate-spin h-6 w-6" />
+        ) : (
+          <>
+            {unsuccessfullSchedulers.length > 0 && (
+              <h1 className="text-lg font-medium text-red-500">
+                {unsuccessfullSchedulers.length} Unsuccessfull Schedulers
+              </h1>
+            )}
+            <div className="text-gray-700">
+              {unsuccessfullSchedulers.map((item) => {
+                return (
+                  <span key={item.id}>
+                    {item.name} -{" "}
+                    {item.status ? item.status : "Status not found"}
+                  </span>
+                );
+              })}
+            </div>
 
-        <button
-          onClick={() => setShowSchedulerInfoModal(true)}
-          className="hover:text-white hover:bg-green-600 mt-2 rounded-md px-3 py-1 font-medium text-green-700 bg-green-300"
-        >
-          View All
-        </button>
+            <button
+              onClick={() => setShowSchedulerInfoModal(true)}
+              className="hover:text-white hover:bg-green-600 mt-2 rounded-md px-3 py-1 font-medium text-green-700 bg-green-300"
+            >
+              View All
+            </button>
+          </>
+        )}
       </div>
 
       <Modal
