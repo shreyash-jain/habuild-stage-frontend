@@ -87,7 +87,7 @@ const HabuildAlerts = () => {
         setModalOpen={setShowAllAlerts}
         hideActionButtons
       >
-        <label>View Logs for </label>
+        <label>View alerts for </label>
         <input
           className="p-2 border border-gray-400 rounded-md max-w-fit"
           type={"number"}
