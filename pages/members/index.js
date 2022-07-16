@@ -123,8 +123,12 @@ const Members = (props) => {
     {
       name: "Change Member Channel",
       onClick: (actionEntity) => {
-        setMemberForAction(actionEntity);
-        setChangeChannelModal(true);
+        if (actionEntity.status !== "INACTIVE") {
+          setMemberForAction(actionEntity);
+          setChangeChannelModal(true);
+        } else {
+          toast.error("Can only change channel for ACTIVE/PAUSED Members");
+        }
       },
     },
     {
