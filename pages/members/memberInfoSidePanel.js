@@ -121,9 +121,9 @@ const MemberInfoSidePanel = (props) => {
     });
     setMemberShortLink("https://" + props.memberForAction.short_meeting_link);
     if (props.memberForAction.short_meeting_link) {
-      // getMemberShortlinks(
-      //   "https://" + props.memberForAction.short_meeting_link
-      // );
+      getMemberShortlinks(
+        "https://" + props.memberForAction.short_meeting_link
+      );
     }
   }, [props.memberForAction]);
 
@@ -264,6 +264,7 @@ const MemberInfoSidePanel = (props) => {
                           }
                         >
                           <a
+                            target="_blank"
                             style={{
                               textDecoration: "underline",
                               color: "blue",
@@ -340,6 +341,7 @@ const MemberInfoSidePanel = (props) => {
                 </label>
                 <Link className="overflow-hidden" href={memberShortLink}>
                   <a
+                    target="_blank"
                     style={{
                       textDecoration: "underline",
                       color: "blue",
@@ -359,6 +361,7 @@ const MemberInfoSidePanel = (props) => {
                 </label>
                 <Link href={currentLongUrl}>
                   <a
+                    target="_blank"
                     style={{
                       width: "50%",
                       textDecoration: "underline",
