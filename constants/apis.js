@@ -134,3 +134,7 @@ export const ReRegisterApis = {
 export const PlanApis = {
   GET: () => `${API_BASE_URL}/api/plan/`,
 };
+
+export const HabuildAlertsApis = {
+  GET: (numDays) => `${API_BASE_URL}/api/alert/getAlerts?noOfDays=${numDays}`,
+};

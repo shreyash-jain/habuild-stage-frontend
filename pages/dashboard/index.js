@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import LayoutSidebar from "../../components/LayoutSidebar";
-import Table from "../../components/Table";
-import Modal from "../../components/Modal";
 import {
   ShieldCheckIcon,
   RefreshIcon,
@@ -10,38 +8,30 @@ import {
 } from "@heroicons/react/outline";
 import { HealthCheckApis } from "../../constants/apis";
 import Link from "next/link";
-import {
-  ShortenerApis,
-  SchedulerApis,
-  ProgramsApis,
-  BatchesApis,
-} from "../../constants/apis";
+import { ShortenerApis, ProgramsApis, BatchesApis } from "../../constants/apis";
 import toast from "react-hot-toast";
 import { format, parseISO } from "date-fns";
 import MenuSidePanel from "./MenuSidePanel";
+import HabuildAlerts from "./HabuildAlerts";
+import SchedulerInfos from "./SchedulerInfos";
 
 const Dashboard = () => {
   const [serverHealthy, setServerHealthy] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [schedulersInfoLoading, setSchedulersInfoLoading] = useState(true);
   const [currentYTUrl, setCurrentYTUrl] = useState(
     "https://youtube.com/example"
   );
   const [currentDbYTUrl, setCurrentDbYTUrl] = useState(
     "https://youtube.com/example"
   );
-  const [schedulerInfos, setSchedulerInfos] = useState([]);
   const [showMenuSidebar, setShowMenuSidebar] = useState(false);
   const [memberProgramsWithBatches, setMemberProgramsWithBatches] = useState(
     []
   );
-  const [showSchedulerInfoModal, setShowSchedulerInfoModal] = useState(false);
-  const [unsuccessfullSchedulers, setUnsuccessfullSchedulers] = useState([]);
 
   useEffect(() => {
     apiCall();
     getCurrentYoutubeUrl();
-    getSchedulersInfos();
     getMemberBatches();
   }, []);
 
@@ -66,27 +56,6 @@ const Dashboard = () => {
 
           setMemberProgramsWithBatches(programsWithBatches);
         }
-      });
-  };
-
-  const getSchedulersInfos = () => {
-    setSchedulersInfoLoading(true);
-
-    fetch(SchedulerApis.GET())
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        setSchedulerInfos(data.message);
-
-        const notSuccessfulSchedulers = data.message.filter((item) => {
-          if (item.status !== "SUCCESS") {
-            return item;
-          }
-        });
-
-        setUnsuccessfullSchedulers(notSuccessfulSchedulers);
-
-        setSchedulersInfoLoading(false);
       });
   };
 
@@ -145,76 +114,6 @@ const Dashboard = () => {
         }
       });
   };
-
-  const columns = [
-    {
-      title: "Scheduler Id",
-      dataIndex: "scId",
-      key: "scId",
-    },
-    {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
-    },
-    {
-      title: "Last Run",
-      dataIndex: "status",
-      key: "status",
-      render: (status) => {
-        if (!status) {
-          return <p className="text-gray-800">Status not Found</p>;
-        }
-        return (
-          <span
-            className={`text-center px-2.5 py-0.5 rounded-md text-sm font-medium ${
-              status == "SUCCESS"
-                ? "bg-green-300 text-green-800"
-                : "bg-red-300 text-red-800"
-            }  `}
-          >
-            {status}
-          </span>
-        );
-      },
-    },
-    {
-      title: "Last Run Date",
-      dataIndex: "latestDate",
-      key: "latestDate",
-      render: (date) => {
-        if (!date) {
-          return "-";
-        }
-
-        return date.split("T")[0];
-      },
-    },
-    {
-      title: "Last Start Time",
-      dataIndex: "startDate",
-      key: "startDate",
-      render: (date) => {
-        if (!date) {
-          return "-";
-        }
-
-        return date.split("T")[1];
-      },
-    },
-    {
-      title: "Last Stop Time",
-      dataIndex: "stopDate",
-      key: "stopDate",
-      render: (date) => {
-        if (!date) {
-          return "-";
-        }
-
-        return date.split("T")[1];
-      },
-    },
-  ];
 
   return (
     <div>
@@ -280,54 +179,9 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div className="mt-8 border border-gray-100 shadow-md rounded-md p-2 max-w-fit">
-        <h1 className="text-lg font-medium text-gray-900">Schedulers Info</h1>
+      <SchedulerInfos />
 
-        {schedulersInfoLoading ? (
-          <RefreshIcon className="text-green-400 animate-spin h-6 w-6" />
-        ) : (
-          <>
-            {unsuccessfullSchedulers.length > 0 && (
-              <h1 className="text-lg font-medium text-red-500">
-                {unsuccessfullSchedulers.length} Unsuccessfull Schedulers
-              </h1>
-            )}
-            <div className="text-gray-700">
-              {unsuccessfullSchedulers.map((item) => {
-                return (
-                  <span key={item.id}>
-                    {item.name} -{" "}
-                    {item.status ? item.status : "Status not found"}
-                  </span>
-                );
-              })}
-            </div>
-
-            <button
-              onClick={() => setShowSchedulerInfoModal(true)}
-              className="hover:text-white hover:bg-green-600 mt-2 rounded-md px-3 py-1 font-medium text-green-700 bg-green-300"
-            >
-              View All
-            </button>
-          </>
-        )}
-      </div>
-
-      <Modal
-        modalOpen={showSchedulerInfoModal}
-        setModalOpen={setShowSchedulerInfoModal}
-        hideActionButtons
-      >
-        <Table
-          dataLoading={loading}
-          // onPaginationApi={getMembers}
-          // totalRecords={totalRecords}
-          columns={columns}
-          // pagination
-          dataSource={schedulerInfos}
-          // currentPagePagination={currentPagePagination}
-        />
-      </Modal>
+      <HabuildAlerts />
 
       <button
         onClick={() => setShowMenuSidebar(true)}
