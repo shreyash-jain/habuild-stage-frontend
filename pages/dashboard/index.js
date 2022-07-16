@@ -281,9 +281,12 @@ const Dashboard = () => {
 
       <div className="mt-8 border border-gray-100 shadow-md rounded-md p-2 max-w-fit">
         <h1 className="text-lg font-medium text-gray-900">Schedulers Info</h1>
-        <h1 className="text-lg font-medium text-red-500">
-          {unsuccessfullSchedulers.length} Unsuccessfull Schedulers
-        </h1>
+
+        {unsuccessfullSchedulers.length > 0 && (
+          <h1 className="text-lg font-medium text-red-500">
+            {unsuccessfullSchedulers.length} Unsuccessfull Schedulers
+          </h1>
+        )}
         <div className="text-gray-700">
           {unsuccessfullSchedulers.map((item) => {
             return (
