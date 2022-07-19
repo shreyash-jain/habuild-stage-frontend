@@ -1,5 +1,6 @@
 import { RefreshIcon } from "@heroicons/react/outline";
 import { useState } from "react";
+import toast from "react-hot-toast";
 import { MemberCSVApis } from "../../constants/apis";
 
 const MemberCSVUpload = (props) => {
@@ -37,10 +38,19 @@ const MemberCSVUpload = (props) => {
       redirect: "follow",
     };
     fetch(API, requestOptions)
-      .then((response) => response.text())
+      .then((response) => response.json())
       .then((result) => {
         console.log("Result", result);
         setApiLoading(false);
+        if (result.status == 200) {
+          toast.success(result.message);
+        } else {
+          if (result?.message) {
+            toast.error(result.message);
+          } else {
+            toast.error("Error");
+          }
+        }
         // props.refreshData();
         // props.setModalOpen(false);
       })
