@@ -138,3 +138,11 @@ export const PlanApis = {
 export const HabuildAlertsApis = {
   GET: (numDays) => `${API_BASE_URL}/api/alert/getAlerts?noOfDays=${numDays}`,
 };
+
+export const MemberCSVApis = {
+  UPDATE_MEMBER_DATA: () => `${API_BASE_URL}/api/upload_csv/upload_member`,
+  UPDATE_MEMBER_PERFORMANCE: () =>
+    `${API_BASE_URL}/api/upload_csv/upload_member_performance`,
+  UPDATE_MEMBER_ATTENDANCE: () =>
+    `${API_BASE_URL}/api/upload_csv/post_member_attendance`,
+};
