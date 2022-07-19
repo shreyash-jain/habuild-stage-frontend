@@ -152,7 +152,7 @@ const DailyQuoteFormModal = (props) => {
   return (
     <Modal
       apiLoading={apiLoading}
-      modalOpen={props.viewModal}
+      modalOpen={props.viewModal || false}
       setModalOpen={props.setViewModal}
       hideActionButtons
     >
