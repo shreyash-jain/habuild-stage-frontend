@@ -10,6 +10,10 @@ const MemberCSVUpload = (props) => {
   const [attendanceFile, setAttendanceFile] = useState({});
 
   const formSubmit = (calledFrom) => {
+    if (!window.confirm("Are you sure?")) {
+      return;
+    }
+    
     setApiLoading(true);
     let API;
     let file;
