@@ -22,13 +22,25 @@ import { format, parseISO } from "date-fns";
 import toast from "react-hot-toast";
 import { PaymentApis } from "../constants/apis";
 
+const tabs = [
+  { name: "Failed Payments", href: "#", current: false },
+  { name: "Successfull Payments", href: "#", current: false },
+];
+
+function classNames(...classes) {
+  return classes.filter(Boolean).join(" ");
+}
+
 const Payments = (props) => {
-  const [payments, setPayments] = useState([]);
+  const [currentPaymentsToShow, setCurrentPaymentsToShow] = useState([]);
+  const [successfullPayments, setSuccessfullPayments] = useState([]);
+  const [failedPayments, setFailedPayments] = useState([]);
   const [editPayment, setEditPayment] = useState([]);
   const [viewEditModal, setViewEditModal] = useState(false);
   const [viewAddModal, setViewAddModal] = useState(false);
   const [totalRecords, setTotalRecords] = useState(0);
   const [currentPagePagination, setCurrentPagePagination] = useState(1);
+  const [currentTab, setCurrentTab] = useState("Failed Payments");
 
   useEffect(() => {
     getPayments(1);
@@ -39,15 +51,36 @@ const Payments = (props) => {
     await fetch(PaymentApis.GET_PAYMENTS(pageNum))
       .then((res) => res.json())
       .then((data) => {
-        // console.log("Payments", data);
-        setPayments(
-          data.data.paymentDataArr.map((item) => {
-            return {
-              ...item,
-              action: item,
+        console.log("Payments", data);
+
+        let successfullPayments = [];
+        let failedPayments = [];
+        let allPayments = [];
+
+        for (let i = 0; i < data.data.paymentDataArr.length; i++) {
+          if (data.data.paymentDataArr[i].status == "SUCCESS") {
+            const obj = {
+              ...data.data.paymentDataArr[i],
+              action: data.data.paymentDataArr[i],
             };
-          })
-        );
+            successfullPayments.push(obj);
+          } else {
+            const obj = {
+              ...data.data.paymentDataArr[i],
+              action: data.data.paymentDataArr[i],
+            };
+            failedPayments.push(obj);
+          }
+        }
+
+        setSuccessfullPayments(successfullPayments);
+        setFailedPayments(failedPayments);
+        if (currentTab == "Failed Payments") {
+          setCurrentPaymentsToShow(failedPayments);
+        } else {
+          setCurrentPaymentsToShow(successfullPayments);
+        }
+
         setTotalRecords(data.data.totalPaymentsSize);
       });
   };
@@ -148,18 +181,57 @@ const Payments = (props) => {
     },
   ];
 
+  const handleTabChange = (newTab) => {
+    if (newTab == "Failed Payments") {
+      setCurrentPaymentsToShow(failedPayments);
+    } else {
+      setCurrentPaymentsToShow(successfullPayments);
+    }
+    setCurrentTab(newTab);
+  };
+
   return (
     <div>
       <h1 className="text-2xl font-semibold text-gray-900">Payments</h1>
 
-      <Table
-        onPaginationApi={getPayments}
-        pagination
-        totalRecords={totalRecords}
-        columns={columns}
-        dataSource={payments}
-        currentPagePagination={currentPagePagination}
-      />
+      <div>
+        <div className="border-b border-gray-200">
+          <nav className="-mb-px flex" aria-label="Tabs">
+            {tabs.map((tab) => (
+              <button
+                onClick={() => handleTabChange(tab.name)}
+                key={tab.name}
+                href={tab.href}
+                className={`
+                  ${
+                    currentTab == tab.name
+                      ? "border-green-500 text-green-600"
+                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                  }
+                  w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm
+                  `}
+              >
+                {tab.name}
+              </button>
+            ))}
+          </nav>
+        </div>
+      </div>
+
+      {currentPaymentsToShow.length > 0 ? (
+        <Table
+          onPaginationApi={getPayments}
+          pagination
+          totalRecords={totalRecords}
+          columns={columns}
+          dataSource={currentPaymentsToShow}
+          currentPagePagination={currentPagePagination}
+        />
+      ) : (
+        <h1 className="my-2 font-medium text-lg text-gray-700">
+          No Payments to Show
+        </h1>
+      )}
 
       <button
         onClick={() => setViewAddModal(true)}

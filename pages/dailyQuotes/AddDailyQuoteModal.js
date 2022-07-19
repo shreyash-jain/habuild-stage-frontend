@@ -1,295 +1,8 @@
-import { useEffect, useState, Fragment } from "react";
-import {
-  Dialog,
-  Disclosure,
-  Menu,
-  Popover,
-  Transition,
-} from "@headlessui/react";
-import LayoutSidebar from "../components/LayoutSidebar";
-import Table from "../components/Table";
-import FlyoutMenu from "../components/FlyoutMenu";
-import Modal from "../components/Modal";
-import {
-  RefreshIcon,
-  TrashIcon,
-  PlusIcon,
-  XCircleIcon,
-  CheckCircleIcon,
-  ChevronDownIcon,
-  SearchIcon,
-  FilterIcon,
-} from "@heroicons/react/outline";
-import { format, parseISO } from "date-fns";
+import Modal from "../../components/Modal";
+import { RefreshIcon, TrashIcon, PlusIcon } from "@heroicons/react/outline";
 import toast from "react-hot-toast";
-import { Switch } from "@headlessui/react";
-import {
-  DailyQuotesApis,
-  DemoBatchesApis,
-  ProgramsApis,
-} from "../constants/apis";
-
-function classNames(...classes) {
-  return classes.filter(Boolean).join(" ");
-}
-
-const DailyQuotes = (props) => {
-  const [dailyQuotes, setDailyQuotes] = useState([]);
-  const [memberDailyQuotes, setMemberDailyQuotes] = useState([]);
-  const [leadDailyQuotes, setLeadDailyQuotes] = useState([]);
-  const [viewAddModal, setViewAddModal] = useState(false);
-  const [viewEditModal, setViewEditModal] = useState(false);
-
-  const [demoBatches, setDemoBatches] = useState([]);
-  const [programs, setPrograms] = useState([]);
-
-  const [editQuote, setEditQuote] = useState({});
-
-  const [enabled, setEnabled] = useState(false);
-
-  useEffect(() => {
-    getDailyQuotes();
-
-    getAllPrograms();
-    getDemoBatches();
-  }, []);
-
-  const getDailyQuotes = async () => {
-    await fetch(DailyQuotesApis.GET())
-      .then((res) => res.json())
-      .then((data) => {
-        // console.log(data);
-        setDailyQuotes(
-          data.dailyQuotes.map((item) => {
-            return {
-              ...item,
-              action: item,
-            };
-          })
-        );
-
-        const filteredMemberQuotes = data.dailyQuotes.filter((item) => {
-          if (item.type == "MEMBER") {
-            return {
-              ...item,
-              action: item,
-            };
-          }
-        });
-
-        setMemberDailyQuotes(
-          filteredMemberQuotes.map((item) => {
-            return {
-              ...item,
-              action: item,
-            };
-          })
-        );
-
-        const filteredLeadQuotes = data.dailyQuotes.filter((item) => {
-          if (item.type !== "MEMBER") {
-            return {
-              ...item,
-              action: item,
-            };
-          }
-        });
-
-        setLeadDailyQuotes(
-          filteredLeadQuotes.map((item) => {
-            return {
-              ...item,
-              action: item,
-            };
-          })
-        );
-      });
-  };
-
-  const getDemoBatches = async () => {
-    await fetch(DemoBatchesApis.GET_DEMO_BATCHES())
-      .then((res) => res.json())
-      .then((data) => {
-        // console.log("Data", data);
-        setDemoBatches(data.demoBatches);
-      });
-  };
-
-  const getAllPrograms = async () => {
-    await fetch(ProgramsApis.GET_PROGRAMS())
-      .then((res) => res.json())
-      .then((data) => {
-        setPrograms(data.programs);
-      });
-  };
-
-  const menuItems = [
-    {
-      name: "Edit",
-      onClick: (actionEntity) => {
-        setEditQuote(actionEntity);
-        setViewEditModal(true);
-      },
-    },
-    {
-      name: "Delete",
-      onClick: (actionEntity) => {
-        if (window.confirm("Are you sure you want to Delete this quote?")) {
-          deleteAttendanceQuote(actionEntity.id);
-        }
-      },
-    },
-    // {
-    //   name: "View Attendance",
-    //   onClick: () => {
-    //     setViewAttendanceModal(!viewAttendanceModal);
-    //   },
-    // },
-  ];
-
-  const columns = [
-    {
-      title: "DayQuote",
-      dataIndex: "day_id",
-      key: "day_id",
-    },
-    !enabled && {
-      title: "Highlight",
-      dataIndex: "highlight",
-      key: "highlight",
-    },
-    !enabled && {
-      title: "Highlight_2",
-      dataIndex: "highlight_2",
-      key: "highlight_2",
-    },
-    !enabled && {
-      title: "Tip",
-      dataIndex: "tip",
-      key: "tip",
-    },
-    // {
-    //   title: "Tip 2",
-    //   dataIndex: "tip_2",
-    //   key: "tip_2",
-    // },
-    // {
-    //   title: "Tip 3",
-    //   dataIndex: "tip_3",
-    //   key: "tip_3",
-    // },
-    {
-      title: "Quote 1",
-      dataIndex: "quote_1",
-      key: "quote_1",
-    },
-    {
-      title: "Quote 2",
-      dataIndex: "quote_2",
-      key: "quote_2",
-    },
-    {
-      title: "Quote 3",
-      dataIndex: "quote_3",
-      key: "quote_3",
-    },
-    enabled && {
-      title: "Morning Message",
-      dataIndex: "morning_message",
-      key: "morning_message",
-    },
-    {
-      title: "Program Id",
-      dataIndex: "program_id",
-      key: "program_id",
-    },
-    {
-      title: "Demo Batch",
-      dataIndex: "demo_batch_id",
-      key: "demo_batch_id",
-    },
-    {
-      title: "Actions",
-      dataIndex: "action",
-      key: "action",
-      render: (obj) => {
-        return (
-          <FlyoutMenu actionEntity={obj} menuItems={menuItems}></FlyoutMenu>
-        );
-      },
-    },
-  ];
-
-  return (
-    <div>
-      <h1 className="text-2xl font-semibold text-gray-900 mb-4">
-        Daily Quotes
-      </h1>
-
-      <div className="flex flex-row space-x-2 justify-left">
-        <button
-          className={`font-medium px-4 py-2 rounded-md ${
-            enabled
-              ? "bg-green-300 text-green-700"
-              : "bg-red-300 text-red-700  opacity-50 hover:opacity-100"
-          }`}
-          onClick={() => {
-            setEnabled(!enabled);
-          }}
-          disabled={enabled}
-        >
-          {enabled ? "" : "Show"} Member Quotes
-        </button>
-
-        <button
-          className={`font-medium px-4 py-2 rounded-md ${
-            enabled
-              ? "bg-red-300 text-red-700 opacity-50 hover:opacity-100"
-              : "bg-green-300 text-green-700"
-          }`}
-          onClick={() => {
-            setEnabled(!enabled);
-          }}
-          disabled={!enabled}
-        >
-          {enabled ? "Show" : ""} Lead Quotes
-        </button>
-      </div>
-
-      <Table
-        onPaginationApi={() => {}}
-        columns={columns}
-        pagination
-        dataSource={enabled ? memberDailyQuotes : leadDailyQuotes}
-      />
-
-      <button
-        onClick={() => setViewAddModal(true)}
-        className="font-medium px-4 py-2 rounded-md bg-green-300 hover:bg-green-500 text-green-700 hover:text-white fixed bottom-2 right-2"
-      >
-        Add Daily Quote +
-      </button>
-
-      <DailyQuoteFormModal
-        demoBatches={demoBatches}
-        programs={programs}
-        getQuotes={getDailyQuotes}
-        viewModal={viewAddModal}
-        setViewModal={setViewAddModal}
-      />
-
-      <DailyQuoteFormModal
-        editQuote={editQuote}
-        demoBatches={demoBatches}
-        programs={programs}
-        getQuotes={getDailyQuotes}
-        viewModal={viewEditModal}
-        setViewModal={setViewEditModal}
-        mode="edit"
-      />
-    </div>
-  );
-};
+import { useEffect, useState, Fragment } from "react";
+import { DailyQuotesApis } from "../../constants/apis";
 
 const DailyQuoteFormModal = (props) => {
   const [date, setDate] = useState("");
@@ -306,6 +19,7 @@ const DailyQuoteFormModal = (props) => {
 
   const [quoteFormArray, setQuoteFormArray] = useState([
     {
+      dayNumber: "",
       date: "",
       demo_batch_id: "",
       highlight: "",
@@ -324,6 +38,7 @@ const DailyQuoteFormModal = (props) => {
       if (props.mode == "edit") {
         const newArr = [
           {
+            dayNumber: props.editQuote.day_id,
             date: props.editQuote?.date?.split("T")[0],
             demo_batch_id: props.editQuote.demo_batch_id,
             highlight: props.editQuote.highlight,
@@ -366,16 +81,14 @@ const DailyQuoteFormModal = (props) => {
       const item = quoteFormArray[i];
 
       if (
-        !item.date ||
+        !item.dayNumber ||
         !item.highlight ||
         !item.highlight_2 ||
         !item.quote_1 ||
         !item.quote_2 ||
         !item.quote_3 ||
         !item.status ||
-        !item.tip ||
-        !item.program_id ||
-        !item.demo_batch_id
+        !item.tip
       ) {
         alert("Please enter all details.");
         setApiLoading(false);
@@ -384,6 +97,7 @@ const DailyQuoteFormModal = (props) => {
       var myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
       var raw = JSON.stringify({
+        day_id: item.dayNumber,
         date: item.date + " 01:00:00",
         highlight: item.highlight,
         highlight_2: item.highlight_2,
@@ -457,9 +171,9 @@ const DailyQuoteFormModal = (props) => {
               <div className="grid grid-cols-10 space-x-2 mb-4" key={index}>
                 <div className="col-span-1 ">
                   <label className="block text-sm font-medium text-gray-700">
-                    Date
+                    Day Number
                   </label>
-                  <input
+                  {/* <input
                     value={item.date}
                     onChange={(e) =>
                       handleQuoteFormChange("date", index, e.target.value)
@@ -468,6 +182,16 @@ const DailyQuoteFormModal = (props) => {
                     name="date"
                     id="date"
                     placeholder="Date"
+                    className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                  /> */}
+                  <input
+                    value={item.dayNumber}
+                    onChange={(e) =>
+                      handleQuoteFormChange("dayNumber", index, e.target.value)
+                    }
+                    type="number"
+                    min={1}
+                    placeholder="Day Number"
                     className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
                   />
                 </div>
@@ -581,7 +305,7 @@ const DailyQuoteFormModal = (props) => {
                   />
                 </div>
 
-                <div className="col-span-1 ">
+                {/* <div className="col-span-1 ">
                   <label
                     htmlFor="program"
                     className="block text-md font-medium text-gray-700"
@@ -605,9 +329,9 @@ const DailyQuoteFormModal = (props) => {
                       );
                     })}
                   </select>
-                </div>
+                </div> */}
 
-                <div className="col-span-1 ">
+                {/* <div className="col-span-1 ">
                   <label
                     htmlFor="program"
                     className="block text-md font-medium text-gray-700"
@@ -635,10 +359,11 @@ const DailyQuoteFormModal = (props) => {
                       );
                     })}
                   </select>
-                </div>
+                </div> */}
 
                 <button
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.preventDefault();
                     const newArr = [...quoteFormArray];
 
                     newArr.splice(index, 1);
@@ -653,42 +378,40 @@ const DailyQuoteFormModal = (props) => {
               </div>
             );
           })}
-      </form>
-
-      {props.mode !== "edit" && (
-        <button
-          onClick={() => {
-            const newArr = [...quoteFormArray];
-            newArr.push({
-              total_days_absent: "",
-              total_days_present: "",
-              day_presence: "",
-              message: "",
-              status: "",
-              program_id: "",
-              demo_batch_id: "",
-            });
-            setQuoteFormArray(newArr);
-          }}
-          className="mb-4 font-medium text-gray-500 bg-gray-200 hover:bg-gray-400 hover:text-white py-2 px-4 rounded-md"
-        >
-          <PlusIcon className="h-4 w-4 mx-auto" />
-        </button>
-      )}
-
-      <button
-        onClick={formSubmit}
-        className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:col-start-2 sm:text-sm"
-      >
-        {props.mode == "edit" ? "Edit" : "Add"} Quote
-        {apiLoading && (
-          <RefreshIcon className="text-white animate-spin h-6 w-6 mx-auto" />
+        {props.mode !== "edit" && (
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              const newArr = [...quoteFormArray];
+              newArr.push({
+                total_days_absent: "",
+                total_days_present: "",
+                day_presence: "",
+                message: "",
+                status: "",
+                program_id: "",
+                demo_batch_id: "",
+              });
+              setQuoteFormArray(newArr);
+            }}
+            className="mt-4 max-w-fit mb-4 font-medium text-gray-500 bg-gray-200 hover:bg-gray-400 hover:text-white py-2 px-4 rounded-md"
+          >
+            <PlusIcon className="h-4 w-4 mx-auto" />
+          </button>
         )}
-      </button>
+
+        <button
+          type="submit"
+          className="-mb-4 max-w-fit flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:col-start-2 sm:text-sm"
+        >
+          {props.mode == "edit" ? "Edit" : "Add"} Quote
+          {apiLoading && (
+            <RefreshIcon className="text-white animate-spin h-6 w-6 mx-auto" />
+          )}
+        </button>
+      </form>
     </Modal>
   );
 };
 
-DailyQuotes.getLayout = LayoutSidebar;
-
-export default DailyQuotes;
+export default DailyQuoteFormModal;

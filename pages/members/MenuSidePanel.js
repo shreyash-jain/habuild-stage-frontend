@@ -3,11 +3,13 @@ import SidePannel from "../../components/SidePannel";
 import toast from "react-hot-toast";
 import StopWACommMember from "./StopWACommMember";
 import MemberSendWAModal from "./MemberSendWAModal";
+import MemberCSVUpload from "./MemberCSVUpload";
 import { DemoProgramsApis, WatiTemplatesApis } from "../../constants/apis";
 
 const tabs = [
   { name: "Send WA Message", current: false },
   { name: "Start/Stop WA Communication", current: true },
+  { name: "CSV Data Upload", current: false },
 ];
 
 function classNames(...classes) {
@@ -119,6 +121,8 @@ const MenuSidePanel = (props) => {
             refetchTemplates={refetchTemplates}
           />
         )}
+
+        {currentTab == "CSV Data Upload" && <MemberCSVUpload />}
       </div>
     </SidePannel>
   );
