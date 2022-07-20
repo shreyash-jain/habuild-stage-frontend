@@ -18,10 +18,6 @@ export default function Home() {
         ```
       */}
       <div className="min-h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-        <h1 className="text-5xl font-bold text-red-500 mx-auto mt-24">
-          Temporarily out of service
-        </h1>
-
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <img
             className="mx-auto h-12 w-auto"
