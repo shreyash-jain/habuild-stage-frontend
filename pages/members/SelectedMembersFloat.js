@@ -42,7 +42,7 @@ const SelectedMembersFloat = (props) => {
   return (
     <div className="fixed bg-green-50 text-gray-700 overflow-hidden bottom-2 left-64 animate-bounce rounded-lg p-3 px-6 drop-shadow bg-white">
       <span className="text-green-700 font-medium mr-2">
-        {props.selectedMembers.length}
+        {props.selectedMembers?.length}
       </span>
       Members Selected for Action
       <buton
