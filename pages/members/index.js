@@ -18,6 +18,7 @@ import PauseMembership from "./PauseMembership";
 import UpdateMemberDetails from "./UpdateMemberDetails";
 import ChangeMemberChannel from "./ChangeMemberChannel";
 import ChangePrefferedBatch from "./ChangePrefferedBatch";
+import SelectedMembersFloat from "./SelectedMembersFloat";
 import {
   ProgramsApis,
   BatchesApis,
@@ -51,6 +52,8 @@ const Members = (props) => {
   const [viewCommsModal, setViewCommsModal] = useState(false);
   const [viewChangePrefferedBatchModal, setViewChangePrefferedBatchModal] =
     useState(false);
+
+  const [allSelectChecked, setAllSelectChecked] = useState(false);
 
   useEffect(() => {
     getMembers(1);
@@ -90,18 +93,29 @@ const Members = (props) => {
   const getMembers = async (pageNum) => {
     setLoading(true);
     setCurrentPagePagination(pageNum);
+    setAllSelectChecked(false);
 
     await fetch(MembersApis.GET(pageNum))
       .then((res) => res.json())
       .then((data) => {
         console.log("DATA", data);
+
         setMembers(
           data.data.members.map((item) => {
+            let selectedValue = false;
+
+            for (let i = 0; i < selectedMembers.length; i++) {
+              if (selectedMembers[i].id == item.id) {
+                selectedValue = true;
+                break;
+              }
+            }
+
             return {
               ...item,
               isSelected: {
                 identifier: item.id,
-                value: false,
+                value: selectedValue,
               },
               action: item,
             };
@@ -301,7 +315,7 @@ const Members = (props) => {
 
   const handleSelectAll = (checked) => {
     const newLeads = [...members];
-    const newSelectedLeads = [];
+    let newSelectedLeads = [...selectedMembers];
 
     for (let i = 0; i < newLeads.length; i++) {
       if (checked) {
@@ -330,7 +344,11 @@ const Members = (props) => {
       headerRender: () => {
         return (
           <input
-            onChange={(e) => handleSelectAll(e.target.checked)}
+            checked={allSelectChecked}
+            onChange={(e) => {
+              setAllSelectChecked(!allSelectChecked);
+              handleSelectAll(!allSelectChecked);
+            }}
             className="mt-1 h-4 w-4 rounded-md border-gray-300 "
             type="checkbox"
           />
@@ -727,6 +745,8 @@ const Members = (props) => {
         memberProgramsWithBatches={memberProgramsWithBatches}
         memberBatches={memberBatches}
       />
+
+      <SelectedMembersFloat selectedMembers={selectedMembers} />
     </div>
   );
 };
