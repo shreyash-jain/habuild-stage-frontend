@@ -36,6 +36,7 @@ const SelectedMembersFloat = (props) => {
       key: "mobile_number",
     },
     {
+
       title: "Actions",
       dataIndex: "action",
       key: "action",
