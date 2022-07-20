@@ -41,7 +41,11 @@ export default function Modal(props) {
             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
             <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-7xl sm:w-full sm:p-6">
-              <div>{props.children}</div>
+              <div
+                className={`${props.overflowFix ? "overflow-x-scroll" : ""}`}
+              >
+                {props.children}
+              </div>
               <div className="flex flex-col space-y-4 mt-5">
                 {!props.hideActionButtons && (
                   <button
