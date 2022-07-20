@@ -26,6 +26,16 @@ const SelectedMembersFloat = (props) => {
       key: "name",
     },
     {
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+    },
+    {
+      title: "Phone",
+      dataIndex: "mobile_number",
+      key: "mobile_number",
+    },
+    {
       title: "Actions",
       dataIndex: "action",
       key: "action",

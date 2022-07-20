@@ -86,6 +86,7 @@ const HabuildAlerts = () => {
         modalOpen={showAllAlerts}
         setModalOpen={setShowAllAlerts}
         hideActionButtons
+        overflowFix
       >
         <label>View alerts for </label>
         <input
