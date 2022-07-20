@@ -152,6 +152,8 @@ const Dashboard = () => {
         </div>
 
         <div className="border border-gray-100 rounded-md shadow-md p-4 flex flex-col w-1/2 space-y-2">
+          <h1 className=" font-semibold text-gray-600">Change YouTube Link</h1>
+
           <input
             type="text"
             className="px-2 py-1 rounded-md border-gray-400 border w-full text-gray-800"
