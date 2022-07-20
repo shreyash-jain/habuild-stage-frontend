@@ -42,7 +42,7 @@ export default function Modal(props) {
           >
             <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-7xl sm:w-full sm:p-6">
               <div>{props.children}</div>
-              <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+              <div className="flex flex-col space-y-4 mt-5">
                 {!props.hideActionButtons && (
                   <button
                     disabled={props.apiLoading && props.apiLoading}
