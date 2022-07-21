@@ -9,6 +9,7 @@ import {
 } from "../../constants/apis";
 import AddDailyQuoteModal from "./AddDailyQuoteModal";
 import EditEverydayQuote from "./EditEverydayQuote";
+import { RefreshIcon } from "@heroicons/react/outline";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -35,6 +36,7 @@ const DailyQuotes = (props) => {
 
   const [enabled, setEnabled] = useState(true);
   const [currentMemberTab, setCurrentMemberTab] = useState("EveryDay Quotes");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     getDailyQuotes();
@@ -43,8 +45,9 @@ const DailyQuotes = (props) => {
     getDemoBatches();
   }, []);
 
-  const getDailyQuotes = async () => {
-    await fetch(DailyQuotesApis.GET())
+  const getDailyQuotes = () => {
+    setLoading(true);
+    fetch(DailyQuotesApis.GET())
       .then((res) => res.json())
       .then((data) => {
         // console.log(data);
@@ -92,6 +95,8 @@ const DailyQuotes = (props) => {
             };
           })
         );
+
+        setLoading(false);
       });
   };
 
@@ -117,9 +122,15 @@ const DailyQuotes = (props) => {
       name: "Edit",
       onClick: (actionEntity) => {
         setEditQuote(actionEntity);
-        currentMemberTab == "EveryDay Quotes"
-          ? setViewEditEverydayQuoteModal(true)
-          : setViewEditModal(true);
+        if (
+          (currentMemberTab == "EveryDay Quotes" ||
+            currentMemberTab == "Morning Quotes") &&
+          enabled
+        ) {
+          setViewEditEverydayQuoteModal(true);
+        } else {
+          setViewEditModal(true);
+        }
       },
     },
     {
@@ -317,12 +328,16 @@ const DailyQuotes = (props) => {
         </div>
       )}
 
-      <Table
-        onPaginationApi={() => {}}
-        columns={enabled ? memberQuotesColumns : columns}
-        pagination
-        dataSource={enabled ? memberDailyQuotes : leadDailyQuotes}
-      />
+      {loading ? (
+        <RefreshIcon className="text-green-300 animate-spin h-12 w-12 mx-auto" />
+      ) : (
+        <Table
+          onPaginationApi={() => {}}
+          columns={enabled ? memberQuotesColumns : columns}
+          pagination
+          dataSource={enabled ? memberDailyQuotes : leadDailyQuotes}
+        />
+      )}
 
       <button
         onClick={() => setViewAddModal(true)}
@@ -351,6 +366,13 @@ const DailyQuotes = (props) => {
       />
 
       <EditEverydayQuote
+        calledFrom={() => {
+          if (currentMemberTab == "Morning Quotes") {
+            return "morningTab";
+          } else {
+            return "everydayTab";
+          }
+        }}
         editQuote={editQuote}
         getQuotes={getDailyQuotes}
         viewModal={viewEditEverydayQuoteModal}

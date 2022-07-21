@@ -20,6 +20,7 @@ const DailyQuoteFormModal = (props) => {
       quote_3: "",
       status: "",
       tip: "",
+      morning_message: "",
     },
   ]);
 
@@ -39,6 +40,7 @@ const DailyQuoteFormModal = (props) => {
             quote_3: props.editQuote.quote_3,
             status: props.editQuote.status,
             tip: props.editQuote.tip,
+            morning_message: props.editQuote.morning_message,
           },
         ];
 
@@ -84,7 +86,7 @@ const DailyQuoteFormModal = (props) => {
         setApiLoading(false);
         return;
       }
-      
+
       var myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
       var raw = JSON.stringify({
@@ -292,6 +294,24 @@ const DailyQuoteFormModal = (props) => {
                     }
                     type="text"
                     placeholder="Tip"
+                    className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+                  />
+                </div>
+                <div className="col-span-1 ">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Morning Message
+                  </label>
+                  <input
+                    value={item.morning_message}
+                    onChange={(e) =>
+                      handleQuoteFormChange(
+                        "morning_message",
+                        index,
+                        e.target.value
+                      )
+                    }
+                    type="text"
+                    placeholder="Morning Message"
                     className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
                   />
                 </div>

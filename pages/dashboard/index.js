@@ -14,6 +14,7 @@ import { format, parseISO } from "date-fns";
 import MenuSidePanel from "./MenuSidePanel";
 import HabuildAlerts from "./HabuildAlerts";
 import SchedulerInfos from "./SchedulerInfos";
+import DayAttendance from "./DayAttendance";
 
 const Dashboard = () => {
   const [serverHealthy, setServerHealthy] = useState(false);
@@ -180,9 +181,13 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <SchedulerInfos />
+      <div className="flex sm:space-x-4 flex-col sm:flex-row ">
+        <SchedulerInfos />
 
-      <HabuildAlerts />
+        <HabuildAlerts />
+      </div>
+
+      <DayAttendance />
 
       <button
         onClick={() => setShowMenuSidebar(true)}

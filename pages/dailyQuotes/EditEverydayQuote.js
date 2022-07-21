@@ -6,10 +6,138 @@ import { DailyQuotesApis } from "../../constants/apis";
 
 const EditEverydayQuote = (props) => {
   const [apiLoading, setApiLoading] = useState(false);
+  const [quoteObj, setQuoteObj] = useState({});
 
-  console.log("Props EfitEveryDayQuote", props);
+  // console.log("Props EfitEveryDayQuote", quoteObj);
 
-  const formFDields = [];
+  useEffect(() => {
+    setQuoteObj(props.editQuote);
+  }, [props.editQuote.id]);
+
+  const formSubmit = (e) => {
+    let method = "PATCH";
+
+    e.preventDefault();
+    setApiLoading(true);
+
+    const item = quoteObj;
+
+    console.log("ITEMMMM!!", item);
+
+    // if (
+    //   !item.day_id ||
+    //   !item.highlight ||
+    //   !item.highlight_2 ||
+    //   !item.quote_1 ||
+    //   !item.quote_2 ||
+    //   !item.quote_3 ||
+    //   !item.status ||
+    //   !item.tip ||
+    //   !item.morning_message
+    // ) {
+    //   alert("Please enter all details.");
+    //   setApiLoading(false);
+    //   return;
+    // }
+
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    var raw = JSON.stringify({
+      day_id: item.day_id,
+      date: item.date + " 01:00:00",
+      highlight: item.highlight,
+      highlight_2: item.highlight_2,
+      quote_1: item.quote_1,
+      quote_2: item.quote_2,
+      quote_3: item.quote_3,
+      status: item.status,
+      tip: item.tip,
+      program_id: item.program_id,
+      demo_batch_id: item.demo_batch_id,
+      morning_message: item.morning_message,
+    });
+    var requestOptions = {
+      method: method,
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+
+    // console.log(raw);
+    // console.log(API);
+    // console.log(method);
+
+    try {
+      fetch(DailyQuotesApis.UPDATE(item.id), requestOptions)
+        .then((response) => {
+          // console.log("response", response);
+          return response.text();
+        })
+        .then((result) => {
+          setApiLoading(false);
+          toast.success(`Updated`);
+          props.getQuotes();
+          props.setViewModal(false);
+        });
+    } catch {
+      (error) => {
+        setApiLoading(false);
+        toast.error(`Updated Failed`);
+        // console.log("error", error);
+      };
+    }
+  };
+
+  if (props.calledFrom() == "morningTab") {
+    return (
+      <div>
+        <Modal
+          apiLoading={apiLoading}
+          modalOpen={props.viewModal || false}
+          setModalOpen={props.setViewModal}
+          actionText="Update"
+          onActionButtonClick={formSubmit}
+          // hideActionButtons
+        >
+          <div className="flex flex-col space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Day Number
+              </label>
+              <input
+                value={quoteObj.day_id}
+                //   onChange={(e) =>
+                //     handleQuoteFormChange("highlight", index, e.target.value)
+                //   }
+                name="day_id"
+                id="day_id"
+                type="number"
+                min="0"
+                placeholder="Day Number"
+                className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Morning Message
+              </label>
+              <textarea
+                value={quoteObj.morning_message}
+                // onChange={(e) =>
+                //   handleQuoteFormChange("quote_1", index, e.target.value)
+                // }
+                rows={4}
+                type="text"
+                placeholder="Morning Message"
+                className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+              />
+            </div>
+          </div>
+        </Modal>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -17,18 +145,23 @@ const EditEverydayQuote = (props) => {
         apiLoading={apiLoading}
         modalOpen={props.viewModal || false}
         setModalOpen={props.setViewModal}
-        hideActionButtons
+        actionText="Update"
+        onActionButtonClick={formSubmit}
+        // hideActionButtons
       >
-        <div className="flex flex-col">
+        <div className="flex flex-col space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Day Number
             </label>
             <input
-              //   value={item.highlight}
-              //   onChange={(e) =>
-              //     handleQuoteFormChange("highlight", index, e.target.value)
-              //   }
+              value={quoteObj.day_id}
+              onChange={(e) =>
+                setQuoteObj({
+                  ...quoteObj,
+                  day_id: e.target.value,
+                })
+              }
               name="day_id"
               id="day_id"
               type="number"
@@ -42,11 +175,12 @@ const EditEverydayQuote = (props) => {
             <label className="block text-sm font-medium text-gray-700">
               Quote 1
             </label>
-            <input
-              // value={item.quote_1}
-              // onChange={(e) =>
-              //   handleQuoteFormChange("quote_1", index, e.target.value)
-              // }
+            <textarea
+              value={quoteObj.quote_1}
+              onChange={(e) =>
+                setQuoteObj({ ...quoteObj, quote_1: e.target.value })
+              }
+              rows={4}
               type="text"
               placeholder="Quote 1"
               className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
@@ -57,11 +191,12 @@ const EditEverydayQuote = (props) => {
             <label className="block text-sm font-medium text-gray-700">
               Quote 2
             </label>
-            <input
-              // value={item.quote_2}
-              // onChange={(e) =>
-              //   handleQuoteFormChange("quote_2", index, e.target.value)
-              // }
+            <textarea
+              value={quoteObj.quote_2}
+              onChange={(e) =>
+                setQuoteObj({ ...quoteObj, quote_2: e.target.value })
+              }
+              rows={4}
               type="text"
               placeholder="Quote 3"
               className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
@@ -72,11 +207,12 @@ const EditEverydayQuote = (props) => {
             <label className="block text-sm font-medium text-gray-700">
               Quote 3
             </label>
-            <input
-              // value={item.quote_3}
-              // onChange={(e) =>
-              //   handleQuoteFormChange("quote_3", index, e.target.value)
-              // }
+            <textarea
+              value={quoteObj.quote_3}
+              onChange={(e) =>
+                setQuoteObj({ ...quoteObj, quote_3: e.target.value })
+              }
+              rows={4}
               type="text"
               placeholder="Quote 3"
               className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"

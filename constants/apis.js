@@ -146,3 +146,10 @@ export const MemberCSVApis = {
   UPDATE_MEMBER_ATTENDANCE: () =>
     `${API_BASE_URL}/api/upload_csv/post_member_attendance`,
 };
+
+export const HabuildAttendance = {
+  GET_MORNING_ATT: (startDate, endDate) =>
+    `${API_BASE_URL}/api/member/zoom_attendance/morning?startDate=${startDate}&endDate=${endDate}`,
+  GET_EVENING_ATT: (startDate, endDate) =>
+    `${API_BASE_URL}/api/member/zoom_attendance/evening?startDate=${startDate}&endDate=${endDate}`,
+};
