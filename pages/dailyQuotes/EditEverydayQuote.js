@@ -22,8 +22,6 @@ const EditEverydayQuote = (props) => {
 
     const item = quoteObj;
 
-    console.log("ITEMMMM!!", item);
-
     // if (
     //   !item.day_id ||
     //   !item.highlight ||
@@ -68,7 +66,7 @@ const EditEverydayQuote = (props) => {
     // console.log(method);
 
     try {
-      fetch(DailyQuotesApis.UPDATE(item.id), requestOptions)
+      fetch(DailyQuotesApis.UPDATE(item?.id), requestOptions)
         .then((response) => {
           // console.log("response", response);
           return response.text();
