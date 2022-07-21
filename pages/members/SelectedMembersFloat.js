@@ -158,6 +158,7 @@ const SelectedMembersFloat = (props) => {
                   console.log(item);
                   return (
                     <button
+                      key={item.actionName}
                       className="px-4 py-2 font-medium border border-green-300 text-gray-800 hover:bg-gray-100 rounded-md max-w-fit"
                       onClick={() => item.viewSetter(true)}
                     >
