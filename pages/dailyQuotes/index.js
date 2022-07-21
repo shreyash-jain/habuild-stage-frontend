@@ -366,13 +366,14 @@ const DailyQuotes = (props) => {
       />
 
       <EditEverydayQuote
-        calledFrom={() => {
-          if (currentMemberTab == "Morning Quotes") {
-            return "morningTab";
-          } else {
-            return "everydayTab";
-          }
-        }}
+        // calledFrom={() => {
+        //   if (currentMemberTab == "Morning Quotes") {
+        //     return "morningTab";
+        //   } else {
+        //     return "everydayTab";
+        //   }
+        // }}
+        currentMemberTab={currentMemberTab}
         editQuote={editQuote}
         getQuotes={getDailyQuotes}
         viewModal={viewEditEverydayQuoteModal}

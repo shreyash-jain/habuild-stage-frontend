@@ -9,10 +9,10 @@ const DayAttendance = (props) => {
   const [morningAtt, setMorningAtt] = useState([]);
   const [eveningAtt, setEveningAtt] = useState([]);
 
-  useEffect(() => {
-    getMorningAttendance();
-    getEveningAttendance();
-  }, []);
+  // useEffect(() => {
+  //   getMorningAttendance();
+  //   getEveningAttendance();
+  // }, []);
 
   const getMorningAttendance = () => {
     fetch(HabuildAttendance.GET_MORNING_ATT(startDate, endDate))

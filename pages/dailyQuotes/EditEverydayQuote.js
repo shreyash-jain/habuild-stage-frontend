@@ -83,7 +83,7 @@ const EditEverydayQuote = (props) => {
     }
   };
 
-  if (props?.calledFrom() == "morningTab") {
+  if (props?.currentMemberTab == "Morning Quotes") {
     return (
       <div>
         <Modal
