@@ -9,9 +9,7 @@ const EditEverydayQuote = (props) => {
 
   console.log("Props EfitEveryDayQuote", props);
 
-  const formFDields = [
-    
-  ]
+  const formFDields = [];
 
   return (
     <div>
@@ -40,45 +38,45 @@ const EditEverydayQuote = (props) => {
             />
           </div>
 
-          <div className="col-span-1 ">
+          <div>
             <label className="block text-sm font-medium text-gray-700">
               Quote 1
             </label>
             <input
-              value={item.quote_1}
-              onChange={(e) =>
-                handleQuoteFormChange("quote_1", index, e.target.value)
-              }
+              // value={item.quote_1}
+              // onChange={(e) =>
+              //   handleQuoteFormChange("quote_1", index, e.target.value)
+              // }
               type="text"
               placeholder="Quote 1"
               className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
             />
           </div>
 
-          <div className="col-span-1 ">
+          <div>
             <label className="block text-sm font-medium text-gray-700">
               Quote 2
             </label>
             <input
-              value={item.quote_2}
-              onChange={(e) =>
-                handleQuoteFormChange("quote_2", index, e.target.value)
-              }
+              // value={item.quote_2}
+              // onChange={(e) =>
+              //   handleQuoteFormChange("quote_2", index, e.target.value)
+              // }
               type="text"
               placeholder="Quote 3"
               className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
             />
           </div>
 
-          <div className="col-span-1 ">
+          <div>
             <label className="block text-sm font-medium text-gray-700">
               Quote 3
             </label>
             <input
-              value={item.quote_3}
-              onChange={(e) =>
-                handleQuoteFormChange("quote_3", index, e.target.value)
-              }
+              // value={item.quote_3}
+              // onChange={(e) =>
+              //   handleQuoteFormChange("quote_3", index, e.target.value)
+              // }
               type="text"
               placeholder="Quote 3"
               className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
