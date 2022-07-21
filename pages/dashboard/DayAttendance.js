@@ -70,7 +70,7 @@ const DayAttendance = (props) => {
             {datesArr &&
               datesArr.map((item, index) => {
                 return (
-                  <div>
+                  <div key={index}>
                     {format(item, "dd-MM-yyyy")} {"->"} {morningAtt[index]}
                   </div>
                 );
@@ -84,7 +84,7 @@ const DayAttendance = (props) => {
             {datesArr &&
               datesArr.map((item, index) => {
                 return (
-                  <div>
+                  <div key={index}>
                     {format(item, "dd-MM-yyyy")} {"->"} {eveningAtt[index]}
                   </div>
                 );
