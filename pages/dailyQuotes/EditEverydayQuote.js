@@ -12,7 +12,7 @@ const EditEverydayQuote = (props) => {
 
   useEffect(() => {
     setQuoteObj(props.editQuote);
-  }, [props.editQuote.id]);
+  }, [props?.editQuote?.id]);
 
   const formSubmit = (e) => {
     let method = "PATCH";
