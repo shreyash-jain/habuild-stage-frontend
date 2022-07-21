@@ -6,7 +6,7 @@ import { DailyQuotesApis } from "../../constants/apis";
 
 const EditEverydayQuote = (props) => {
   const [apiLoading, setApiLoading] = useState(false);
-  const [quoteObj, setQuoteObj] = useState({});
+  const [quoteObj, setQuoteObj] = useState({ id: "" });
 
   // console.log("Props EfitEveryDayQuote", quoteObj);
 
