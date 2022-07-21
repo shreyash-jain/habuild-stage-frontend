@@ -251,13 +251,15 @@ const Members = (props) => {
       });
   };
 
-  const resumeMembership = (actionEntity) => {
-    if (
-      !window.confirm(
-        `Are you sure you want to Resume Membership for ${actionEntity.name}?`
-      )
-    ) {
-      return;
+  const resumeMembership = (actionEntity, calledFrom) => {
+    if (calledFrom !== "groupActions") {
+      if (
+        !window.confirm(
+          `Are you sure you want to Resume Membership for ${actionEntity.name}?`
+        )
+      ) {
+        return;
+      }
     }
 
     var myHeaders = new Headers();
@@ -319,8 +321,14 @@ const Members = (props) => {
 
     for (let i = 0; i < newLeads.length; i++) {
       if (checked) {
-        newSelectedLeads.push(newLeads[i]);
-        newLeads[i].isSelected.value = true;
+        const elementInArr = newSelectedLeads.find(
+          (item) => newLeads[i].id === item.id
+        );
+
+        if (!elementInArr) {
+          newSelectedLeads.push(newLeads[i]);
+          newLeads[i].isSelected.value = true;
+        }
       } else {
         newLeads[i].isSelected.value = false;
       }
@@ -543,7 +551,7 @@ const Members = (props) => {
 
   const handleSearch = () => {
     setLoading(true);
-    setSelectedMembers([]);
+    // setSelectedMembers([]);
     if (!searchTerm || !searchFor) {
       return;
     }
@@ -746,7 +754,13 @@ const Members = (props) => {
         memberBatches={memberBatches}
       />
 
-      <SelectedMembersFloat selectedMembers={selectedMembers} />
+      <SelectedMembersFloat
+        selectedMembers={selectedMembers}
+        removeSelection={handleSelect}
+        memberProgramsWithBatches={memberProgramsWithBatches}
+        memberBatches={memberBatches}
+        resumeMembership={resumeMembership}
+      />
     </div>
   );
 };

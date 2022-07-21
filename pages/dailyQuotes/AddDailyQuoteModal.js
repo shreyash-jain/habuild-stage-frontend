@@ -5,16 +5,6 @@ import { useEffect, useState, Fragment } from "react";
 import { DailyQuotesApis } from "../../constants/apis";
 
 const DailyQuoteFormModal = (props) => {
-  const [date, setDate] = useState("");
-  const [demo_batch_id, setDemoBatchId] = useState("");
-  const [highlight, setHighlight] = useState("");
-  const [highlight_2, setHighlight2] = useState("");
-  const [program_id, setProgramId] = useState("");
-  const [quote_1, setQuote1] = useState("");
-  const [quote_2, setQuote2] = useState("");
-  const [quote_3, setQuote3] = useState("");
-  const [status, setStatus] = useState("");
-  const [tip, setTip] = useState("");
   const [apiLoading, setApiLoading] = useState(false);
 
   const [quoteFormArray, setQuoteFormArray] = useState([
@@ -94,6 +84,7 @@ const DailyQuoteFormModal = (props) => {
         setApiLoading(false);
         return;
       }
+      
       var myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
       var raw = JSON.stringify({

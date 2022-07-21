@@ -40,13 +40,21 @@ const ChangePrefferedBatch = (props) => {
     setBatchSelectOptions(overallArr);
   };
 
-  const updatePrefferedBatch = () => {
+  const updatePrefferedBatch = (member, calledFrom) => {
     setApiLoading(true);
+
+    let memberForAction;
+
+    if (member?.id) {
+      memberForAction = member;
+    } else {
+      memberForAction = props.memberForAction;
+    }
 
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     var raw = JSON.stringify({
-      member_id: props.memberForAction.id,
+      member_id: memberForAction.id,
       batch_id: selectedBatchId,
     });
     var requestOptions = {
@@ -75,13 +83,25 @@ const ChangePrefferedBatch = (props) => {
       });
   };
 
+  const triggerGroupAction = () => {
+    for (let i = 0; i < props.selectedMembers.length; i++) {
+      updatePrefferedBatch(props.selectedMembers[i], "groupActions");
+    }
+
+    props.setModalOpen(false);
+  };
+
   return (
     <Modal
       apiLoading={apiLoading}
       modalOpen={props.modalOpen || false}
       setModalOpen={props.setModalOpen}
       actionText="Update Preffered Batch"
-      onActionButtonClick={updatePrefferedBatch}
+      onActionButtonClick={
+        props.calledFrom == "groupActions"
+          ? triggerGroupAction
+          : updatePrefferedBatch
+      }
     >
       <div className="space-y-4">
         <div className="flex flex-row">

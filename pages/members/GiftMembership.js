@@ -7,8 +7,16 @@ const GiftMembershipModal = (props) => {
   const [apiLoading, setApiLoading] = useState(false);
   const [numDays, setNumDays] = useState(0);
 
-  const giftMembership = () => {
+  const giftMembership = (member, calledFrom) => {
     setApiLoading(true);
+
+    let memberForAction;
+
+    if (member?.id) {
+      memberForAction = member;
+    } else {
+      memberForAction = props.memberForAction;
+    }
 
     if (!numDays) {
       setApiLoading(false);
@@ -19,10 +27,11 @@ const GiftMembershipModal = (props) => {
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     var raw = JSON.stringify({
-      email: props.memberForAction.email,
+      email: memberForAction.email,
       noOfDays: numDays,
-      batchId: props.memberForAction.preffered_batch_id,
+      batchId: memberForAction.preffered_batch_id,
     });
+
     var requestOptions = {
       method: "PATCH",
       headers: myHeaders,
@@ -38,8 +47,11 @@ const GiftMembershipModal = (props) => {
         } else {
           toast.success(result.message);
         }
-        props.getPaginatedLeads(props.currentPagePagination);
-        props.setModalOpen(false);
+
+        if (calledFrom !== "groupActions") {
+          props.getPaginatedLeads(props.currentPagePagination);
+          props.setModalOpen(false);
+        }
         // console.log(result);
       })
       .catch((error) => {
@@ -49,13 +61,23 @@ const GiftMembershipModal = (props) => {
       });
   };
 
+  const triggerGroupAction = () => {
+    for (let i = 0; i < props.selectedMembers.length; i++) {
+      giftMembership(props.selectedMembers[i], "groupActions");
+    }
+
+    props.setModalOpen(false);
+  };
+
   return (
     <Modal
       apiLoading={apiLoading}
       modalOpen={props.modalOpen || false}
       setModalOpen={props.setModalOpen}
       actionText="Gift"
-      onActionButtonClick={giftMembership}
+      onActionButtonClick={
+        props.calledFrom == "groupActions" ? triggerGroupAction : giftMembership
+      }
       // hideActionButtons
     >
       <div className="space-y-4">

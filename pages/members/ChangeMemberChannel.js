@@ -7,15 +7,27 @@ import { Select } from "react-select";
 import Image from "next/image";
 
 const ChangeMemberChannel = (props) => {
+  console.log("Change Member Channel Props", props);
+
   const [apiLoading, setApiLoading] = useState(false);
   const [channel, setChannel] = useState({});
 
   useEffect(() => {
-    setChannel(props.memberForAction.channel);
+    if (props.calledFrom !== "groupActions") {
+      setChannel(props.memberForAction.channel);
+    }
   }, [props.memberForAction]);
 
-  const updateChannel = (channelToUpdate) => {
+  const updateChannel = (channelToUpdate, member, calledFrom) => {
     setApiLoading(true);
+
+    let memberForAction;
+
+    if (member?.id) {
+      memberForAction = member;
+    } else {
+      memberForAction = props.memberForAction;
+    }
 
     if (channelToUpdate === channel) {
       setApiLoading(false);
@@ -33,7 +45,7 @@ const ChangeMemberChannel = (props) => {
       body: raw,
       redirect: "follow",
     };
-    fetch(MembersApis.UPDATE_CHANNEL(props.memberForAction.id), requestOptions)
+    fetch(MembersApis.UPDATE_CHANNEL(memberForAction.id), requestOptions)
       .then((response) => response.json())
       .then((result) => {
         setApiLoading(false);
@@ -42,15 +54,25 @@ const ChangeMemberChannel = (props) => {
         } else {
           toast.success("Member Updated Successfully.");
         }
-        props.getPaginatedLeads(props.currentPagePagination);
-        props.setModalOpen(false);
-        console.log(result);
+        if (props.calledFrom !== "groupActions") {
+          props.getPaginatedLeads(props.currentPagePagination);
+          props.setModalOpen(false);
+        }
+        // console.log(result);
       })
       .catch((error) => {
         setApiLoading(false);
         // toast.error(error);
         // console.log("error", error);
       });
+  };
+
+  const triggerGroupAction = (channelToUpdate) => {
+    for (let i = 0; i < props.selectedMembers.length; i++) {
+      updateChannel(channelToUpdate, props.selectedMembers[i], "groupActions");
+    }
+
+    props.setModalOpen(false);
   };
 
   return (
@@ -68,16 +90,26 @@ const ChangeMemberChannel = (props) => {
             {props?.memberForAction?.name}
           </h1>
         </div>
-        <div className="flex flex-row">
-          <h2 className="text-xl text-gray-700 mr-2">Current Channel - </h2>
-          <h1 className="font-bold text-xl text-gray-800">{channel}</h1>
-        </div>
+        {props.calledFrom !== "groupActions" && (
+          <div className="flex flex-row">
+            <h2 className="text-xl text-gray-700 mr-2">Current Channel - </h2>
+            <h1 className="font-bold text-xl text-gray-800">{channel}</h1>
+          </div>
+        )}
         <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
           <div
             title="Change channel to ZOOM."
-            onClick={() => updateChannel("ZOOM")}
+            onClick={() =>
+              props.calledFrom == "groupActions"
+                ? triggerGroupAction("ZOOM")
+                : updateChannel("ZOOM")
+            }
             className={`${
-              channel === "ZOOM" ? "opacity-100" : "opacity-40"
+              props.calledFrom !== "groupActions"
+                ? channel === "ZOOM"
+                  ? "opacity-100"
+                  : "opacity-40"
+                : "opacity-40"
             } grid place-content-center transition duration-300 p-2 border border-gray-100 hover:opacity-100 hover:cursor-pointer hover:shadow-md rounded-md shadow-sm`}
           >
             <Image
@@ -90,9 +122,17 @@ const ChangeMemberChannel = (props) => {
 
           <div
             title="Change channel to YOUTUBE."
-            onClick={() => updateChannel("YOUTUBE")}
+            onClick={() =>
+              props.calledFrom == "groupActions"
+                ? triggerGroupAction("YOUTUBE")
+                : updateChannel("YOUTUBE")
+            }
             className={`${
-              channel === "YOUTUBE" ? "opacity-100" : "opacity-40"
+              props.calledFrom !== "groupActions"
+                ? channel === "YOUTUBE"
+                  ? "opacity-100"
+                  : "opacity-40"
+                : "opacity-40"
             } grid place-content-center transition duration-300 p-2 border border-gray-100 hover:opacity-100 hover:cursor-pointer hover:shadow-md rounded-md shadow-sm`}
           >
             <Image

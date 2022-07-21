@@ -8,6 +8,7 @@ import {
   ProgramsApis,
 } from "../../constants/apis";
 import AddDailyQuoteModal from "./AddDailyQuoteModal";
+import EditEverydayQuote from "./EditEverydayQuote";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -24,6 +25,8 @@ const DailyQuotes = (props) => {
   const [leadDailyQuotes, setLeadDailyQuotes] = useState([]);
   const [viewAddModal, setViewAddModal] = useState(false);
   const [viewEditModal, setViewEditModal] = useState(false);
+  const [viewEditEverydayQuoteModal, setViewEditEverydayQuoteModal] =
+    useState(false);
 
   const [demoBatches, setDemoBatches] = useState([]);
   const [programs, setPrograms] = useState([]);
@@ -114,7 +117,9 @@ const DailyQuotes = (props) => {
       name: "Edit",
       onClick: (actionEntity) => {
         setEditQuote(actionEntity);
-        setViewEditModal(true);
+        currentMemberTab == "EveryDay Quotes"
+          ? setViewEditEverydayQuoteModal(true)
+          : setViewEditModal(true);
       },
     },
     {
@@ -343,6 +348,13 @@ const DailyQuotes = (props) => {
         viewModal={viewEditModal}
         setViewModal={setViewEditModal}
         mode="edit"
+      />
+
+      <EditEverydayQuote
+        editQuote={editQuote}
+        getQuotes={getDailyQuotes}
+        viewModal={viewEditEverydayQuoteModal}
+        setViewModal={setViewEditEverydayQuoteModal}
       />
     </div>
   );

@@ -9,7 +9,7 @@ const StopMembership = (props) => {
   const [amount, setAmount] = useState("");
   const [refundCheck, setRefundCheck] = useState(false);
 
-  const stopMembership = () => {
+  const stopMembership = (member, calledFrom) => {
     setApiLoading(true);
 
     if (refundCheck) {
@@ -18,6 +18,14 @@ const StopMembership = (props) => {
         toast.error("Please provide UTR and Amount of transaction.");
         return;
       }
+    }
+
+    let memberForAction;
+
+    if (member?.id) {
+      memberForAction = member;
+    } else {
+      memberForAction = props.memberForAction;
     }
 
     var myHeaders = new Headers();
@@ -33,7 +41,7 @@ const StopMembership = (props) => {
       body: raw,
       redirect: "follow",
     };
-    fetch(MembersApis.STOP_MEMBERSHIP(props.memberForAction.id), requestOptions)
+    fetch(MembersApis.STOP_MEMBERSHIP(memberForAction.id), requestOptions)
       .then((response) => response.json())
       .then((result) => {
         setApiLoading(false);
@@ -42,8 +50,10 @@ const StopMembership = (props) => {
         } else {
           toast.success(result.message);
         }
-        props.getPaginatedLeads(props.currentPagePagination);
-        props.setModalOpen(false);
+        if (calledFrom !== "groupActions") {
+          props.getPaginatedLeads(props.currentPagePagination);
+          props.setModalOpen(false);
+        }
         setRefundCheck(false);
       })
       .catch((error) => {
@@ -53,13 +63,23 @@ const StopMembership = (props) => {
       });
   };
 
+  const triggerGroupAction = () => {
+    for (let i = 0; i < props.selectedMembers.length; i++) {
+      stopMembership(props.selectedMembers[i], "groupActions");
+    }
+
+    props.setModalOpen(false);
+  };
+
   return (
     <Modal
       apiLoading={apiLoading}
       modalOpen={props.modalOpen || false}
       setModalOpen={props.setModalOpen}
       actionText="Stop/Refund membership"
-      onActionButtonClick={stopMembership}
+      onActionButtonClick={
+        props.calledFrom == "groupActions" ? triggerGroupAction : stopMembership
+      }
       // hideActionButtons
     >
       <div className="space-y-4">

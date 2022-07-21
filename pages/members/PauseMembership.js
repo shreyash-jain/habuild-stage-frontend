@@ -8,13 +8,21 @@ const PauseMembership = (props) => {
   const [numDays, setNumDays] = useState(false);
   const [pauseStartDate, setPauseStartDate] = useState(false);
 
-  const pauseMembership = () => {
+  const pauseMembership = (member, calledFrom) => {
     setApiLoading(true);
 
     if (!numDays || !pauseStartDate) {
       setApiLoading(false);
       toast.error("Number of Days or pause start date missing.");
       return;
+    }
+
+    let memberForAction;
+
+    if (member.id) {
+      memberForAction = member;
+    } else {
+      memberForAction = props.memberForAction;
     }
 
     var myHeaders = new Headers();
@@ -29,7 +37,7 @@ const PauseMembership = (props) => {
     fetch(
       MembersApis.PAUSE_MEMBERSHIP({
         numDays,
-        memberId: props.memberForAction.id,
+        memberId: memberForAction.id,
         pauseStartDate,
       }),
       requestOptions
@@ -43,8 +51,10 @@ const PauseMembership = (props) => {
         } else {
           toast.success(result.message);
         }
-        props.getPaginatedLeads(props.currentPagePagination);
-        props.setModalOpen(false);
+        if (calledFrom !== "groupActions") {
+          props.getPaginatedLeads(props.currentPagePagination);
+          props.setModalOpen(false);
+        }
         // console.log(result);
       })
       .catch((error) => {
@@ -54,13 +64,25 @@ const PauseMembership = (props) => {
       });
   };
 
+  const triggerGroupAction = () => {
+    for (let i = 0; i < props.selectedMembers.length; i++) {
+      pauseMembership(props.selectedMembers[i], "groupActions");
+    }
+
+    props.setModalOpen(false);
+  };
+
   return (
     <Modal
       apiLoading={apiLoading}
       modalOpen={props.modalOpen || false}
       setModalOpen={props.setModalOpen}
       actionText="Pause membership"
-      onActionButtonClick={pauseMembership}
+      onActionButtonClick={
+        props.calledFrom == "groupActions"
+          ? triggerGroupAction
+          : pauseMembership
+      }
       // hideActionButtons
     >
       <div className="flex flex-col space-y-4">
