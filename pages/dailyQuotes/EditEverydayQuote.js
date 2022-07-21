@@ -22,6 +22,10 @@ const EditEverydayQuote = (props) => {
 
     const item = quoteObj;
 
+    if (!item) {
+      return;
+    }
+
     // if (
     //   !item.day_id ||
     //   !item.highlight ||
