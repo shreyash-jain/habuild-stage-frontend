@@ -19,13 +19,6 @@ const EditEverydayQuote = (props) => {
 
     e.preventDefault();
     setApiLoading(true);
-
-    const item = quoteObj;
-
-    if (!item) {
-      return;
-    }
-
     // if (
     //   !item.day_id ||
     //   !item.highlight ||
@@ -45,18 +38,18 @@ const EditEverydayQuote = (props) => {
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     var raw = JSON.stringify({
-      day_id: item.day_id,
-      date: item.date + " 01:00:00",
-      highlight: item.highlight,
-      highlight_2: item.highlight_2,
-      quote_1: item.quote_1,
-      quote_2: item.quote_2,
-      quote_3: item.quote_3,
-      status: item.status,
-      tip: item.tip,
-      program_id: item.program_id,
-      demo_batch_id: item.demo_batch_id,
-      morning_message: item.morning_message,
+      day_id: quoteObj.day_id,
+      date: quoteObj.date + " 01:00:00",
+      highlight: quoteObj.highlight,
+      highlight_2: quoteObj.highlight_2,
+      quote_1: quoteObj.quote_1,
+      quote_2: quoteObj.quote_2,
+      quote_3: quoteObj.quote_3,
+      status: quoteObj.status,
+      tip: quoteObj.tip,
+      program_id: quoteObj.program_id,
+      demo_batch_id: quoteObj.demo_batch_id,
+      morning_message: quoteObj.morning_message,
     });
     var requestOptions = {
       method: method,
@@ -70,7 +63,7 @@ const EditEverydayQuote = (props) => {
     // console.log(method);
 
     try {
-      fetch(DailyQuotesApis.UPDATE(item?.id), requestOptions)
+      fetch(DailyQuotesApis.UPDATE(quoteObj?.id), requestOptions)
         .then((response) => {
           // console.log("response", response);
           return response.text();
