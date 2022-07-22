@@ -61,28 +61,38 @@ const AttendanceQuotes = (props) => {
           })
         );
 
-        const absentQuotes = data.attendanceQuotes.filter((item) => {
+        let absentQuotes = data.attendanceQuotes.filter((item) => {
           if (!parseInt(item.day_presence)) {
-            return {
-              ...item,
-              action: item,
-            };
+            return true;
           }
         });
+
+        absentQuotes = absentQuotes.map((item) => {
+          return {
+            ...item,
+            action: item,
+          };
+        });
+
         setAbsentAttendanceQuotes(
           absentQuotes.sort(function (a, b) {
             return a.total_days_absent - b.total_days_absent;
           })
         );
 
-        const presentQuotes = data.attendanceQuotes.filter((item) => {
+        let presentQuotes = data.attendanceQuotes.filter((item) => {
           if (parseInt(item.day_presence)) {
-            return {
-              ...item,
-              action: item,
-            };
+            return true;
           }
         });
+
+        presentQuotes = presentQuotes.map((item) => {
+          return {
+            ...item,
+            action: item,
+          };
+        });
+
         setPresentAttendanceQuotes(
           presentQuotes.sort(function (a, b) {
             return a.total_days_present - b.total_days_present;
@@ -308,13 +318,13 @@ const AddAttendanceQuote = (props) => {
     if (props.mode == "edit") {
       const newArr = [
         {
-          total_days_absent: props.editQuote.total_days_present,
-          total_days_present: props.editQuote.total_days_absent,
-          day_presence: props.editQuote.day_presence,
-          message: props.editQuote.message,
-          status: props.editQuote.status,
-          program_id: props.editQuote.program_id,
-          demo_batch_id: props.editQuote.demo_batch_id,
+          total_days_absent: props.editQuote?.total_days_present,
+          total_days_present: props.editQuote?.total_days_absent,
+          day_presence: props.editQuote?.day_presence,
+          message: props.editQuote?.message,
+          status: props.editQuote?.status,
+          program_id: props.editQuote?.program_id,
+          demo_batch_id: props.editQuote?.demo_batch_id,
         },
       ];
 
@@ -608,7 +618,7 @@ const AddAttendanceQuote = (props) => {
       )}
 
       <button
-        className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:col-start-2 sm:text-sm"
+        className="max-w-fit inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:col-start-2 sm:text-sm"
         onClick={formSubmit}
       >
         {props.mode == "edit" ? "Edit" : "Add"} Quote

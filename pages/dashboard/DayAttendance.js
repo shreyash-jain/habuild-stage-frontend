@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { HabuildAttendance } from "../../constants/apis";
 import { eachDayOfInterval, format } from "date-fns";
+import { RefreshIcon } from "@heroicons/react/outline";
 
 const DayAttendance = (props) => {
   const [startDate, setStartDate] = useState("");
@@ -8,33 +9,60 @@ const DayAttendance = (props) => {
   const [datesArr, setDatesArr] = useState([]);
   const [morningAtt, setMorningAtt] = useState([]);
   const [eveningAtt, setEveningAtt] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  // useEffect(() => {
-  //   getMorningAttendance();
-  //   getEveningAttendance();
-  // }, []);
+  useEffect(() => {
+    getMorningAttendance(new Date(), new Date());
+    getEveningAttendance(new Date(), new Date());
+    generateDays(new Date(), new Date());
+  }, []);
 
-  const getMorningAttendance = () => {
+  const getMorningAttendance = (startDate, endDate) => {
+    setLoading(true);
     fetch(HabuildAttendance.GET_MORNING_ATT(startDate, endDate))
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
+        // console.log(data);
+        setLoading(false);
         setMorningAtt(data.result);
       });
   };
 
-  const getEveningAttendance = () => {
+  const getEveningAttendance = (startDate, endDate) => {
+    setLoading(true);
+
     fetch(HabuildAttendance.GET_EVENING_ATT(startDate, endDate))
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
+        // console.log(data);
+        setLoading(false);
         setEveningAtt(data.result);
       });
   };
 
+  const generateDays = (startDate, endDate) => {
+    const dates = eachDayOfInterval({
+      start: new Date(startDate),
+      end: new Date(endDate),
+    });
+
+    setDatesArr(dates);
+  };
+
+  if (loading) {
+    return (
+      <div className="rounded-md p-4 shadow-md border border-gray-100 max-w-fit mt-8 space-y-4">
+        <h1 className="text-lg font-medium text-gray-900">Day Attendance</h1>
+
+        <RefreshIcon className="text-green-400 animate-spin h-6 w-6" />
+      </div>
+    );
+  }
+
   return (
     <div className="rounded-md p-4 shadow-md border border-gray-100 max-w-fit mt-8 space-y-4">
       <h1 className="text-lg font-medium text-gray-900">Day Attendance</h1>
+
       <div className="flex flex-row space-x-4">
         <div>
           <label className="block text-xs font-medium text-gray-700">
@@ -94,14 +122,9 @@ const DayAttendance = (props) => {
       </div>
       <button
         onClick={() => {
-          const dates = eachDayOfInterval({
-            start: new Date(startDate),
-            end: new Date(endDate),
-          });
-
-          setDatesArr(dates);
-          getMorningAttendance();
-          getEveningAttendance();
+          generateDays(startDate, endDate);
+          getMorningAttendance(startDate, endDate);
+          getEveningAttendance(startDate, endDate);
         }}
         className="rounded-md px-3 py-1 bg-green-300 font-medium text-green-700 hover:bg-green-600 hover:text-white"
       >
