@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { HabuildAttendance } from "../../constants/apis";
 import { eachDayOfInterval, format } from "date-fns";
 import { RefreshIcon } from "@heroicons/react/outline";
+import { ArrowCircleRightIcon } from "@heroicons/react/solid";
 
 const DayAttendance = (props) => {
   const [startDate, setStartDate] = useState("");
@@ -98,8 +99,12 @@ const DayAttendance = (props) => {
             {datesArr &&
               datesArr.map((item, index) => {
                 return (
-                  <div key={index}>
-                    {format(item, "dd-MM-yyyy")} {"->"} {morningAtt[index]}
+                  <div key={index} className="flex flex-row items-center">
+                    <span className="text-gray-800">
+                      {format(item, "dd-MM-yyyy")}
+                    </span>
+                    <ArrowCircleRightIcon className="text-green-300 h-5 w-5" />
+                    {morningAtt[index]}
                   </div>
                 );
               })}
@@ -112,8 +117,12 @@ const DayAttendance = (props) => {
             {datesArr &&
               datesArr.map((item, index) => {
                 return (
-                  <div key={index}>
-                    {format(item, "dd-MM-yyyy")} {"->"} {eveningAtt[index]}
+                  <div key={index} className="flex flex-row items-center">
+                    <span className="text-gray-800">
+                      {format(item, "dd-MM-yyyy")}
+                    </span>
+                    <ArrowCircleRightIcon className="text-green-300 h-5 w-5" />
+                    {eveningAtt[index]}
                   </div>
                 );
               })}
