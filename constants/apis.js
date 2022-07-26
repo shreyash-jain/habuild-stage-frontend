@@ -2,7 +2,9 @@
 // export const API_BASE_URL = "http://localhost:4000";
 
 //PROD - Uncomment before pushing to delpoy
-export const API_BASE_URL = "https://api.habuild.in";
+// export const API_BASE_URL = "https://api.habuild.in";
+
+const API_BASE_URL = process.env.API_BASE_URL
 
 export const ProgramsApis = {
   GET_PROGRAMS: () => `${API_BASE_URL}/api/program/`,
@@ -152,4 +154,8 @@ export const HabuildAttendance = {
     `${API_BASE_URL}/api/member/zoom_attendance/morning?startDate=${startDate}&endDate=${endDate}`,
   GET_EVENING_ATT: (startDate, endDate) =>
     `${API_BASE_URL}/api/member/zoom_attendance/evening?startDate=${startDate}&endDate=${endDate}`,
+};
+
+export const LoginApis = {
+  LOGIN: () => `${API_BASE_URL}/api/user/login`,
 };
