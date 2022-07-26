@@ -4,7 +4,8 @@
 //PROD - Uncomment before pushing to delpoy
 // export const API_BASE_URL = "https://api.habuild.in";
 
-const API_BASE_URL = process.env.API_BASE_URL
+//STAGE - 
+const API_BASE_URL = 'http://43.204.233.42:3000'
 
 export const ProgramsApis = {
   GET_PROGRAMS: () => `${API_BASE_URL}/api/program/`,
