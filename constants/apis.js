@@ -5,7 +5,8 @@
 // export const API_BASE_URL = "https://api.habuild.in";
 
 //STAGE - 
-const API_BASE_URL = 'http://43.204.233.42:3000'
+const API_BASE_URL = "https://stage.api.habuild.in/";
+
 
 export const ProgramsApis = {
   GET_PROGRAMS: () => `${API_BASE_URL}/api/program/`,
