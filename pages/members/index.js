@@ -27,6 +27,7 @@ import {
 } from "../../constants/apis";
 import Image from "next/image";
 import ViewMemberCommsModal from "./ViewMemberCommsModal";
+import UpdateEmailModal from "./UpdateEmailModal";
 
 const Members = (props) => {
   const [members, setMembers] = useState([]);
@@ -54,6 +55,7 @@ const Members = (props) => {
     useState(false);
 
   const [allSelectChecked, setAllSelectChecked] = useState(false);
+  const [viewUpdateEmailModal, setViewUpdateEmailModal] = useState(false);
 
   useEffect(() => {
     getMembers(1);
@@ -221,6 +223,13 @@ const Members = (props) => {
         } else {
           toast.error("Can only change batch for an ACTIVE member.");
         }
+      },
+    },
+    {
+      name: "Update Email",
+      onClick: (actionEntity) => {
+        setMemberForAction(actionEntity);
+        setViewUpdateEmailModal(true);
       },
     },
   ];
@@ -764,6 +773,14 @@ const Members = (props) => {
         memberProgramsWithBatches={memberProgramsWithBatches}
         memberBatches={memberBatches}
         resumeMembership={resumeMembership}
+      />
+
+      <UpdateEmailModal
+        memberForAction={memberForAction}
+        modalOpen={viewUpdateEmailModal}
+        setModalOpen={setViewUpdateEmailModal}
+        currentPagePagination={currentPagePagination}
+        getPaginatedLeads={getMembers}
       />
     </div>
   );

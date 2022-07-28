@@ -2,7 +2,7 @@
 // export const API_BASE_URL = "http://localhost:4000";
 
 //PROD - Uncomment before pushing to delpoy
-// export const API_BASE_URL = "https://api.habuild.in";
+// export const API_BASE_URL = "https://stage.api.habuild.in";
 
 //STAGE -
 const API_BASE_URL = process.env.API_BASE_URL;
@@ -103,6 +103,8 @@ export const MembersApis = {
     `${API_BASE_URL}/api/member/${memberId}/preferred_channel`,
   UPDATE_PREFFERED_BATCH: () =>
     `${API_BASE_URL}/api/member/updatePreferredBatch`,
+  UPDATE_EMAIL: (memberId) =>
+    `${API_BASE_URL}/api/member/${memberId}/update_email`,
 };
 
 export const WatiTemplatesApis = {
