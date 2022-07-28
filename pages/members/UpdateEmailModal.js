@@ -53,13 +53,33 @@ const UpdateEmailModal = (props) => {
       });
   };
 
+  if (apiLoading) {
+    return (
+      <Modal
+        apiLoading={apiLoading}
+        modalOpen={props.modalOpen || false}
+        setModalOpen={props.setModalOpen}
+        hideActionButtons
+      >
+        <div className="space-y-4">
+          <div className="flex flex-row">
+            <h2 className="text-xl text-gray-700 mr-2">Update Email for -</h2>
+            <h1 className="font-bold text-xl text-gray-800">
+              {props?.memberForAction?.name}
+            </h1>
+          </div>
+
+          <RefreshIcon className="text-green-300 animate-spin h-12 w-12 mx-auto" />
+        </div>
+      </Modal>
+    );
+  }
+
   return (
     <Modal
       apiLoading={apiLoading}
       modalOpen={props.modalOpen || false}
       setModalOpen={props.setModalOpen}
-      // actionText="Update"
-      // onActionButtonClick={updateDetails}
       hideActionButtons
     >
       <div className="space-y-4">
