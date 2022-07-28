@@ -27,7 +27,7 @@ const GiftMembershipModal = (props) => {
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     var raw = JSON.stringify({
-      email: memberForAction.id,
+      memberId: memberForAction.id,
       noOfDays: numDays,
       batchId: memberForAction.preffered_batch_id,
     });
