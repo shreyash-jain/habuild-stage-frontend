@@ -23,7 +23,7 @@ const SchedulerInfos = (props) => {
         console.log(data);
         setSchedulerInfos(data.message);
 
-        const notSuccessfulSchedulers = data.message.filter((item) => {
+        const notSuccessfulSchedulers = data?.message?.filter((item) => {
           if (item.status !== "SUCCESS") {
             return item;
           }

@@ -96,8 +96,8 @@ const MemberInfoSidePanel = (props) => {
       Performance: {
         "Total Days":
           memberPerformance?.total_absent_days +
-          memberPerformance?.total_active_days,
-        "Total Attended Days": memberPerformance?.total_active_days,
+          memberPerformance?.total_attended_days,
+        "Total Attended Days": memberPerformance?.total_attended_days,
         "Total Absent Days": memberPerformance?.total_absent_days,
         "Streak Leaves": memberPerformance?.streak_leaves,
         "Total Active Week": memberPerformance?.total_active_weeks,
