@@ -20,7 +20,7 @@ const SchedulerInfos = (props) => {
     fetch(SchedulerApis.GET())
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
+        // console.log(data);
         setSchedulerInfos(data.message);
 
         const notSuccessfulSchedulers = data?.message?.filter((item) => {

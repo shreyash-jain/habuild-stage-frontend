@@ -24,6 +24,8 @@ import MemberCSVUpload from "../members/MemberCSVUpload";
 const CsvUpload = (props) => {
   const [apiLoading, setApiLoading] = useState();
   const [csvArray, setCsvArray] = useState([]);
+  const [includeInactiveMember, setIncludeInactiveMember] = useState(false);
+  const [memberDataFile, setMemberDataFile] = useState({});
 
   const processCSV = (str, delim = ",") => {
     const headers = str.slice(0, str.indexOf("\n")).split(delim);
@@ -38,7 +40,7 @@ const CsvUpload = (props) => {
       return eachObject;
     });
 
-    console.log("New Arrr", newArray);
+    // console.log("New Arrr", newArray);
 
     setCsvArray(newArray);
 
@@ -69,7 +71,7 @@ const CsvUpload = (props) => {
 
     reader.onload = function (e) {
       const text = e.target.result;
-      console.log(text);
+      // console.log(text);
       processCSV(text);
     };
 
@@ -103,7 +105,7 @@ const CsvUpload = (props) => {
     // console.log(API);
     // console.log(method);
 
-    console.log(requestOptions);
+    // console.log(requestOptions);
 
     try {
       fetch(API, requestOptions)
@@ -115,17 +117,58 @@ const CsvUpload = (props) => {
           setApiLoading(false);
           toast.success(`Payment Created`);
 
-          console.log("Api Result", result);
+          // console.log("Api Result", result);
         });
     } catch {
       (error) => {
-        console.log("error", error);
+        // console.log("error", error);
         if (!fromCSV) {
           setApiLoading(false);
           toast.error(`No payment Created`);
         }
       };
     }
+  };
+
+  const formSubmitStageTest = (calledFrom) => {
+    setApiLoading(true);
+
+    let API = `https://stage.api.habuild.in/api/upload_csv/upload_member?includeInactiveMember=${includeInactiveMember}`;
+    let file = memberDataFile;
+
+    let formData = new FormData();
+    formData.append("file", file);
+
+    var requestOptions = {
+      method: "POST",
+      body: formData,
+      redirect: "follow",
+    };
+
+    // console.log(requestOptions);
+
+    fetch(API, requestOptions)
+      .then((response) => response.json())
+      .then((result) => {
+        // console.log("Result", result);
+        setApiLoading(false);
+        if (result.status == 200) {
+          toast.success(result.message);
+        } else {
+          if (result?.message) {
+            toast.error(result.message);
+          } else {
+            toast.error("Error");
+          }
+        }
+        // props.refreshData();
+        // props.setModalOpen(false);
+      })
+      .catch((error) => {
+        setApiLoading(false);
+        toast.error("Error");
+        // console.log("error", error);
+      });
   };
 
   if (apiLoading) {
@@ -175,6 +218,50 @@ const CsvUpload = (props) => {
       </div>
 
       <MemberCSVUpload />
+
+      <div className="p-4 rounded-md shadow-sm border border-red-100 space-y-4">
+        <h1 className="text-xl font-medium text-gray-800">
+          **************FEATURE ON STAGE TESTING - Dont run on
+          Production**************
+        </h1>
+
+        <div className="flex flex-col space-y-2">
+          <label className="font-medium text-gray-700">
+            STAGE Update Member Data
+          </label>
+          <a
+            href="/assets/Member_data_template.csv"
+            download={"Member_data_template.csv"}
+            className="text-gray-600 flex flex-row px-3 py-1 text-sm font-medium rounded-md max-w-fit hover:bg-gray-200"
+          >
+            <DownloadIcon className="w-4 h-4 mr-2" /> Download Member Data
+            Template
+          </a>
+
+          <div className="flex flex-row space-x-4">
+            <input
+              type="checkbox"
+              onChange={(e) => {
+                setIncludeInactiveMember(e.target.checked);
+              }}
+            ></input>
+            <label className="block text-sm font-medium text-gray-700">
+              Include Inactive Member
+            </label>
+          </div>
+
+          <input
+            onChange={(e) => setMemberDataFile(e.target.files[0])}
+            type={"file"}
+          />
+          <button
+            onClick={() => formSubmitStageTest("data")}
+            className="max-w-fit px-3 py-2 text-green-700 bg-green-300 hover:text-white hover:bg-green-700 font-medium rounded-md"
+          >
+            Update Member Data
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

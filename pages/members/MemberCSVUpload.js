@@ -49,7 +49,7 @@ const MemberCSVUpload = (props) => {
     fetch(API, requestOptions)
       .then((response) => response.json())
       .then((result) => {
-        console.log("Result", result);
+        // console.log("Result", result);
         setApiLoading(false);
         if (result.status == 200) {
           toast.success(result.message);

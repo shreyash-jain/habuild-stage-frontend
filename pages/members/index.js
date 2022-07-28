@@ -69,7 +69,7 @@ const Members = (props) => {
           const programsWithBatches = [];
           let allBatches = [];
 
-          console.log("Program Data", data);
+          // console.log("Program Data", data);
 
           for (let i = 0; i < data.programs.length; i++) {
             await fetch(BatchesApis.GET_BATCH_FROM_PROGRAM(data.programs[i].id))
@@ -84,7 +84,7 @@ const Members = (props) => {
           }
 
           setMemberProgramsWithBatches(programsWithBatches);
-          console.log("All batches", allBatches);
+          // console.log("All batches", allBatches);
           setMemberBatches(allBatches);
         }
       });
@@ -98,7 +98,7 @@ const Members = (props) => {
     await fetch(MembersApis.GET(pageNum))
       .then((res) => res.json())
       .then((data) => {
-        console.log("DATA", data);
+        // console.log("DATA", data);
 
         setMembers(
           data.data.members.map((item) => {
@@ -245,8 +245,12 @@ const Members = (props) => {
 
         if (data.status == 500) {
           toast.error("Failed to Re-Register Member");
+        } else if (data.status == 200) {
+          toast.success(
+            `Successfully Re-Registered, message: ${data?.message}`
+          );
         } else {
-          toast.success("Successfully Re-Registered");
+          toast.error("Unkown Error occured");
         }
       });
   };

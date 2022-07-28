@@ -155,7 +155,7 @@ const SelectedMembersFloat = (props) => {
             <div className="p-8">
               <div className="flex flex-col space-y-4">
                 {actionButtonTriggers.map((item) => {
-                  console.log(item);
+                  // console.log(item);
                   return (
                     <button
                       key={item.actionName}

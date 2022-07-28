@@ -63,7 +63,7 @@ const ReRegisterBatch = (props) => {
           toast.error("Failed to Re-Register batches.");
         }
         toast.success("Re-Registered batches Successfully.");
-        console.log("DATAAAA", data);
+        // console.log("DATAAAA", data);
       });
   };
 

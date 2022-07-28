@@ -2,6 +2,7 @@ import React, { useEffect, useState, Fragment } from "react";
 import Modal from "../../components/Modal";
 import toast from "react-hot-toast";
 import { MembersApis } from "../../constants/apis";
+import { format } from "date-fns";
 
 const PauseMembership = (props) => {
   const [apiLoading, setApiLoading] = useState(false);
@@ -34,6 +35,7 @@ const PauseMembership = (props) => {
       body: "",
       redirect: "follow",
     };
+
     fetch(
       MembersApis.PAUSE_MEMBERSHIP({
         numDays,
@@ -95,14 +97,16 @@ const PauseMembership = (props) => {
 
         <label className="text-lg">Start Date</label>
         <input
-          className="p-2 font-medium text-gray-800 rounded-md border border-gray-500"
+          className="p-2 font-medium text-gray-800 rounded-md border border-gray-500 max-w-fit"
           type={"date"}
           onChange={(e) => setPauseStartDate(e.target.value)}
+          defaultValue={format(new Date(), "yyyy-MM-dd")}
         />
 
         <label className="mt-4 text-lg">Number of Pause days</label>
         <input
-          className="p-2 font-medium text-gray-800 rounded-md border border-gray-500"
+          defaultValue={100}
+          className="p-2 font-medium text-gray-800 rounded-md border border-gray-500 max-w-fit"
           type={"number"}
           onChange={(e) => setNumDays(e.target.value)}
         />

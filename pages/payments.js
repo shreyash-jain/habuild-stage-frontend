@@ -51,7 +51,7 @@ const Payments = (props) => {
     await fetch(PaymentApis.GET_PAYMENTS(pageNum))
       .then((res) => res.json())
       .then((data) => {
-        console.log("Payments", data);
+        // console.log("Payments", data);
 
         let successfullPayments = [];
         let failedPayments = [];

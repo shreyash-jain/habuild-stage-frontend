@@ -70,7 +70,7 @@ const DailyQuotes = (props) => {
           (a, b) => a.day_id - b.day_id
         );
 
-        console.log("FilteredMemberQuotes", filteredMemberQuotes);
+        // console.log("FilteredMemberQuotes", filteredMemberQuotes);
 
         setMemberDailyQuotes(
           filteredMemberQuotes.map((item) => {

@@ -415,7 +415,7 @@ const AddPaymentForApproval = (props) => {
       return eachObject;
     });
 
-    console.log("New Arrr", newArray);
+    // console.log("New Arrr", newArray);
 
     setCsvArray(newArray);
 
@@ -446,7 +446,7 @@ const AddPaymentForApproval = (props) => {
 
     reader.onload = function (e) {
       const text = e.target.result;
-      console.log(text);
+      // console.log(text);
       processCSV(text);
     };
 
@@ -496,7 +496,7 @@ const AddPaymentForApproval = (props) => {
     // console.log(API);
     // console.log(method);
 
-    console.log(requestOptions);
+    // console.log(requestOptions);
 
     try {
       fetch(API, requestOptions)
@@ -514,11 +514,11 @@ const AddPaymentForApproval = (props) => {
             props.setViewModal(false);
           }
           props.getAllPaymentsToApprove();
-          console.log("Api Result", result);
+          // console.log("Api Result", result);
         });
     } catch {
       (error) => {
-        console.log("error", error);
+        // console.log("error", error);
         if (!fromCSV) {
           setApiLoading(false);
           toast.error(

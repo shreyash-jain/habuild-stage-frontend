@@ -152,7 +152,7 @@ const MemberInfoSidePanel = (props) => {
         setShortLinkLoader(false);
         setCurrentLongUrl(data.long_url);
         setLongUrlForShortUrl(data.long_url);
-        console.log("Short URL Data", data);
+        // console.log("Short URL Data", data);
       });
   };
 
