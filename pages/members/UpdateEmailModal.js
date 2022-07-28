@@ -3,6 +3,7 @@ import Modal from "../../components/Modal";
 import toast from "react-hot-toast";
 import { format, parseISO } from "date-fns";
 import { MembersApis } from "../../constants/apis";
+import { RefreshIcon } from "@heroicons/react/outline";
 
 const UpdateEmailModal = (props) => {
   const [apiLoading, setApiLoading] = useState(false);
