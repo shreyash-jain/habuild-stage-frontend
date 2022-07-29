@@ -43,7 +43,8 @@ const UpdateEmailModal = (props) => {
         } else {
           toast.success("Member Updated Successfully.");
         }
-        props.getPaginatedLeads(props.currentPagePagination);
+        props.refetchData();
+        // props.getPaginatedLeads(props.currentPagePagination);
         props.setModalOpen(false);
         // console.log(result);
       })

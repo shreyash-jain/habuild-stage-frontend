@@ -781,6 +781,7 @@ const Members = (props) => {
         setModalOpen={setViewUpdateEmailModal}
         currentPagePagination={currentPagePagination}
         getPaginatedLeads={getMembers}
+        refetchData={handleSearch}
       />
     </div>
   );
