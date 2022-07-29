@@ -719,6 +719,9 @@ const Members = (props) => {
         modalOpen={viewGiftMembershipModal}
         setModalOpen={setViewGiftMembershipModal}
         memberForAction={memberForAction}
+        refetchData={handleSearch}
+        searchFor={searchFor}
+        searchTerm={searchTerm}
       />
 
       <StopMembership
@@ -727,6 +730,9 @@ const Members = (props) => {
         modalOpen={stopMembershipModal}
         setModalOpen={setStopMembershipModal}
         memberForAction={memberForAction}
+        refetchData={handleSearch}
+        searchFor={searchFor}
+        searchTerm={searchTerm}
       />
 
       <PauseMembership
@@ -735,6 +741,9 @@ const Members = (props) => {
         modalOpen={pauseMembershipModal}
         setModalOpen={setPauseMembershipModal}
         memberForAction={memberForAction}
+        refetchData={handleSearch}
+        searchFor={searchFor}
+        searchTerm={searchTerm}
       />
 
       <UpdateMemberDetails
@@ -743,6 +752,9 @@ const Members = (props) => {
         modalOpen={viewUpdateMemberInfo}
         setModalOpen={setViewUpdateMemberInfo}
         memberForAction={memberForAction}
+        refetchData={handleSearch}
+        searchFor={searchFor}
+        searchTerm={searchTerm}
       />
 
       <ChangeMemberChannel
@@ -751,6 +763,9 @@ const Members = (props) => {
         memberForAction={memberForAction}
         getPaginatedLeads={getMembers}
         currentPagePagination={currentPagePagination}
+        refetchData={handleSearch}
+        searchFor={searchFor}
+        searchTerm={searchTerm}
       />
 
       <ViewMemberCommsModal
@@ -765,6 +780,9 @@ const Members = (props) => {
         setModalOpen={setViewChangePrefferedBatchModal}
         memberProgramsWithBatches={memberProgramsWithBatches}
         memberBatches={memberBatches}
+        refetchData={handleSearch}
+        searchFor={searchFor}
+        searchTerm={searchTerm}
       />
 
       <SelectedMembersFloat
@@ -782,6 +800,8 @@ const Members = (props) => {
         currentPagePagination={currentPagePagination}
         getPaginatedLeads={getMembers}
         refetchData={handleSearch}
+        searchFor={searchFor}
+        searchTerm={searchTerm}
       />
     </div>
   );
