@@ -1,26 +1,14 @@
 import { useEffect, useState, Fragment } from "react";
-import {
-  Dialog,
-  Disclosure,
-  Menu,
-  Popover,
-  Transition,
-} from "@headlessui/react";
-import LayoutSidebar from "../components/LayoutSidebar";
-import Table from "../components/Table";
-import FlyoutMenu from "../components/FlyoutMenu";
-import Modal from "../components/Modal";
-import {
-  RefreshIcon,
-  XCircleIcon,
-  CheckCircleIcon,
-  ChevronDownIcon,
-  SearchIcon,
-  FilterIcon,
-} from "@heroicons/react/outline";
+import LayoutSidebar from "../../components/LayoutSidebar";
+import Table from "../../components/Table";
+import FlyoutMenu from "../../components/FlyoutMenu";
+import Modal from "../../components/Modal";
+import { RefreshIcon, ExternalLinkIcon } from "@heroicons/react/outline";
 import { format, parseISO } from "date-fns";
 import toast from "react-hot-toast";
-import { PaymentApis } from "../constants/apis";
+import { PaymentApis } from "../../constants/apis";
+import AddCommModal from "../leads/AddCommModal";
+import ViewMemberCommsModal from "../members/ViewMemberCommsModal";
 
 const tabs = [
   { name: "Failed Payments", href: "#", current: false },
@@ -41,17 +29,24 @@ const Payments = (props) => {
   const [totalRecords, setTotalRecords] = useState(0);
   const [currentPagePagination, setCurrentPagePagination] = useState(1);
   const [currentTab, setCurrentTab] = useState("Failed Payments");
+  const [apiLoading, setApiLoading] = useState(false);
+  const [viewExistingModal, setViewExistingModal] = useState(false);
+  const [paymentToShow, setPaymentToShow] = useState({});
+  const [leadForAction, setLeadForAction] = useState({});
+  const [viewAddCommModal, setViewAddCommModal] = useState(false);
+  const [viewCommsModal, setViewCommsModal] = useState(false);
 
   useEffect(() => {
     getPayments(1);
   }, []);
 
   const getPayments = async (pageNum) => {
+    setApiLoading(true);
     setCurrentPagePagination(pageNum);
     await fetch(PaymentApis.GET_PAYMENTS(pageNum))
       .then((res) => res.json())
       .then((data) => {
-        // console.log("Payments", data);
+        console.log("Payments", data);
 
         let successfullPayments = [];
         let failedPayments = [];
@@ -73,6 +68,8 @@ const Payments = (props) => {
           }
         }
 
+        console.log("Failed Payments!!!!!!!!!", failedPayments);
+
         setSuccessfullPayments(successfullPayments);
         setFailedPayments(failedPayments);
         if (currentTab == "Failed Payments") {
@@ -82,31 +79,25 @@ const Payments = (props) => {
         }
 
         setTotalRecords(data.data.totalPaymentsSize);
+        setApiLoading(false);
       });
   };
 
   const menuItems = [
-    // {
-    //   name: "Edit",
-    //   onClick: (actionEntity) => {
-    //     setEditPayment(actionEntity);
-    //     setViewEditModal(true);
-    //   },
-    // },
-    // {
-    //   name: "Delete",
-    //   onClick: (actionEntity) => {
-    //     if (window.confirm("Are you sure you want to Delete this quote?")) {
-    //       deleteAttendanceQuote(actionEntity.id);
-    //     }
-    //   },
-    // },
-    // {
-    //   name: "View Attendance",
-    //   onClick: () => {
-    //     setViewAttendanceModal(!viewAttendanceModal);
-    //   },
-    // },
+    {
+      name: "View Communication Logs",
+      onClick: (actionEntity) => {
+        setLeadForAction(actionEntity.habuild_members);
+        setViewCommsModal(true);
+      },
+    },
+    {
+      name: "Add Communication Log",
+      onClick: (actionEntity) => {
+        setLeadForAction(actionEntity.habuild_members);
+        setViewAddCommModal(true);
+      },
+    },
   ];
 
   const columns = [
@@ -119,22 +110,57 @@ const Payments = (props) => {
       title: "Created at",
       dataIndex: "created_at",
       key: "created_at",
+      render: (created_at) => {
+        return (
+          <div className="text-sm font-medium text-gray-700">
+            {format(parseISO(created_at), "PPpp")}
+          </div>
+        );
+      },
     },
-    {
-      title: "Gateway",
-      dataIndex: "gateway",
-      key: "gateway",
-    },
+    // {
+    //   title: "Gateway",
+    //   dataIndex: "gateway",
+    //   key: "gateway",
+    // },
     {
       title: "Member Id",
       dataIndex: "member_id",
       key: "member_id",
     },
     {
-      title: "Mode",
-      dataIndex: "mode",
-      key: "mode",
+      title: "Name",
+      dataIndex: "habuild_members",
+      key: "habuild_members",
+      render: (memberObj) => {
+        return <div className="text-sm  text-gray-600">{memberObj.name}</div>;
+      },
     },
+    {
+      title: "Email",
+      dataIndex: "habuild_members",
+      key: "habuild_members",
+      render: (memberObj) => {
+        return <div className="text-sm  text-gray-600">{memberObj.email}</div>;
+      },
+    },
+    {
+      title: "Mobile Number",
+      dataIndex: "habuild_members",
+      key: "habuild_members",
+      render: (memberObj) => {
+        return (
+          <div className="text-sm  text-gray-600">
+            {memberObj.mobile_number}
+          </div>
+        );
+      },
+    },
+    // {
+    //   title: "Mode",
+    //   dataIndex: "mode",
+    //   key: "mode",
+    // },
     {
       title: "Order Id",
       dataIndex: "order_id",
@@ -145,20 +171,47 @@ const Payments = (props) => {
     //   dataIndex: "pg_request",
     //   key: "pg_request",
     // },
-    {
-      title: "Pg Response",
-      dataIndex: "pg_response",
-      key: "pg_response",
-    },
-    {
-      title: "Source",
-      dataIndex: "source",
-      key: "source",
-    },
+    // {
+    //   title: "Pg Response",
+    //   dataIndex: "pg_response",
+    //   key: "pg_response",
+    // },
+    // {
+    //   title: "Source",
+    //   dataIndex: "source",
+    //   key: "source",
+    // },
     {
       title: "Status",
       dataIndex: "status",
       key: "status",
+    },
+    currentTab == "Failed Payments" && {
+      title: "Latest Status",
+      dataIndex: "latestPayment",
+      key: "latestPayment",
+      render: (latestPaymentArr) => {
+        console.log("Column Data", latestPaymentArr);
+
+        if (latestPaymentArr?.length > 0) {
+          return (
+            <div className="flex flex-row">
+              <ExternalLinkIcon
+                className="mr-2 h-5 w-5 text-green-400 cursor-pointer hover:text-green-600"
+                onClick={() => {
+                  setViewExistingModal(true);
+                  setPaymentToShow(latestPaymentArr[0]);
+                }}
+              />
+              <span className="text-sm font-medium text-gray-700">
+                {latestPaymentArr[0].status}
+              </span>
+            </div>
+          );
+        } else {
+          return <div>-</div>;
+        }
+      },
     },
     {
       title: "UTR",
@@ -190,6 +243,16 @@ const Payments = (props) => {
     setCurrentTab(newTab);
   };
 
+  if (apiLoading) {
+    return (
+      <div>
+        <h1 className="text-2xl font-semibold text-gray-900">Payments</h1>
+
+        <RefreshIcon className="text-green-300 animate-spin h-8 w-8 mx-auto" />
+      </div>
+    );
+  }
+
   return (
     <div>
       <h1 className="text-2xl font-semibold text-gray-900">Payments</h1>
@@ -218,20 +281,20 @@ const Payments = (props) => {
         </div>
       </div>
 
-      {currentPaymentsToShow.length > 0 ? (
-        <Table
-          onPaginationApi={getPayments}
-          pagination
-          totalRecords={totalRecords}
-          columns={columns}
-          dataSource={currentPaymentsToShow}
-          currentPagePagination={currentPagePagination}
-        />
-      ) : (
+      {/* {currentPaymentsToShow.length > 0 ? ( */}
+      <Table
+        onPaginationApi={getPayments}
+        pagination
+        totalRecords={totalRecords}
+        columns={columns}
+        dataSource={currentPaymentsToShow}
+        currentPagePagination={currentPagePagination}
+      />
+      {/* ) : (
         <h1 className="my-2 font-medium text-lg text-gray-700">
           No Payments to Show
         </h1>
-      )}
+      )} */}
 
       <button
         onClick={() => setViewAddModal(true)}
@@ -253,7 +316,38 @@ const Payments = (props) => {
         setViewModal={setViewEditModal}
         mode="edit"
       /> */}
+
+      <ExistingPaymentModal
+        paymentToShow={paymentToShow}
+        viewModal={viewExistingModal}
+        setViewModal={setViewExistingModal}
+        columns={columns}
+      />
+
+      <AddCommModal
+        leadForAction={leadForAction}
+        modalOpen={viewAddCommModal}
+        setModalOpen={setViewAddCommModal}
+      />
+
+      <ViewMemberCommsModal
+        memberForAction={leadForAction}
+        modalOpen={viewCommsModal}
+        setModalOpen={setViewCommsModal}
+      />
     </div>
+  );
+};
+
+const ExistingPaymentModal = (props) => {
+  return (
+    <Modal
+      modalOpen={props.viewModal}
+      setModalOpen={props.setViewModal}
+      hideActionButtons
+    >
+      <Table columns={props.columns} dataSource={[props.paymentToShow]} />
+    </Modal>
   );
 };
 

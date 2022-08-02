@@ -33,6 +33,11 @@ const ViewMemberCommsModal = (props) => {
       key: "template_identifier",
     },
     {
+      title: "Description",
+      dataIndex: "description",
+      key: "description",
+    },
+    {
       title: "Destination",
       dataIndex: "destination",
       key: "destination",
