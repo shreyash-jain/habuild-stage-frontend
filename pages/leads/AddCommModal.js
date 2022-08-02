@@ -60,7 +60,7 @@ const AddCommModal = (props) => {
   return (
     <Modal
       apiLoading={apiLoading}
-      modalOpen={props.modalOpen}
+      modalOpen={props.modalOpen ? props.modalOpen : false}
       setModalOpen={props.setModalOpen}
       actionText="Add"
       hideActionButtons
