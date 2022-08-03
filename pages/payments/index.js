@@ -255,6 +255,10 @@ const Payments = (props) => {
     );
   }
 
+  if (checkAuthLoading) {
+    return <RefreshIcon className="text-green-300 h-8 w-8 mx-auto" />;
+  }
+
   return (
     <div>
       <h1 className="text-2xl font-semibold text-gray-900">Payments</h1>
@@ -526,10 +530,6 @@ const PaymentFormModal = (props) => {
       };
     }
   };
-
-  if (checkAuthLoading) {
-    return <RefreshIcon className="text-green-300 h-8 w-8 mx-auto" />;
-  }
 
   return (
     <Modal
