@@ -54,11 +54,12 @@ const DemoBatches = (props) => {
   // };
 
   const getAllPrograms = async () => {
-    await fetch(ProgramsApis.GET_PROGRAMS())
-      .then((res) => res.json())
-      .then((data) => {
-        setPrograms(data.programs);
-      });
+    const data = await props.customFetch(
+      ProgramsApis.GET_PROGRAMS(),
+      "GET",
+      {}
+    );
+    setPrograms(data.programs);
   };
 
   const columns = [
@@ -158,7 +159,7 @@ const AddDemoBatchModal = (props) => {
   const [ad_id, setAd_id] = useState("");
   const [apiLoading, setApiLoading] = useState(false);
 
-  const formSubmit = (e) => {
+  const formSubmit = async (e) => {
     e.preventDefault();
     setApiLoading(true);
 
@@ -168,36 +169,26 @@ const AddDemoBatchModal = (props) => {
       return;
     }
 
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    var raw = JSON.stringify({
-      name,
-      program_id: programId,
-      start_date: startDate,
-      end_date: endDate,
-      ad_id: ad_id,
-      status: "INACTIVE",
-    });
+    try {
+      var raw = {
+        name,
+        program_id: programId,
+        start_date: startDate,
+        end_date: endDate,
+        ad_id: ad_id,
+        status: "INACTIVE",
+      };
 
-    var requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
-    };
-    fetch(DemoBatchesApis.CREATE(), requestOptions)
-      .then((response) => response.text())
-      .then((result) => {
-        setApiLoading(false);
-        props.refreshData();
-        props.setModalOpen(false);
-        toast.success("Demo Batch Created");
-      })
-      .catch((error) => {
-        setApiLoading(false);
-        toast.error("Error");
-        // console.log("error", error);
-      });
+      await props.customFetch(DemoBatchesApis.CREATE(), "POST", raw);
+      setApiLoading(false);
+      props.refreshData();
+      props.setModalOpen(false);
+      toast.success("Demo Batch Created");
+    } catch (err) {
+      setApiLoading(false);
+      toast.error("Error");
+      // console.log("error", error);
+    }
   };
 
   return (

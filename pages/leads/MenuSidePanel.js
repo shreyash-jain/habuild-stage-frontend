@@ -31,6 +31,7 @@ import {
   MembersApis,
   WatiTemplatesApis,
 } from "../../constants/apis";
+import { data } from "autoprefixer";
 
 const tabs = [
   { name: "Send WA Message", current: true },
@@ -56,18 +57,16 @@ const MenuSidePanel = (props) => {
 
   const withDemoBatches = (demoPrograms) => {
     const demoProgramsWithDemoBatches = demoPrograms.map(async (item) => {
-      const demobatches = await fetch(
-        DemoProgramsApis.GET_DEMO_BATCHES_FROM_PROGRAM(item.id)
-      )
-        .then((res) => res.json())
-        .then((data) => {
-          return data.data;
-        });
+      const data = await props.customFetch(
+        DemoProgramsApis.GET_DEMO_BATCHES_FROM_PROGRAM(item.id),
+        "GET",
+        {}
+      );
 
       return {
         ...item,
         action: item,
-        demobatches,
+        demobatches: data.data,
       };
     });
 
@@ -77,38 +76,24 @@ const MenuSidePanel = (props) => {
   };
 
   const getAllDemoPrograms = async () => {
-    const demoPrograms = await fetch(DemoProgramsApis.GET())
-      .then((res) => {
-        return res.json();
-      })
-      .then((data) => {
-        // console.log("DATAAAA", data.data);
-        // withDemoBatches(data.data);
-        return data.data;
-      });
+    const data = await props.customFetch(DemoProgramsApis.GET(), "GET", {});
 
-    withDemoBatches(demoPrograms);
+    withDemoBatches(data.data);
   };
 
   const fetchTemplates = async (calledFrom) => {
-    await fetch(WatiTemplatesApis.GET())
-      .then((res) => res.json())
-      .then((data) => {
-        setWatiTemplates(data.data);
-        if (calledFrom == "fromRefetch") {
-          setRefetchLoading(false);
-          toast.success("Wat templates updated.");
-        }
-      });
+    const data = await props.customFetch(WatiTemplatesApis.GET(), "GET", {});
+    setWatiTemplates(data.data);
+    if (calledFrom == "fromRefetch") {
+      setRefetchLoading(false);
+      toast.success("Wat templates updated.");
+    }
   };
 
   const refetchTemplates = async () => {
     setRefetchLoading(true);
-    await fetch(WatiTemplatesApis.REFETCH(), {
-      method: "PATCH",
-    }).then((res) => {
-      fetchTemplates("fromRefetch");
-    });
+    await props.customFetch(WatiTemplatesApis.REFETCH(), "PATCH", {});
+    fetchTemplates("fromRefetch");
   };
 
   return (
@@ -166,6 +151,7 @@ const MenuSidePanel = (props) => {
             }
             selectedLeads={props.selectedLeads}
             selectedLeadsLength={props.selectedLeads?.length}
+            customFetch={props.customFetch}
           />
         )}
 
@@ -180,6 +166,7 @@ const MenuSidePanel = (props) => {
             selectedLeads={props.selectedLeads}
             selectedLeadsLength={props.selectedLeads?.length}
             refetchLoading={refetchLoading}
+            customFetch={props.customFetch}
           />
         )}
 
@@ -188,6 +175,7 @@ const MenuSidePanel = (props) => {
             open={props.open}
             setOpen={props.setOpen}
             demoBatches={props.demoBatches}
+            customFetch={props.customFetch}
           />
         )}
       </div>
@@ -206,16 +194,15 @@ const ViewAttendance = (props) => {
   const onSearch = async () => {
     setApiLoading(true);
 
-    await fetch(
+    await props.customFetch(
       MembersApis.GET_ATTENDANCE({
         batchId: selectedDemoBatch,
         daysAttended,
-      })
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        setApiLoading(false);
-      });
+      }),
+      "GET",
+      {}
+    );
+    setApiLoading(false);
   };
 
   return (

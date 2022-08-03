@@ -28,24 +28,18 @@ const MenuSidePanel = (props) => {
   }, []);
 
   const fetchTemplates = async (calledFrom) => {
-    await fetch(WatiTemplatesApis.GET())
-      .then((res) => res.json())
-      .then((data) => {
-        setWatiTemplates(data.data);
-        if (calledFrom == "fromRefetch") {
-          setRefetchLoading(false);
-          toast.success("Wat templates updated.");
-        }
-      });
+    const data = await props.customFetch(WatiTemplatesApis.GET(), "GET", {});
+    setWatiTemplates(data.data);
+    if (calledFrom == "fromRefetch") {
+      setRefetchLoading(false);
+      toast.success("Wat templates updated.");
+    }
   };
 
   const refetchTemplates = async () => {
     setRefetchLoading(true);
-    await fetch(WatiTemplatesApis.REFETCH(), {
-      method: "PATCH",
-    }).then((res) => {
-      fetchTemplates("fromRefetch");
-    });
+    await props.customFetch(WatiTemplatesApis.REFETCH(), "PATCH", {});
+    fetchTemplates("fromRefetch");
   };
 
   return (
@@ -103,6 +97,7 @@ const MenuSidePanel = (props) => {
             }
             selectedLeads={props.selectedLeads}
             selectedLeadsLength={props.selectedLeads?.length}
+            customFetch={props.customFetch}
           />
         )}
 
@@ -119,10 +114,13 @@ const MenuSidePanel = (props) => {
             memberProgramsWithBatches={props.memberProgramsWithBatches}
             watiTemplates={watiTemplates}
             refetchTemplates={refetchTemplates}
+            customFetch={props.customFetch}
           />
         )}
 
-        {currentTab == "CSV Data Upload" && <MemberCSVUpload />}
+        {currentTab == "CSV Data Upload" && (
+          <MemberCSVUpload customFetchFile={props.customFetchFile} />
+        )}
       </div>
     </SidePannel>
   );

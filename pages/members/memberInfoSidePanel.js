@@ -132,28 +132,21 @@ const MemberInfoSidePanel = (props) => {
       return;
     }
 
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-
     setShortLinkLoader(true);
-    var raw = JSON.stringify({
+    var raw = {
       shortUrl: shortLink,
-    });
-    var requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
     };
 
-    await fetch(ShortenerApis.GET_LONG_URL(), requestOptions)
-      .then((res) => res.json())
-      .then((data) => {
-        setShortLinkLoader(false);
-        setCurrentLongUrl(data.long_url);
-        setLongUrlForShortUrl(data.long_url);
-        // console.log("Short URL Data", data);
-      });
+    const data = await props.customFetch(
+      ShortenerApis.GET_LONG_URL(),
+      "POST",
+      raw
+    );
+
+    setShortLinkLoader(false);
+    setCurrentLongUrl(data.long_url);
+    setLongUrlForShortUrl(data.long_url);
+    // console.log("Short URL Data", data);
   };
 
   const updateLongUrl = async () => {
@@ -163,33 +156,25 @@ const MemberInfoSidePanel = (props) => {
 
     setShortLinkLoader(true);
 
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-
     setShortLinkLoader(true);
-    var raw = JSON.stringify({
+    var raw = {
       shortUrl: memberShortLink,
       newLongUrl: longUrlForShortUrl,
-    });
-    var requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
     };
 
-    await fetch(ShortenerApis.UPDATE_LONG_URL(), requestOptions)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.ok) {
-          toast.success("Updated Long URL");
-          getMemberShortlinks(memberShortLink);
-        } else {
-          toast.error("Failed to update Long URL");
-        }
+    const data = await props.customFetch(
+      ShortenerApis.UPDATE_LONG_URL(),
+      "POST",
+      raw
+    );
+    if (data.ok) {
+      toast.success("Updated Long URL");
+      getMemberShortlinks(memberShortLink);
+    } else {
+      toast.error("Failed to update Long URL");
+    }
 
-        setShortLinkLoader(false);
-      });
+    setShortLinkLoader(false);
   };
 
   return (

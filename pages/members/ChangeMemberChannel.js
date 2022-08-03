@@ -18,7 +18,7 @@ const ChangeMemberChannel = (props) => {
     }
   }, [props.memberForAction]);
 
-  const updateChannel = (channelToUpdate, member, calledFrom) => {
+  const updateChannel = async (channelToUpdate, member, calledFrom) => {
     setApiLoading(true);
 
     let memberForAction;
@@ -34,37 +34,32 @@ const ChangeMemberChannel = (props) => {
       return;
     }
 
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    var raw = JSON.stringify({
+    var raw = {
       channel: channelToUpdate,
-    });
-    var requestOptions = {
-      method: "PATCH",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
     };
-    fetch(MembersApis.UPDATE_CHANNEL(memberForAction.id), requestOptions)
-      .then((response) => response.json())
-      .then((result) => {
-        setApiLoading(false);
-        if (!result.ok) {
-          toast.error(JSON.stringify(result.error));
-        } else {
-          toast.success("Member Updated Successfully.");
-        }
-        if (props.calledFrom !== "groupActions") {
-          props.getPaginatedLeads(props.currentPagePagination);
-          props.setModalOpen(false);
-        }
-        // console.log(result);
-      })
-      .catch((error) => {
-        setApiLoading(false);
-        // toast.error(error);
-        // console.log("error", error);
-      });
+    try {
+      const result = await props.customFetch(
+        MembersApis.UPDATE_CHANNEL(memberForAction.id),
+        "PATCH",
+        raw
+      );
+
+      setApiLoading(false);
+      if (!result.ok) {
+        toast.error(JSON.stringify(result.error));
+      } else {
+        toast.success("Member Updated Successfully.");
+      }
+      if (props.calledFrom !== "groupActions") {
+        props.getPaginatedLeads(props.currentPagePagination);
+        props.setModalOpen(false);
+      }
+      // console.log(result);
+    } catch (error) {
+      setApiLoading(false);
+      // toast.error(error);
+      // console.log("error", error);
+    }
   };
 
   const triggerGroupAction = (channelToUpdate) => {

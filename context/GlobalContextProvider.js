@@ -10,15 +10,15 @@ export const GlobalContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
+    setAuthLoading(true);
     if (typeof window !== "undefined") {
-      setAuthLoading(true);
       const sessionUser = JSON.parse(window.sessionStorage.getItem("user"));
 
       // console.log("Session Storage ", sessionUser);
 
       if (sessionUser?.token) setUser(sessionUser);
-      setAuthLoading(false);
     }
+    setAuthLoading(false);
   }, []);
 
   const login = async (username, password) => {

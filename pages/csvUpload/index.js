@@ -21,9 +21,12 @@ import {
 } from "../../constants/apis";
 import MemberCSVUpload from "../members/MemberCSVUpload";
 import useCheckAuth from "../../hooks/useCheckAuth";
+import { useFetchWrapper } from "../../utils/apiCall";
 
 const CsvUpload = (props) => {
   const checkAuthLoading = useCheckAuth(false);
+
+  const { customFetch, customFetchFile } = useFetchWrapper();
 
   const [apiLoading, setApiLoading] = useState();
   const [csvArray, setCsvArray] = useState([]);
@@ -81,7 +84,7 @@ const CsvUpload = (props) => {
     reader.readAsText(file);
   };
 
-  const formSubmit = (e, fromCSV, data) => {
+  const formSubmit = async (e, fromCSV, data) => {
     setApiLoading(true);
 
     let dataObj = {};
@@ -94,16 +97,6 @@ const CsvUpload = (props) => {
     let API = PaymentApis.CREATE_OFFLINE_PAYMENT();
     let method = "POST";
 
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    var raw = JSON.stringify(dataObj);
-    var requestOptions = {
-      method: method,
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
-    };
-
     // console.log(raw);
     // console.log(API);
     // console.log(method);
@@ -111,17 +104,12 @@ const CsvUpload = (props) => {
     // console.log(requestOptions);
 
     try {
-      fetch(API, requestOptions)
-        .then((response) => {
-          // console.log("response", response);
-          return response.text();
-        })
-        .then((result) => {
-          setApiLoading(false);
-          toast.success(`Payment Created`);
+      await customFetch(API, method, dataObj);
 
-          // console.log("Api Result", result);
-        });
+      setApiLoading(false);
+      toast.success(`Payment Created`);
+
+      // console.log("Api Result", result);
     } catch {
       (error) => {
         // console.log("error", error);
@@ -139,39 +127,29 @@ const CsvUpload = (props) => {
     let API = `https://stage.api.habuild.in/api/upload_csv/upload_member?includeInactiveMember=${includeInactiveMember}`;
     let file = memberDataFile;
 
-    let formData = new FormData();
-    formData.append("file", file);
-
-    var requestOptions = {
-      method: "POST",
-      body: formData,
-      redirect: "follow",
-    };
-
     // console.log(requestOptions);
 
-    fetch(API, requestOptions)
-      .then((response) => response.json())
-      .then((result) => {
-        // console.log("Result", result);
-        setApiLoading(false);
-        if (result.status == 200) {
-          toast.success(result.message);
+    try {
+      customFetchFile(API, "POST", file);
+
+      // console.log("Result", result);
+      setApiLoading(false);
+      if (result.status == 200) {
+        toast.success(result.message);
+      } else {
+        if (result?.message) {
+          toast.error(result.message);
         } else {
-          if (result?.message) {
-            toast.error(result.message);
-          } else {
-            toast.error("Error");
-          }
+          toast.error("Error");
         }
-        // props.refreshData();
-        // props.setModalOpen(false);
-      })
-      .catch((error) => {
-        setApiLoading(false);
-        toast.error("Error");
-        // console.log("error", error);
-      });
+      }
+      // props.refreshData();
+      // props.setModalOpen(false);
+    } catch (err) {
+      setApiLoading(false);
+      toast.error(err);
+      // console.log("error", error);
+    }
   };
 
   if (checkAuthLoading) {

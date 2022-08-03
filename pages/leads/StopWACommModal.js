@@ -8,7 +8,7 @@ import { LeadsApis } from "../../constants/apis";
 const StopWACommModal = (props) => {
   const [apiLoading, setApiLoading] = useState();
 
-  const apiCall = (status) => {
+  const apiCall = async (status) => {
     setApiLoading(true);
 
     const selectedLeadsIds = props.selectedLeads.map((item) => item.member_id);
@@ -22,37 +22,33 @@ const StopWACommModal = (props) => {
       return;
     }
 
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    var raw = JSON.stringify({
+    var raw = {
       lead_member_ids: selectedLeadsIds,
       status,
-    });
-    var requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
     };
-    fetch(LeadsApis.UPDATE_COMM_STATUS(), requestOptions)
-      .then((response) => response.json())
-      .then((result) => {
-        setApiLoading(false);
-        if (result.errorMessage) {
-          toast.error(result.errorMessage);
-        } else {
-          toast.success(result.message);
-        }
-        props.getPaginatedLeads();
-        props.setSelectedLeads([]);
-        props.setOpen(false);
-        // console.log(result);
-      })
-      .catch((error) => {
-        setApiLoading(false);
-        // toast.error(error);
-        // console.log("error", error);
-      });
+
+    try {
+      const result = await props.customFetch(
+        LeadsApis.UPDATE_COMM_STATUS(),
+        "POST",
+        raw
+      );
+
+      setApiLoading(false);
+      if (result.errorMessage) {
+        toast.error(result.errorMessage);
+      } else {
+        toast.success(result.message);
+      }
+      props.getPaginatedLeads();
+      props.setSelectedLeads([]);
+      props.setOpen(false);
+      // console.log(result);
+    } catch (error) {
+      setApiLoading(false);
+      // toast.error(error);
+      // console.log("error", error);
+    }
   };
 
   return (

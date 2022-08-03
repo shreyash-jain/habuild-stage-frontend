@@ -9,7 +9,7 @@ const StopMembership = (props) => {
   const [amount, setAmount] = useState("");
   const [refundCheck, setRefundCheck] = useState(false);
 
-  const stopMembership = (member, calledFrom) => {
+  const stopMembership = async (member, calledFrom) => {
     setApiLoading(true);
 
     if (refundCheck) {
@@ -28,39 +28,35 @@ const StopMembership = (props) => {
       memberForAction = props.memberForAction;
     }
 
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    var raw = JSON.stringify({
+    var raw = {
       amount: amount,
       utr: utr,
       createRefundLog: refundCheck,
-    });
-    var requestOptions = {
-      method: "PATCH",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
     };
-    fetch(MembersApis.STOP_MEMBERSHIP(memberForAction.id), requestOptions)
-      .then((response) => response.json())
-      .then((result) => {
-        setApiLoading(false);
-        if (result.status == 500) {
-          toast.error(result.message);
-        } else {
-          toast.success(result.message);
-        }
-        if (calledFrom !== "groupActions") {
-          props.getPaginatedLeads(props.currentPagePagination);
-          props.setModalOpen(false);
-        }
-        setRefundCheck(false);
-      })
-      .catch((error) => {
-        setApiLoading(false);
-        // toast.error(error);
-        // console.log("error", error);
-      });
+
+    try {
+      const result = props.customFetch(
+        MembersApis.STOP_MEMBERSHIP(memberForAction.id),
+        "PATCH",
+        raw
+      );
+
+      setApiLoading(false);
+      if (result.status == 500) {
+        toast.error(result.message);
+      } else {
+        toast.success(result.message);
+      }
+      if (calledFrom !== "groupActions") {
+        props.getPaginatedLeads(props.currentPagePagination);
+        props.setModalOpen(false);
+      }
+      setRefundCheck(false);
+    } catch (error) {
+      setApiLoading(false);
+      // toast.error(error);
+      // console.log("error", error);
+    }
   };
 
   const triggerGroupAction = () => {

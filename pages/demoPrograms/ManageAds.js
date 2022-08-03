@@ -34,17 +34,18 @@ const DemoAds = (props) => {
     }
 
     setDeleteLoading(true);
-    await fetch(HabuildAdsApis.DELETE(demoAd.id), {
-      method: "DELETE",
-    }).then((res) => {
-      setDeleteLoading(false);
-      props.getDemoAds();
-      if (res.status == 404) {
-        toast.error("Demo Ad Not Deleted.");
-      } else {
-        toast.success("Demo Ad Deleted.");
-      }
-    });
+    const res = await props.customFetch(
+      HabuildAdsApis.DELETE(demoAd.id),
+      "DELETE",
+      {}
+    );
+    setDeleteLoading(false);
+    props.getDemoAds();
+    if (res.status == 404) {
+      toast.error("Demo Ad Not Deleted.");
+    } else {
+      toast.success("Demo Ad Deleted.");
+    }
   };
 
   const menuItems = [
@@ -118,7 +119,7 @@ const AddDemoAdModal = (props) => {
 
   const [apiLoading, setApiLoading] = useState(false);
 
-  const formSubmit = (e) => {
+  const formSubmit = async (e) => {
     e.preventDefault();
     setApiLoading(true);
 
@@ -128,32 +129,22 @@ const AddDemoAdModal = (props) => {
       return;
     }
 
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    var raw = JSON.stringify({
+    var raw = {
       name,
       demo_program_id: parseInt(props.demoProgram.id),
       ad_id: parseInt(ad_id),
-    });
-
-    var requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
     };
-    fetch(HabuildAdsApis.CREATE(), requestOptions)
-      .then((response) => response.text())
-      .then((result) => {
-        setApiLoading(false);
-        props.refreshData();
-        props.setModalOpen(false);
-        toast.success("Demo Ad Created");
-      })
-      .catch((error) => {
-        setApiLoading(false);
-        toast.error("Error");
-      });
+
+    try {
+      await props.customFetch(HabuildAdsApis.CREATE(), "POST", raw);
+      setApiLoading(false);
+      props.refreshData();
+      props.setModalOpen(false);
+      toast.success("Demo Ad Created");
+    } catch (err) {
+      setApiLoading(false);
+      toast.error("Error");
+    }
   };
 
   return (

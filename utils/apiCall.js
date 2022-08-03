@@ -20,9 +20,33 @@ export const useFetchWrapper = () => {
       redirect: "follow",
     };
 
-    if (Object(body)?.keys?.length > 0) {
-      requestOptions.body = JSON.stringify(body);
+    if (Object.keys(body)?.length > 0) {
+      requestOptions = { ...requestOptions, body: JSON.stringify(body) };
     }
+
+    console.log(requestOptions);
+
+    const result = await fetch(api, requestOptions).then((res) => res.json());
+
+    return result;
+  };
+
+  const customFetchFile = async (api, method, file) => {
+    var myHeaders = new Headers();
+
+    if (process.env.API_BASE_URL == "https://stage.api.habuild.in") {
+      myHeaders.append("Authorization", `Bearer ${user?.token}`);
+    }
+
+    let formData = new FormData();
+    formData.append("file", file);
+
+    var requestOptions = {
+      method,
+      headers: myHeaders,
+      body: formData,
+      redirect: "follow",
+    };
 
     const result = await fetch(api, requestOptions).then((res) => res.json());
 
@@ -36,5 +60,6 @@ export const useFetchWrapper = () => {
   return {
     customFetch,
     user,
+    customFetchFile,
   };
 };

@@ -9,7 +9,7 @@ const MemberCSVUpload = (props) => {
   const [performanceFile, setPerformanceFile] = useState({});
   const [attendanceFile, setAttendanceFile] = useState({});
 
-  const formSubmit = (calledFrom) => {
+  const formSubmit = async (calledFrom) => {
     if (!window.confirm("Are you sure?")) {
       return;
     }
@@ -38,36 +38,26 @@ const MemberCSVUpload = (props) => {
       return;
     }
 
-    let formData = new FormData();
-    formData.append("file", file);
-
-    var requestOptions = {
-      method: "POST",
-      body: formData,
-      redirect: "follow",
-    };
-    fetch(API, requestOptions)
-      .then((response) => response.json())
-      .then((result) => {
-        // console.log("Result", result);
-        setApiLoading(false);
-        if (result.status == 200) {
-          toast.success(result.message);
+    try {
+      const result = await props.customFetchFile(API, "POST", file);
+      // console.log("Result", result);
+      setApiLoading(false);
+      if (result.status == 200) {
+        toast.success(result.message);
+      } else {
+        if (result?.message) {
+          toast.error(result.message);
         } else {
-          if (result?.message) {
-            toast.error(result.message);
-          } else {
-            toast.error("Error");
-          }
+          toast.error("Error");
         }
-        // props.refreshData();
-        // props.setModalOpen(false);
-      })
-      .catch((error) => {
-        setApiLoading(false);
-        toast.error("Error");
-        // console.log("error", error);
-      });
+      }
+      // props.refreshData();
+      // props.setModalOpen(false);
+    } catch (error) {
+      setApiLoading(false);
+      toast.error("Error");
+      // console.log("error", error);
+    }
   };
 
   if (apiLoading) {

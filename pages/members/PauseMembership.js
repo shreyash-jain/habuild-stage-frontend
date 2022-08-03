@@ -9,7 +9,7 @@ const PauseMembership = (props) => {
   const [numDays, setNumDays] = useState(false);
   const [pauseStartDate, setPauseStartDate] = useState(false);
 
-  const pauseMembership = (member, calledFrom) => {
+  const pauseMembership = async (member, calledFrom) => {
     setApiLoading(true);
 
     if (!numDays || !pauseStartDate) {
@@ -26,44 +26,34 @@ const PauseMembership = (props) => {
       memberForAction = props.memberForAction;
     }
 
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
+    try {
+      const result = await props.customFetch(
+        MembersApis.PAUSE_MEMBERSHIP({
+          numDays,
+          memberId: memberForAction.id,
+          pauseStartDate,
+        }),
+        "PATCH",
+        {}
+      );
 
-    var requestOptions = {
-      method: "PATCH",
-      headers: myHeaders,
-      body: "",
-      redirect: "follow",
-    };
-
-    fetch(
-      MembersApis.PAUSE_MEMBERSHIP({
-        numDays,
-        memberId: memberForAction.id,
-        pauseStartDate,
-      }),
-      requestOptions
-    )
-      .then((response) => response.json())
-      .then((result) => {
-        // console.log(result);
-        setApiLoading(false);
-        if (result.status == 500) {
-          toast.error(result.message);
-        } else {
-          toast.success(result.message);
-        }
-        if (calledFrom !== "groupActions") {
-          props.getPaginatedLeads(props.currentPagePagination);
-          props.setModalOpen(false);
-        }
-        // console.log(result);
-      })
-      .catch((error) => {
-        setApiLoading(false);
-        // toast.error(error);
-        // console.log("error", error);
-      });
+      // console.log(result);
+      setApiLoading(false);
+      if (result.status == 500) {
+        toast.error(result.message);
+      } else {
+        toast.success(result.message);
+      }
+      if (calledFrom !== "groupActions") {
+        props.getPaginatedLeads(props.currentPagePagination);
+        props.setModalOpen(false);
+      }
+      // console.log(result);
+    } catch (error) {
+      setApiLoading(false);
+      // toast.error(error);
+      // console.log("error", error);
+    }
   };
 
   const triggerGroupAction = () => {

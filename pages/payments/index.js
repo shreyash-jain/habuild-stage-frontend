@@ -10,6 +10,7 @@ import { PaymentApis } from "../../constants/apis";
 import AddCommModal from "../leads/AddCommModal";
 import ViewMemberCommsModal from "../members/ViewMemberCommsModal";
 import useCheckAuth from "../../hooks/useCheckAuth";
+import { useFetchWrapper } from "../../utils/apiCall";
 
 const tabs = [
   { name: "Failed Payments", href: "#", current: false },
@@ -22,6 +23,9 @@ function classNames(...classes) {
 
 const Payments = (props) => {
   const checkAuthLoading = useCheckAuth(false);
+
+  const { customFetch } = useFetchWrapper();
+
   const [currentPaymentsToShow, setCurrentPaymentsToShow] = useState([]);
   const [successfullPayments, setSuccessfullPayments] = useState([]);
   const [failedPayments, setFailedPayments] = useState([]);
@@ -39,50 +43,51 @@ const Payments = (props) => {
   const [viewCommsModal, setViewCommsModal] = useState(false);
 
   useEffect(() => {
-    getPayments(1);
-  }, []);
+    if (!checkAuthLoading) {
+      getPayments(1);
+    }
+  }, [checkAuthLoading]);
 
   const getPayments = async (pageNum) => {
     setApiLoading(true);
     setCurrentPagePagination(pageNum);
-    await fetch(PaymentApis.GET_PAYMENTS(pageNum))
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("Payments", data);
 
-        let successfullPayments = [];
-        let failedPayments = [];
-        let allPayments = [];
+    const data = await customFetch(
+      PaymentApis.GET_PAYMENTS(pageNum),
+      "GET",
+      {}
+    );
 
-        for (let i = 0; i < data.data.paymentDataArr.length; i++) {
-          if (data.data.paymentDataArr[i].status == "SUCCESS") {
-            const obj = {
-              ...data.data.paymentDataArr[i],
-              action: data.data.paymentDataArr[i],
-            };
-            successfullPayments.push(obj);
-          } else {
-            const obj = {
-              ...data.data.paymentDataArr[i],
-              action: data.data.paymentDataArr[i],
-            };
-            failedPayments.push(obj);
-          }
-        }
+    let successfullPayments = [];
+    let failedPayments = [];
+    let allPayments = [];
 
-        console.log("Failed Payments!!!!!!!!!", failedPayments);
+    for (let i = 0; i < data.data.paymentDataArr.length; i++) {
+      if (data.data.paymentDataArr[i].status == "SUCCESS") {
+        const obj = {
+          ...data.data.paymentDataArr[i],
+          action: data.data.paymentDataArr[i],
+        };
+        successfullPayments.push(obj);
+      } else {
+        const obj = {
+          ...data.data.paymentDataArr[i],
+          action: data.data.paymentDataArr[i],
+        };
+        failedPayments.push(obj);
+      }
+    }
 
-        setSuccessfullPayments(successfullPayments);
-        setFailedPayments(failedPayments);
-        if (currentTab == "Failed Payments") {
-          setCurrentPaymentsToShow(failedPayments);
-        } else {
-          setCurrentPaymentsToShow(successfullPayments);
-        }
+    setSuccessfullPayments(successfullPayments);
+    setFailedPayments(failedPayments);
+    if (currentTab == "Failed Payments") {
+      setCurrentPaymentsToShow(failedPayments);
+    } else {
+      setCurrentPaymentsToShow(successfullPayments);
+    }
 
-        setTotalRecords(data.data.totalPaymentsSize);
-        setApiLoading(false);
-      });
+    setTotalRecords(data.data.totalPaymentsSize);
+    setApiLoading(false);
   };
 
   const menuItems = [
@@ -313,6 +318,7 @@ const Payments = (props) => {
         getPayments={getPayments}
         viewModal={viewAddModal}
         setViewModal={setViewAddModal}
+        customFetch={customFetch}
       />
 
       {/* <PaymentFormModal
@@ -334,6 +340,7 @@ const Payments = (props) => {
         leadForAction={leadForAction}
         modalOpen={viewAddCommModal}
         setModalOpen={setViewAddCommModal}
+        customFetch={customFetch}
       />
 
       <ViewMemberCommsModal
@@ -458,7 +465,7 @@ const PaymentFormModal = (props) => {
     },
   ];
 
-  const formSubmit = (e) => {
+  const formSubmit = async (e) => {
     let API = PaymentApis.CREATE();
     let method = "POST";
 
@@ -480,9 +487,8 @@ const PaymentFormModal = (props) => {
       setApiLoading(false);
       return;
     }
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    var raw = JSON.stringify({
+
+    var raw = {
       amount,
       gateway,
       member_id,
@@ -493,12 +499,6 @@ const PaymentFormModal = (props) => {
       source,
       status,
       utr,
-    });
-    var requestOptions = {
-      method: method,
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
     };
 
     // console.log(raw);
@@ -506,20 +506,13 @@ const PaymentFormModal = (props) => {
     // console.log(method);
 
     try {
-      fetch(API, requestOptions)
-        .then((response) => {
-          // console.log("response", response);
-          return response.text();
-        })
-        .then((result) => {
-          setApiLoading(false);
-          toast.success(
-            `Payment ${props.mode == "edit" ? "Updated" : "Created"}`
-          );
-          props.getPayments();
-          props.setViewModal(false);
-          // console.log("Api Result", result);
-        });
+      await props.customFetch(API, method, raw);
+
+      setApiLoading(false);
+      toast.success(`Payment ${props.mode == "edit" ? "Updated" : "Created"}`);
+      props.getPayments();
+      props.setViewModal(false);
+      // console.log("Api Result", result);
     } catch {
       (error) => {
         setApiLoading(false);

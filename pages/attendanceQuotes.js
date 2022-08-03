@@ -21,8 +21,7 @@ import {
   ProgramsApis,
 } from "../constants/apis";
 import useCheckAuth from "../hooks/useCheckAuth";
-import { customFetch } from "../utils/apiCall";
-import { GlobalContext } from "../context/GlobalContextProvider";
+import { useFetchWrapper } from "../utils/apiCall";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -31,7 +30,7 @@ function classNames(...classes) {
 const AttendanceQuotes = (props) => {
   const checkAuthLoading = useCheckAuth(false);
 
-  const { user } = useContext(GlobalContext);
+  const { customFetch, user } = useFetchWrapper();
 
   const [loading, setLoading] = useState(false);
   const [attendnaceQuotes, setAttendanceQuotes] = useState([]);
@@ -48,96 +47,97 @@ const AttendanceQuotes = (props) => {
   const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
-    if (user) { 
+    if (!checkAuthLoading) {
       getAllPrograms();
       getDemoBatches();
       getAttendanceQuotes();
     }
-  }, [user?.token]);
+  }, []);
 
   const getAttendanceQuotes = async () => {
     setLoading(true);
-    await fetch(AttendanceQuotesApis.GET_ATTENDANCE_QUOTES())
-      .then((res) => res.json())
-      .then((data) => {
-        // console.log("Data", data.attendanceQuotes);
-        setAttendanceQuotes(
-          data.attendanceQuotes.map((item) => {
-            return {
-              ...item,
-              action: item,
-            };
-          })
-        );
+    const data = await customFetch(
+      AttendanceQuotesApis.GET_ATTENDANCE_QUOTES(),
+      "GET",
+      {}
+    );
 
-        let absentQuotes = data.attendanceQuotes.filter((item) => {
-          if (!parseInt(item.day_presence)) {
-            return true;
-          }
-        });
+    setAttendanceQuotes(
+      data.attendanceQuotes.map((item) => {
+        return {
+          ...item,
+          action: item,
+        };
+      })
+    );
 
-        absentQuotes = absentQuotes.map((item) => {
-          return {
-            ...item,
-            action: item,
-          };
-        });
+    let absentQuotes = data.attendanceQuotes.filter((item) => {
+      if (!parseInt(item.day_presence)) {
+        return true;
+      }
+    });
 
-        setAbsentAttendanceQuotes(
-          absentQuotes.sort(function (a, b) {
-            return a.total_days_absent - b.total_days_absent;
-          })
-        );
+    absentQuotes = absentQuotes.map((item) => {
+      return {
+        ...item,
+        action: item,
+      };
+    });
 
-        let presentQuotes = data.attendanceQuotes.filter((item) => {
-          if (parseInt(item.day_presence)) {
-            return true;
-          }
-        });
+    setAbsentAttendanceQuotes(
+      absentQuotes.sort(function (a, b) {
+        return a.total_days_absent - b.total_days_absent;
+      })
+    );
 
-        presentQuotes = presentQuotes.map((item) => {
-          return {
-            ...item,
-            action: item,
-          };
-        });
+    let presentQuotes = data.attendanceQuotes.filter((item) => {
+      if (parseInt(item.day_presence)) {
+        return true;
+      }
+    });
 
-        setPresentAttendanceQuotes(
-          presentQuotes.sort(function (a, b) {
-            return a.total_days_present - b.total_days_present;
-          })
-        );
+    presentQuotes = presentQuotes.map((item) => {
+      return {
+        ...item,
+        action: item,
+      };
+    });
 
-        setLoading(false);
-      });
+    setPresentAttendanceQuotes(
+      presentQuotes.sort(function (a, b) {
+        return a.total_days_present - b.total_days_present;
+      })
+    );
+
+    setLoading(false);
   };
 
   const getDemoBatches = async () => {
-    await fetch(DemoBatchesApis.GET_DEMO_BATCHES())
-      .then((res) => res.json())
-      .then((data) => {
-        // console.log("Data", data);
-        setDemoBatches(data.demoBatches);
-      });
+    const data = await customFetch(
+      DemoBatchesApis.GET_DEMO_BATCHES(),
+      "GET",
+      {}
+    );
+    // console.log("Data", data);
+    setDemoBatches(data.demoBatches);
   };
 
   const getAllPrograms = async () => {
-    await fetch(ProgramsApis.GET_PROGRAMS())
-      .then((res) => res.json())
-      .then((data) => {
-        setPrograms(data.programs);
-      });
+    const data = await customFetch(ProgramsApis.GET_PROGRAMS(), "GET", {});
+
+    setPrograms(data.programs);
   };
 
   const deleteAttendanceQuote = async (id) => {
     setLoading(true);
-    await fetch(AttendanceQuotesApis.DELETE(id), {
-      method: "DELETE",
-    }).then((res) => {
-      // console.log("Data", res);
-      setLoading(false);
-      getAttendanceQuotes();
-    });
+    const data = await customFetch(
+      AttendanceQuotesApis.DELETE(id),
+      "DELETE",
+      {}
+    );
+    // console.log("Data", res);
+    setLoading(false);
+    getAttendanceQuotes();
   };
 
   const menuItems = [
@@ -353,7 +353,7 @@ const AddAttendanceQuote = (props) => {
     setQuoteFormArray(newArr);
   };
 
-  const formSubmit = () => {
+  const formSubmit = async () => {
     let API = AttendanceQuotesApis.CREATE();
     let method = "POST";
 
@@ -379,9 +379,8 @@ const AddAttendanceQuote = (props) => {
         setApiLoading(false);
         return;
       }
-      var myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      var raw = JSON.stringify({
+
+      var raw = {
         total_days_absent: item.total_days_absent,
         total_days_present: item.total_days_present,
         day_presence: item.day_presence,
@@ -389,24 +388,16 @@ const AddAttendanceQuote = (props) => {
         status: item.status,
         program_id: item.program_id,
         demo_batch_id: item.demo_batch_id,
-      });
-      var requestOptions = {
-        method: method,
-        headers: myHeaders,
-        body: raw,
-        redirect: "follow",
       };
 
       try {
-        fetch(API, requestOptions)
-          .then((response) => response.text())
-          .then((result) => {
-            setApiLoading(false);
-            toast.success(
-              `Attendance Quote ${props.mode == "edit" ? "Updated" : "Created"}`
-            );
-            // console.log(result);
-          });
+        await customFetch(API, method, raw);
+
+        setApiLoading(false);
+        toast.success(
+          `Attendance Quote ${props.mode == "edit" ? "Updated" : "Created"}`
+        );
+        // console.log(result);
       } catch {
         (error) => {
           setApiLoading(false);

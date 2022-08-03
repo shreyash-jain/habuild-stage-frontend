@@ -10,7 +10,7 @@ const AddCommModal = (props) => {
   const [mode, setMode] = useState("Phone");
   const [apiLoading, setApiLoading] = useState(false);
 
-  const formSubmit = (e) => {
+  const formSubmit = async (e) => {
     e.preventDefault();
     setApiLoading(true);
 
@@ -20,9 +20,7 @@ const AddCommModal = (props) => {
       return;
     }
 
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    var raw = JSON.stringify({
+    var raw = {
       member_id: props.leadForAction.member_id || props.leadForAction.id,
       date: new Date(),
       status: "success",
@@ -31,30 +29,24 @@ const AddCommModal = (props) => {
       name,
       description,
       source: "crm",
-    });
-    var requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
     };
-    // console.log(requestOptions);
-    fetch(LeadsApis.CREATE_COMM(), requestOptions)
-      .then((response) => response.text())
-      .then((result) => {
-        setApiLoading(false);
-        setName("");
-        setDescription("");
-        setMode("Phone");
-        props.setModalOpen(false);
-        toast.success("Communication Log Created");
-        // console.log(result);
-      })
-      .catch((error) => {
-        setApiLoading(false);
-        // toast.error(error);
-        // console.log("error", error);
-      });
+
+    try {
+      // console.log(requestOptions);
+      await props.customFetch(LeadsApis.CREATE_COMM(), "POST", raw);
+
+      setApiLoading(false);
+      setName("");
+      setDescription("");
+      setMode("Phone");
+      props.setModalOpen(false);
+      toast.success("Communication Log Created");
+      // console.log(result);
+    } catch (error) {
+      setApiLoading(false);
+      // toast.error(error);
+      // console.log("error", error);
+    }
   };
 
   return (

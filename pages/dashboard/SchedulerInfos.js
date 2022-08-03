@@ -14,25 +14,22 @@ const SchedulerInfos = (props) => {
     getSchedulersInfos();
   }, []);
 
-  const getSchedulersInfos = () => {
+  const getSchedulersInfos = async () => {
     setSchedulersInfoLoading(true);
 
-    fetch(SchedulerApis.GET())
-      .then((res) => res.json())
-      .then((data) => {
-        // console.log(data);
-        setSchedulerInfos(data.message);
+    const data = await props.customFetch(SchedulerApis.GET(), "GET", {});
+    // console.log(data);
+    setSchedulerInfos(data.message);
 
-        const notSuccessfulSchedulers = data?.message?.filter((item) => {
-          if (item.status !== "SUCCESS") {
-            return item;
-          }
-        });
+    const notSuccessfulSchedulers = data?.message?.filter((item) => {
+      if (item.status !== "SUCCESS") {
+        return item;
+      }
+    });
 
-        setUnsuccessfullSchedulers(notSuccessfulSchedulers);
+    setUnsuccessfullSchedulers(notSuccessfulSchedulers);
 
-        setSchedulersInfoLoading(false);
-      });
+    setSchedulersInfoLoading(false);
   };
 
   const columns = [

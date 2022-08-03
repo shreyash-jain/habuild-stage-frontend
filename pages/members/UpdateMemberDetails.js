@@ -24,7 +24,7 @@ const UpdateMemberDetails = (props) => {
     setHealthIssues(props.memberForAction.health_issue);
   }, [props.memberForAction]);
 
-  const updateDetails = () => {
+  const updateDetails = async () => {
     setApiLoading(true);
 
     if (!name || !phone) {
@@ -33,9 +33,7 @@ const UpdateMemberDetails = (props) => {
       return;
     }
 
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    var raw = JSON.stringify({
+    var raw = {
       memberDetails: {
         name,
         mobile: phone,
@@ -43,31 +41,29 @@ const UpdateMemberDetails = (props) => {
         healthissues: healthIssues,
         address,
       },
-    });
-    var requestOptions = {
-      method: "PATCH",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
     };
-    fetch(MembersApis.UPDATE(props.memberForAction.id), requestOptions)
-      .then((response) => response.json())
-      .then((result) => {
-        setApiLoading(false);
-        if (result.status == 500) {
-          toast.error(JSON.stringify(result.message));
-        } else {
-          toast.success("Member Updated Successfully.");
-        }
-        props.getPaginatedLeads(props.currentPagePagination);
-        props.setModalOpen(false);
-        // console.log(result);
-      })
-      .catch((error) => {
-        setApiLoading(false);
-        // toast.error(error);
-        // console.log("error", error);
-      });
+
+    try {
+      const result = await props.customFetch(
+        MembersApis.UPDATE(props.memberForAction.id),
+        "PATCH",
+        raw
+      );
+
+      setApiLoading(false);
+      if (result.status == 500) {
+        toast.error(JSON.stringify(result.message));
+      } else {
+        toast.success("Member Updated Successfully.");
+      }
+      props.getPaginatedLeads(props.currentPagePagination);
+      props.setModalOpen(false);
+      // console.log(result);
+    } catch (error) {
+      setApiLoading(false);
+      // toast.error(error);
+      // console.log("error", error);
+    }
   };
 
   return (

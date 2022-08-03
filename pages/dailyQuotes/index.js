@@ -11,6 +11,7 @@ import AddDailyQuoteModal from "./AddDailyQuoteModal";
 import EditEverydayQuote from "./EditEverydayQuote";
 import { RefreshIcon } from "@heroicons/react/outline";
 import useCheckAuth from "../../hooks/useCheckAuth";
+import { useFetchWrapper } from "../../utils/apiCall";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -23,6 +24,9 @@ const tabs = [
 
 const DailyQuotes = (props) => {
   const checkAuthLoading = useCheckAuth(false);
+
+  const { customFetch } = useFetchWrapper();
+
   const [dailyQuotes, setDailyQuotes] = useState([]);
   const [memberDailyQuotes, setMemberDailyQuotes] = useState([]);
   const [leadDailyQuotes, setLeadDailyQuotes] = useState([]);
@@ -41,82 +45,79 @@ const DailyQuotes = (props) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    getDailyQuotes();
+    if (!checkAuthLoading) {
+      getDailyQuotes();
 
-    getAllPrograms();
-    getDemoBatches();
-  }, []);
+      getAllPrograms();
+      getDemoBatches();
+    }
+  }, [checkAuthLoading]);
 
-  const getDailyQuotes = () => {
+  const getDailyQuotes = async () => {
     setLoading(true);
-    fetch(DailyQuotesApis.GET())
-      .then((res) => res.json())
-      .then((data) => {
-        // console.log(data);
-        setDailyQuotes(
-          data.dailyQuotes.map((item) => {
-            return {
-              ...item,
-              action: item,
-            };
-          })
-        );
+    const data = await customFetch(DailyQuotesApis.GET(), "GET", {});
+    // console.log(data);
+    setDailyQuotes(
+      data.dailyQuotes.map((item) => {
+        return {
+          ...item,
+          action: item,
+        };
+      })
+    );
 
-        let filteredMemberQuotes = data.dailyQuotes.filter((item) => {
-          if (item.type == "MEMBER") {
-            return item;
-          }
-        });
+    let filteredMemberQuotes = data.dailyQuotes.filter((item) => {
+      if (item.type == "MEMBER") {
+        return item;
+      }
+    });
 
-        filteredMemberQuotes = filteredMemberQuotes.sort(
-          (a, b) => a.day_id - b.day_id
-        );
+    filteredMemberQuotes = filteredMemberQuotes.sort(
+      (a, b) => a.day_id - b.day_id
+    );
 
-        // console.log("FilteredMemberQuotes", filteredMemberQuotes);
+    // console.log("FilteredMemberQuotes", filteredMemberQuotes);
 
-        setMemberDailyQuotes(
-          filteredMemberQuotes.map((item) => {
-            return {
-              ...item,
-              action: item,
-            };
-          })
-        );
+    setMemberDailyQuotes(
+      filteredMemberQuotes.map((item) => {
+        return {
+          ...item,
+          action: item,
+        };
+      })
+    );
 
-        const filteredLeadQuotes = data.dailyQuotes.filter((item) => {
-          if (item.type !== "MEMBER") {
-            return item;
-          }
-        });
+    const filteredLeadQuotes = data.dailyQuotes.filter((item) => {
+      if (item.type !== "MEMBER") {
+        return item;
+      }
+    });
 
-        setLeadDailyQuotes(
-          filteredLeadQuotes.map((item) => {
-            return {
-              ...item,
-              action: item,
-            };
-          })
-        );
+    setLeadDailyQuotes(
+      filteredLeadQuotes.map((item) => {
+        return {
+          ...item,
+          action: item,
+        };
+      })
+    );
 
-        setLoading(false);
-      });
+    setLoading(false);
   };
 
   const getDemoBatches = async () => {
-    await fetch(DemoBatchesApis.GET_DEMO_BATCHES())
-      .then((res) => res.json())
-      .then((data) => {
-        // console.log("Data", data);
-        setDemoBatches(data.demoBatches);
-      });
+    const data = await customFetch(
+      DemoBatchesApis.GET_DEMO_BATCHES(),
+      "GET",
+      {}
+    );
+    // console.log("Data", data);
+    setDemoBatches(data.demoBatches);
   };
 
   const getAllPrograms = async () => {
-    await fetch(ProgramsApis.GET_PROGRAMS())
-      .then((res) => res.json())
-      .then((data) => {
-        setPrograms(data.programs);
-      });
+    const data = await customFetch(ProgramsApis.GET_PROGRAMS(), "GET", {});
+    setPrograms(data.programs);
   };
 
   const menuItems = [
@@ -359,6 +360,7 @@ const DailyQuotes = (props) => {
         viewModal={viewAddModal}
         setViewModal={setViewAddModal}
         leastDayNum={memberDailyQuotes.length}
+        customFetch={customFetch}
       />
 
       <AddDailyQuoteModal
@@ -369,6 +371,7 @@ const DailyQuotes = (props) => {
         viewModal={viewEditModal}
         setViewModal={setViewEditModal}
         mode="edit"
+        customFetch={customFetch}
       />
 
       <EditEverydayQuote
@@ -384,6 +387,7 @@ const DailyQuotes = (props) => {
         getQuotes={getDailyQuotes}
         viewModal={viewEditEverydayQuoteModal}
         setViewModal={setViewEditEverydayQuoteModal}
+        customFetch={customFetch}
       />
     </div>
   );

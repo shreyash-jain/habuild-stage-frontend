@@ -62,7 +62,7 @@ const AddDemoProgramModal = (props) => {
     },
   ];
 
-  const formSubmit = (e) => {
+  const formSubmit = async (e) => {
     e.preventDefault();
     setApiLoading(true);
 
@@ -72,37 +72,30 @@ const AddDemoProgramModal = (props) => {
       return;
     }
 
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    var raw = JSON.stringify({
-      name,
-      startDate,
-      endDate,
-      meetingId,
-      programId: associatedProgram,
-    });
-    var requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
-    };
-    fetch(DemoProgramsApis.CREATE(), requestOptions)
-      .then((response) => {
-        // console.log("Repsobnse", response);
-        return response.text();
-      })
-      .then((result) => {
-        setApiLoading(false);
-        toast.success("Demo Program Created");
-        props.getAllDemoPrograms();
-        // console.log(result);
-      })
-      .catch((error) => {
-        setApiLoading(false);
-        toast.error("No lead created");
-        // console.log("error", error);
-      });
+    try {
+      var raw = {
+        name,
+        startDate,
+        endDate,
+        meetingId,
+        programId: associatedProgram,
+      };
+
+      const result = await props.customFetch(
+        DemoProgramsApis.CREATE(),
+        "POST",
+        raw
+      );
+
+      setApiLoading(false);
+      toast.success("Demo Program Created");
+      props.getAllDemoPrograms();
+      // console.log(result);
+    } catch (err) {
+      setApiLoading(false);
+      toast.error("No lead created");
+      // console.log("error", error);
+    }
   };
 
   return (

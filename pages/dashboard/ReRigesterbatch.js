@@ -35,7 +35,7 @@ const ReRegisterBatch = (props) => {
     setSelectedbatches(newBatchIds);
   };
 
-  const onClick = () => {
+  const onClick = async () => {
     setLoading(true);
     if (selectedBatches.length == 0) {
       setLoading(false);
@@ -43,28 +43,18 @@ const ReRegisterBatch = (props) => {
       return;
     }
 
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    var raw = JSON.stringify({
+    var raw = {
       batchIds: selectedBatches,
-    });
-    var requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
     };
 
-    fetch(ReRegisterApis.BATCH(), requestOptions)
-      .then((res) => res.json())
-      .then((data) => {
-        setLoading(false);
-        if (data.status == 500) {
-          toast.error("Failed to Re-Register batches.");
-        }
-        toast.success("Re-Registered batches Successfully.");
-        // console.log("DATAAAA", data);
-      });
+    const data = await props.customFetch(ReRegisterApis.BATCH(), "POST", raw);
+
+    setLoading(false);
+    if (data.status == 500) {
+      toast.error("Failed to Re-Register batches.");
+    }
+    toast.success("Re-Registered batches Successfully.");
+    // console.log("DATAAAA", data);
   };
 
   return (

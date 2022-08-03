@@ -37,10 +37,12 @@ const Dashboard = () => {
   );
 
   useEffect(() => {
-    apiCall();
-    getCurrentYoutubeUrl();
-    getMemberBatches();
-  }, []);
+    if (!checkAuthLoading) {
+      apiCall();
+      getCurrentYoutubeUrl();
+      getMemberBatches();
+    }
+  }, [checkAuthLoading]);
 
   const getMemberBatches = async () => {
     // await fetch(`https://api.habuild.in/api/program/`)
@@ -70,14 +72,6 @@ const Dashboard = () => {
   const apiCall = async () => {
     setLoading(true);
     const result = await customFetch(HealthCheckApis.GET(), "GET", {});
-    // fetch("http://localhost:4000/api/health_check/")
-    // .then((res) => res.json())
-    // .then((data) => {
-    //   if (data.status == 200) {
-    //     setServerHealthy(true);
-    //   }
-    //   setLoading(false);
-    // });
 
     if (result.status == 200) {
       setServerHealthy(true);
@@ -201,7 +195,7 @@ const Dashboard = () => {
         <HabuildAlerts customFetch={customFetch} />
       </div>
 
-      <DayAttendance />
+      <DayAttendance customFetch={customFetch} />
 
       <button
         onClick={() => setShowMenuSidebar(true)}

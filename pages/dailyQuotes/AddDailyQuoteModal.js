@@ -57,7 +57,7 @@ const DailyQuoteFormModal = (props) => {
     setQuoteFormArray(newArr);
   };
 
-  const formSubmit = (e) => {
+  const formSubmit = async (e) => {
     let API = DailyQuotesApis.CREATE();
     let method = "POST";
 
@@ -87,9 +87,7 @@ const DailyQuoteFormModal = (props) => {
         return;
       }
 
-      var myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      var raw = JSON.stringify({
+      var raw = {
         day_id: item.dayNumber,
         date: item.date + " 01:00:00",
         highlight: item.highlight,
@@ -101,12 +99,6 @@ const DailyQuoteFormModal = (props) => {
         tip: item.tip,
         program_id: item.program_id,
         demo_batch_id: item.demo_batch_id,
-      });
-      var requestOptions = {
-        method: method,
-        headers: myHeaders,
-        body: raw,
-        redirect: "follow",
       };
 
       // console.log(raw);
@@ -114,20 +106,15 @@ const DailyQuoteFormModal = (props) => {
       // console.log(method);
 
       try {
-        fetch(API, requestOptions)
-          .then((response) => {
-            // console.log("response", response);
-            return response.text();
-          })
-          .then((result) => {
-            setApiLoading(false);
-            toast.success(
-              `Daily Quote ${props.mode == "edit" ? "Updated" : "Created"}`
-            );
-            // props.getQuotes();
-            // props.setViewModal(false);
-            // console.log("Api Result", result);
-          });
+        const data = await props.customFetch(API, method, raw);
+
+        setApiLoading(false);
+        toast.success(
+          `Daily Quote ${props.mode == "edit" ? "Updated" : "Created"}`
+        );
+        // props.getQuotes();
+        // props.setViewModal(false);
+        // console.log("Api Result", result);
       } catch {
         (error) => {
           setApiLoading(false);

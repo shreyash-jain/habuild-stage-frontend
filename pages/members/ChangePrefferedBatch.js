@@ -47,7 +47,7 @@ const ChangePrefferedBatch = (props) => {
     setBatchSelectOptions(overallArr);
   };
 
-  const updatePrefferedBatch = (member, calledFrom) => {
+  const updatePrefferedBatch = async (member, calledFrom) => {
     setApiLoading(true);
 
     let memberForAction;
@@ -58,36 +58,31 @@ const ChangePrefferedBatch = (props) => {
       memberForAction = props.memberForAction;
     }
 
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    var raw = JSON.stringify({
+    var raw = {
       member_id: memberForAction.id,
       batch_id: selectedBatchId,
-    });
-    var requestOptions = {
-      method: "PATCH",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
     };
-    fetch(MembersApis.UPDATE_PREFFERED_BATCH(), requestOptions)
-      .then((response) => response.json())
-      .then((result) => {
-        setApiLoading(false);
-        if (result.status == 500) {
-          toast.error(JSON.stringify(result.message));
-        } else {
-          toast.success("Member Updated Successfully.");
-        }
-        // props.getPaginatedLeads(props.currentPagePagination);
-        // props.setModalOpen(false);
-        console.log(result);
-      })
-      .catch((error) => {
-        setApiLoading(false);
-        // toast.error(error);
-        // console.log("error", error);
-      });
+
+    try {
+      const result = await props.customFetch(
+        MembersApis.UPDATE_PREFFERED_BATCH(),
+        "PATCH",
+        raw
+      );
+      setApiLoading(false);
+      if (result.status == 500) {
+        toast.error(JSON.stringify(result.message));
+      } else {
+        toast.success("Member Updated Successfully.");
+      }
+      // props.getPaginatedLeads(props.currentPagePagination);
+      // props.setModalOpen(false);
+      console.log(result);
+    } catch (error) {
+      setApiLoading(false);
+      // toast.error(error);
+      // console.log("error", error);
+    }
   };
 
   const triggerGroupAction = () => {

@@ -14,7 +14,7 @@ const EditEverydayQuote = (props) => {
     setQuoteObj(props.editQuote);
   }, [props?.editQuote?.id]);
 
-  const formSubmit = (e) => {
+  const formSubmit = async (e) => {
     let method = "PATCH";
 
     e.preventDefault();
@@ -35,9 +35,7 @@ const EditEverydayQuote = (props) => {
     //   return;
     // }
 
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    var raw = JSON.stringify({
+    var raw = {
       day_id: quoteObj?.day_id,
       date: quoteObj?.date + " 01:00:00",
       highlight: quoteObj?.highlight,
@@ -50,12 +48,6 @@ const EditEverydayQuote = (props) => {
       program_id: quoteObj?.program_id,
       demo_batch_id: quoteObj?.demo_batch_id,
       morning_message: quoteObj?.morning_message,
-    });
-    var requestOptions = {
-      method: method,
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
     };
 
     // console.log(raw);
@@ -63,17 +55,12 @@ const EditEverydayQuote = (props) => {
     // console.log(method);
 
     try {
-      fetch(DailyQuotesApis.UPDATE(quoteObj?.id), requestOptions)
-        .then((response) => {
-          // console.log("response", response);
-          return response.text();
-        })
-        .then((result) => {
-          setApiLoading(false);
-          toast.success(`Updated`);
-          props.getQuotes();
-          props.setViewModal(false);
-        });
+      await props
+        .customFetch(DailyQuotesApis.UPDATE(quoteObj?.id), method, raw)
+        .setApiLoading(false);
+      toast.success(`Updated`);
+      props.getQuotes();
+      props.setViewModal(false);
     } catch {
       (error) => {
         setApiLoading(false);

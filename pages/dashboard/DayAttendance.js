@@ -18,27 +18,29 @@ const DayAttendance = (props) => {
     generateDays(new Date(), new Date());
   }, []);
 
-  const getMorningAttendance = (startDate, endDate) => {
+  const getMorningAttendance = async (startDate, endDate) => {
     setLoading(true);
-    fetch(HabuildAttendance.GET_MORNING_ATT(startDate, endDate))
-      .then((res) => res.json())
-      .then((data) => {
-        // console.log(data);
-        setLoading(false);
-        setMorningAtt(data.result);
-      });
+    const data = await props.customFetch(
+      HabuildAttendance.GET_MORNING_ATT(startDate, endDate),
+      "GET",
+      {}
+    );
+    // console.log(data);
+    setLoading(false);
+    setMorningAtt(data.result);
   };
 
-  const getEveningAttendance = (startDate, endDate) => {
+  const getEveningAttendance = async (startDate, endDate) => {
     setLoading(true);
 
-    fetch(HabuildAttendance.GET_EVENING_ATT(startDate, endDate))
-      .then((res) => res.json())
-      .then((data) => {
-        // console.log(data);
-        setLoading(false);
-        setEveningAtt(data.result);
-      });
+    const data = await props.customFetch(
+      HabuildAttendance.GET_EVENING_ATT(startDate, endDate),
+      "GET",
+      {}
+    );
+    // console.log(data);
+    setLoading(false);
+    setEveningAtt(data.result);
   };
 
   const generateDays = (startDate, endDate) => {

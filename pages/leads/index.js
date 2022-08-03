@@ -33,6 +33,7 @@ import {
   MembersApis,
 } from "../../constants/apis";
 import useCheckAuth from "../../hooks/useCheckAuth";
+import { useFetchWrapper } from "../../utils/apiCall";
 
 const filters = {
   status: [
@@ -100,6 +101,8 @@ const weekDaysForAttendance = [
 const Leads = (props) => {
   const checkAuthLoading = useCheckAuth(false);
 
+  const { customFetch } = useFetchWrapper();
+
   const [viewPaymentModal, setViewPaymentModal] = useState(false);
   const [viewCommsModal, setViewCommsModal] = useState(false);
   const [showMenuSidebar, setShowMenuSidebar] = useState(false);
@@ -132,27 +135,25 @@ const Leads = (props) => {
   const [demoPrograms, setDemoPrograms] = useState([]);
 
   useEffect(() => {
-    getPaginatedLeads(1);
-    getDemobatches();
-    getAllDemoPrograms();
-  }, []);
+    if (!checkAuthLoading) {
+      getPaginatedLeads(1);
+      getDemobatches();
+      getAllDemoPrograms();
+    }
+  }, [checkAuthLoading]);
 
   const getDemobatches = async () => {
-    await fetch(DemoBatchesApis.GET_DEMO_BATCHES())
-      .then((res) => res.json())
-      .then((data) => {
-        setDemoBatches(data.demoBatches);
-      });
+    const data = await customFetch(
+      DemoBatchesApis.GET_DEMO_BATCHES(),
+      "GET",
+      {}
+    );
+    setDemoBatches(data.demoBatches);
   };
 
   const getAllDemoPrograms = async () => {
-    await fetch(DemoProgramsApis.GET())
-      .then((res) => {
-        return res.json();
-      })
-      .then((data) => {
-        setDemoPrograms(data.data);
-      });
+    const data = await customFetch(DemoProgramsApis.GET(), "GET", {});
+    setDemoPrograms(data.data);
   };
 
   const getPaginatedLeads = async (pageNum) => {
@@ -174,88 +175,82 @@ const Leads = (props) => {
 
     // console.log("API", api);
 
-    await fetch(api)
-      .then((res) => {
-        if (!res) {
-          throw Error("No Response from Server");
-        }
-        return res.json();
-      })
-      .then((data) => {
-        // console.log("DATA", data);
-        const leads = [];
+    try {
+      const data = await customFetch(api, "GET", {});
 
-        for (let i = 0; i < data.leads.leadDataArr.length; i++) {
-          let demobatch = [];
-          let demoProgram = [];
+      // console.log("DATA", data);
+      const leads = [];
 
-          let leadAtt = data.leads?.leadDataArr[i]?.attendance?.map(
-            (item, index) => {
-              let attended = false;
+      for (let i = 0; i < data.leads.leadDataArr.length; i++) {
+        let demobatch = [];
+        let demoProgram = [];
 
-              if (item.includes(1)) attended = true;
+        let leadAtt = data.leads?.leadDataArr[i]?.attendance?.map(
+          (item, index) => {
+            let attended = false;
 
-              return {
-                day: weekDaysForAttendance[index],
-                attended,
-              };
+            if (item.includes(1)) attended = true;
+
+            return {
+              day: weekDaysForAttendance[index],
+              attended,
+            };
+          }
+        );
+
+        if (data.leads.leadDataArr[i] !== "NA") {
+          demobatch = demoBatches.filter((item1) => {
+            if (item1.id == data.leads.leadDataArr[i].lead_batch_id) {
+              return true;
+            } else {
+              return false;
             }
-          );
-
-          if (data.leads.leadDataArr[i] !== "NA") {
-            demobatch = demoBatches.filter((item1) => {
-              if (item1.id == data.leads.leadDataArr[i].lead_batch_id) {
-                return true;
-              } else {
-                return false;
-              }
-            });
-          }
-
-          if (demobatch[0]) {
-            demoProgram = demoPrograms.filter((item) => {
-              if (demobatch[0]?.demo_program_id == item.id) {
-                return true;
-              } else {
-                return false;
-              }
-            });
-          }
-
-          leads.push({
-            member_id: data.leads.leadDataArr[i].member_id,
-            name: data.leads.leadDataArr[i].name,
-            status: data.leads.leadDataArr[i].status,
-            email: data.leads.leadDataArr[i].email,
-            source: data.leads.leadDataArr[i].source,
-            phone: data.leads.leadDataArr[i].mobile_number,
-            leadTime: format(
-              parseISO(data.leads.leadDataArr[i].lead_time),
-              "PPpp"
-            ),
-            isSelected: {
-              identifier: data.leads.leadDataArr[i].member_id,
-              value: false,
-            },
-            action: data.leads.leadDataArr[i],
-            wa_comm_status: data.leads.leadDataArr[i].wa_comm_status,
-            attendance: leadAtt,
-            demo_batch: demobatch[0]?.name,
-            demo_program: demoProgram[0]?.name,
-            leadObj: data.leads.leadDataArr[i],
           });
         }
 
-        setTotalRecords(data.leads.totalLeadsSize);
-        setLeads(leads);
-        setLoading(false);
-      })
-      .catch((err) => {
-        toast.error("Error, please try refreshing.");
-        // console.log(err);
-        setLeads([]);
-        setLoading(false);
-      });
+        if (demobatch[0]) {
+          demoProgram = demoPrograms.filter((item) => {
+            if (demobatch[0]?.demo_program_id == item.id) {
+              return true;
+            } else {
+              return false;
+            }
+          });
+        }
+
+        leads.push({
+          member_id: data.leads.leadDataArr[i].member_id,
+          name: data.leads.leadDataArr[i].name,
+          status: data.leads.leadDataArr[i].status,
+          email: data.leads.leadDataArr[i].email,
+          source: data.leads.leadDataArr[i].source,
+          phone: data.leads.leadDataArr[i].mobile_number,
+          leadTime: format(
+            parseISO(data.leads.leadDataArr[i].lead_time),
+            "PPpp"
+          ),
+          isSelected: {
+            identifier: data.leads.leadDataArr[i].member_id,
+            value: false,
+          },
+          action: data.leads.leadDataArr[i],
+          wa_comm_status: data.leads.leadDataArr[i].wa_comm_status,
+          attendance: leadAtt,
+          demo_batch: demobatch[0]?.name,
+          demo_program: demoProgram[0]?.name,
+          leadObj: data.leads.leadDataArr[i],
+        });
+      }
+
+      setTotalRecords(data.leads.totalLeadsSize);
+      setLeads(leads);
+      setLoading(false);
+    } catch (err) {
+      toast.error("Error, please try refreshing.");
+      // console.log(err);
+      setLeads([]);
+      setLoading(false);
+    }
   };
 
   const menuItems = [
@@ -292,12 +287,13 @@ const Leads = (props) => {
 
     const idToUse = actionEntity.member_id || actionEntity.id;
 
-    await fetch(MembersApis.GET_COMM_LOGS(idToUse))
-      .then((res) => res.json())
-      .then((data) => {
-        setMemberComms(data);
-        setViewCommsModal(true);
-      });
+    const data = await customFetch(
+      MembersApis.GET_COMM_LOGS(idToUse),
+      "GET",
+      {}
+    );
+    setMemberComms(data);
+    setViewCommsModal(true);
   };
 
   const handleSelectAll = (checked) => {
@@ -481,74 +477,71 @@ const Leads = (props) => {
     },
   ];
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     setLoading(true);
     setSelectedLeads([]);
     if (!searchTerm) {
       return;
     }
 
-    fetch(LeadsApis.SEARCH(searchTerm))
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.message) {
-          toast.error(data.message);
-          setLoading(false);
-          return;
-        }
+    const data = await fetch(LeadsApis.SEARCH(searchTerm), "GET", {});
+    if (data.message) {
+      toast.error(data.message);
+      setLoading(false);
+      return;
+    }
 
-        const leads = [];
+    const leads = [];
 
-        for (let i = 0; i < data.data.length; i++) {
-          let demoBatchName;
+    for (let i = 0; i < data.data.length; i++) {
+      let demoBatchName;
 
-          let leadAtt = data.data[i].attendance.map((item, index) => {
-            let attended = false;
+      let leadAtt = data.data[i].attendance.map((item, index) => {
+        let attended = false;
 
-            if (item.includes(1)) attended = true;
+        if (item.includes(1)) attended = true;
 
-            return {
-              day: weekDaysForAttendance[index],
-              attended,
-            };
-          });
-
-          if (data.data[i] !== "NA") {
-            const demobatch = demoBatches.filter((item1) => {
-              if (item1.id == data.data[i].lead_batch_id) {
-                return true;
-              } else {
-                return false;
-              }
-            });
-
-            demoBatchName = demobatch[0]?.name;
-          }
-
-          leads.push({
-            member_id: data.data[i].member_id,
-            name: data.data[i].name,
-            status: data.data[i].status,
-            email: data.data[i].email,
-            source: data.data[i].lead_source,
-            phone: data.data[i].mobile_number,
-            // leadTime: format(parseISO(data.data[i].lead_time), "PPpp"),
-            isSelected: {
-              identifier: data.data[i].member_id,
-              value: false,
-            },
-            action: data.data[i],
-            wa_comm_status: data.data[i].wa_communication_status,
-            attendance: leadAtt,
-            leadObj: data.data[i],
-            demo_batch: demoBatchName,
-          });
-        }
-
-        setLeads(leads);
-
-        setLoading(false);
+        return {
+          day: weekDaysForAttendance[index],
+          attended,
+        };
       });
+
+      if (data.data[i] !== "NA") {
+        const demobatch = demoBatches.filter((item1) => {
+          if (item1.id == data.data[i].lead_batch_id) {
+            return true;
+          } else {
+            return false;
+          }
+        });
+
+        demoBatchName = demobatch[0]?.name;
+      }
+
+      leads.push({
+        member_id: data.data[i].member_id,
+        name: data.data[i].name,
+        status: data.data[i].status,
+        email: data.data[i].email,
+        source: data.data[i].lead_source,
+        phone: data.data[i].mobile_number,
+        // leadTime: format(parseISO(data.data[i].lead_time), "PPpp"),
+        isSelected: {
+          identifier: data.data[i].member_id,
+          value: false,
+        },
+        action: data.data[i],
+        wa_comm_status: data.data[i].wa_communication_status,
+        attendance: leadAtt,
+        leadObj: data.data[i],
+        demo_batch: demoBatchName,
+      });
+    }
+
+    setLeads(leads);
+
+    setLoading(false);
   };
 
   const handleSearchCancel = () => {
@@ -696,6 +689,7 @@ const Leads = (props) => {
         leadForAction={leadForAction}
         viewPaymentModal={viewPaymentModal}
         setViewPaymentModal={setViewPaymentModal}
+        customFetch={customFetch}
       />
 
       <CommsModal
@@ -703,12 +697,14 @@ const Leads = (props) => {
         leadForAction={leadForAction}
         viewCommsModal={viewCommsModal}
         setViewCommsModal={setViewCommsModal}
+        customFetch={customFetch}
       />
 
       <AddLeadModal
         getPaginatedLeads={getPaginatedLeads}
         viewAddLeadModal={viewAddLeadModal}
         setViewAddLeadModal={setViewAddLeadModal}
+        customFetch={customFetch}
       />
 
       {/* <SendWAModal
@@ -722,6 +718,7 @@ const Leads = (props) => {
         leadForAction={leadForAction}
         modalOpen={viewAddCommModal}
         setModalOpen={setViewAddCommModal}
+        customFetch={customFetch}
       />
 
       {/* <AttendanceModal
@@ -738,6 +735,7 @@ const Leads = (props) => {
         open={showMenuSidebar}
         setOpen={setShowMenuSidebar}
         demoBatches={demoBatches}
+        customFetch={customFetch}
       />
 
       <FiltersModal
@@ -748,6 +746,7 @@ const Leads = (props) => {
         setFilterParams={setFilterParams}
         modalOpen={viewFilterModal}
         setModalOpen={setViewFilterModal}
+        customFetch={customFetch}
       />
     </div>
   );
@@ -1029,7 +1028,7 @@ const AddLeadModal = (props) => {
   const [email, setEmail] = useState("");
   const [apiLoading, setApiLoading] = useState(false);
 
-  const formSubmit = (e) => {
+  const formSubmit = async (e) => {
     e.preventDefault();
     setApiLoading(true);
 
@@ -1039,32 +1038,23 @@ const AddLeadModal = (props) => {
       return;
     }
 
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    var raw = JSON.stringify({
+    var raw = {
       name,
       email,
       mobile_number: "91" + phone,
-    });
-    var requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
     };
-    fetch(LeadsApis.CREATE(), requestOptions)
-      .then((response) => response.text())
-      .then((result) => {
-        setApiLoading(false);
-        toast.success("Lead Created");
-        props.getPaginatedLeads(1);
-        // console.log(result);
-      })
-      .catch((error) => {
-        setApiLoading(false);
-        toast.error("No lead created");
-        // console.log("error", error);
-      });
+
+    try {
+      await customFetch(LeadsApis.CREATE(), "POST", raw);
+      setApiLoading(false);
+      toast.success("Lead Created");
+      props.getPaginatedLeads(1);
+      // console.log(result);
+    } catch (error) {
+      setApiLoading(false);
+      toast.error("No lead created");
+      // console.log("error", error);
+    }
   };
 
   return (

@@ -38,11 +38,12 @@ const DemoBatches = (props) => {
   }, [props.demoBatches?.length]);
 
   const getAllPrograms = async () => {
-    await fetch(ProgramsApis.GET_PROGRAMS())
-      .then((res) => res.json())
-      .then((data) => {
-        setPrograms(data.programs);
-      });
+    const data = await props.customFetch(
+      ProgramsApis.GET_PROGRAMS(),
+      "GET",
+      {}
+    );
+    setPrograms(data.programs);
   };
 
   const deleteDemoBatch = async (demoBatch) => {
@@ -51,17 +52,14 @@ const DemoBatches = (props) => {
     }
 
     setDeleteLoading(true);
-    await fetch(DemoBatchesApis.DELETE(demoBatch.id), {
-      method: "DELETE",
-    }).then((res) => {
-      setDeleteLoading(false);
-      props.getDemoBatches();
-      if (res.status == 404) {
-        toast.error("Demo Batch Not Deleted.");
-      } else {
-        toast.success("Demo Batch Deleted.");
-      }
-    });
+    await props.customFetch(DemoBatchesApis.DELETE(demoBatch.id), "DELETE", {});
+    setDeleteLoading(false);
+    props.getDemoBatches();
+    if (res.status == 404) {
+      toast.error("Demo Batch Not Deleted.");
+    } else {
+      toast.success("Demo Batch Deleted.");
+    }
   };
 
   const menuItems = [
@@ -145,7 +143,7 @@ const AddDemoBatchModal = (props) => {
 
   const [apiLoading, setApiLoading] = useState(false);
 
-  const formSubmit = (e) => {
+  const formSubmit = async (e) => {
     e.preventDefault();
     setApiLoading(true);
 
@@ -155,36 +153,30 @@ const AddDemoBatchModal = (props) => {
       return;
     }
 
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    var raw = JSON.stringify({
-      name,
-      start_time:
-        props.demoProgram.start_date.toString().split("T")[0] +
-        " " +
-        startTime +
-        ":00",
-    });
+    try {
+      var raw = {
+        name,
+        start_time:
+          props.demoProgram.start_date.toString().split("T")[0] +
+          " " +
+          startTime +
+          ":00",
+      };
 
-    var requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
-    };
-    fetch(DemoProgramsApis.CREATE_BATCH(props.demoProgram.id), requestOptions)
-      .then((response) => response.text())
-      .then((result) => {
-        setApiLoading(false);
-        props.refreshData();
-        props.setModalOpen(false);
-        toast.success("Demo Batch Created");
-      })
-      .catch((error) => {
-        setApiLoading(false);
-        toast.error("Error");
-        // console.log("error", error);
-      });
+      const result = await props.customFetch(
+        DemoProgramsApis.CREATE_BATCH(props.demoProgram.id),
+        "POST",
+        raw
+      );
+      setApiLoading(false);
+      props.refreshData();
+      props.setModalOpen(false);
+      toast.success("Demo Batch Created");
+    } catch (err) {
+      setApiLoading(false);
+      toast.error("Error");
+      // console.log("error", error);
+    }
   };
 
   return (

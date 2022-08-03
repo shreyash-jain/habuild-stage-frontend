@@ -11,6 +11,7 @@ import ActionsSidePanel from "./ActionsSidePanel";
 import AddDemoProgramModal from "./AddDemoProgramModal";
 import { DemoProgramsApis, ProgramsApis } from "../../constants/apis";
 import useCheckAuth from "../../hooks/useCheckAuth";
+import { useFetchWrapper } from "../../utils/apiCall";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -18,6 +19,9 @@ function classNames(...classes) {
 
 const DemoPrograms = () => {
   const checkAuthLoading = useCheckAuth(false);
+
+  const { customFetch } = useFetchWrapper();
+
   const [viewAddModal, setViewAddModal] = useState(false);
   const [demoBatches, setDemoBatches] = useState([]);
 
@@ -35,33 +39,25 @@ const DemoPrograms = () => {
     getAllDemoPrograms();
     getAllPrograms();
     // getDemoBatches();
-  }, []);
+  }, [checkAuthLoading]);
 
   const getAllPrograms = async () => {
-    await fetch(ProgramsApis.GET_PROGRAMS())
-      .then((res) => res.json())
-      .then((data) => {
-        setPrograms(data.programs);
-      });
+    const data = await customFetch(ProgramsApis.GET_PROGRAMS(), "GET", {});
+    setPrograms(data.programs);
   };
 
   const getAllDemoPrograms = async () => {
     setLoading(true);
-    await fetch(DemoProgramsApis.GET())
-      .then((res) => {
-        return res.json();
+    const data = await customFetch(DemoProgramsApis.GET(), "GET", {});
+    setDemoPrograms(
+      data.data.map((item) => {
+        return {
+          ...item,
+          action: item,
+        };
       })
-      .then((data) => {
-        setDemoPrograms(
-          data.data.map((item) => {
-            return {
-              ...item,
-              action: item,
-            };
-          })
-        );
-        setLoading(false);
-      });
+    );
+    setLoading(false);
   };
 
   // const beforeOpenActionPanel = (actionEntity) => {
@@ -86,15 +82,16 @@ const DemoPrograms = () => {
     }
 
     setDeleteLoading(true);
-    await fetch(DemoProgramsApis.DELETE(demoProgram.id), {
-      method: "DELETE",
-    }).then((res) => {
-      setDeleteLoading(false);
-      getAllDemoPrograms();
-      if (res.status == 404) {
-        toast.error("Demo Program Not Deleted.");
-      }
-    });
+    const res = await customFetch(
+      DemoProgramsApis.DELETE(demoProgram.id),
+      "DELETE",
+      {}
+    );
+    setDeleteLoading(false);
+    getAllDemoPrograms();
+    if (res.status == 404) {
+      toast.error("Demo Program Not Deleted.");
+    }
   };
 
   const menuItems = [
@@ -200,6 +197,7 @@ const DemoPrograms = () => {
         // programs={programs}
         isOpen={showActionsPanel}
         setIsOpen={setShowActionsPanel}
+        customFetch={customFetch}
       />
 
       <AddDemoProgramModal
@@ -207,6 +205,7 @@ const DemoPrograms = () => {
         setViewAddModal={setViewAddModal}
         getAllDemoPrograms={getAllDemoPrograms}
         programs={programs}
+        customFetch={customFetch}
       />
     </div>
   );

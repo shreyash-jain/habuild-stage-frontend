@@ -15,7 +15,7 @@ const SendWAModal = (props) => {
     setMessage("");
   }, [props.open]);
 
-  const sendMessageApi = (mode, selectedDemoBatches) => {
+  const sendMessageApi = async (mode, selectedDemoBatches) => {
     setApiLoading(true);
     let vars = {};
     let api = "";
@@ -52,40 +52,30 @@ const SendWAModal = (props) => {
       api = NotificationApis.SEND_TO_LEADS();
     }
 
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    var raw = JSON.stringify(vars);
-    var requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
-    };
+    var raw = vars;
 
     // console.log("Vars", vars);
 
     // console.log(api);
     // console.log(vars);
 
-    fetch(api, requestOptions)
-      .then((response) => response.json())
-      .then((result) => {
-        setApiLoading(false);
-        toast.success("Message sent successfully!");
-        // if (result.errorMessage) {
-        //   toast.error(result.errorMessage);
-        // } else {
-        //   toast.success(result.message);
-        // }
-        props.setSelectedLeads([]);
-        props.setOpen(false);
-        // console.log(result);
-      })
-      .catch((error) => {
-        setApiLoading(false);
-        // toast.error(error);
-        // console.log("error", error);
-      });
+    try {
+      await props.customFetch(api, "POST", raw);
+      setApiLoading(false);
+      toast.success("Message sent successfully!");
+      // if (result.errorMessage) {
+      //   toast.error(result.errorMessage);
+      // } else {
+      //   toast.success(result.message);
+      // }
+      props.setSelectedLeads([]);
+      props.setOpen(false);
+      // console.log(result);
+    } catch (error) {
+      setApiLoading(false);
+      // toast.error(error);
+      // console.log("error", error);
+    }
   };
 
   return (

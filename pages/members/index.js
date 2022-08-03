@@ -30,9 +30,13 @@ import Image from "next/image";
 import ViewMemberCommsModal from "./ViewMemberCommsModal";
 import UpdateEmailModal from "./UpdateEmailModal";
 import useCheckAuth from "../../hooks/useCheckAuth";
+import { useFetchWrapper } from "../../utils/apiCall";
 
 const Members = (props) => {
   const checkAuthLoading = useCheckAuth(false);
+
+  const { customFetch, customFetchFile } = useFetchWrapper();
+
   const [members, setMembers] = useState([]);
   const [viewMemberInfo, setViewMemberInfo] = useState(false);
   const [viewUpdateMemberInfo, setViewUpdateMemberInfo] = useState(false);
@@ -61,38 +65,38 @@ const Members = (props) => {
   const [viewUpdateEmailModal, setViewUpdateEmailModal] = useState(false);
 
   useEffect(() => {
-    getMembers(1);
-    getMemberBatches();
-  }, []);
+    if (!checkAuthLoading) {
+      getMembers(1);
+      getMemberBatches();
+    }
+  }, [checkAuthLoading]);
 
   const getMemberBatches = async () => {
-    // await fetch(`https://api.habuild.in/api/program/`)
-    await fetch(ProgramsApis.GET_PROGRAMS())
-      .then((res) => res.json())
-      .then(async (data) => {
-        if (data.programs.length > 0) {
-          const programsWithBatches = [];
-          let allBatches = [];
+    const data = await customFetch(ProgramsApis.GET_PROGRAMS(), "GET", {});
+    if (data.programs.length > 0) {
+      const programsWithBatches = [];
+      let allBatches = [];
 
-          // console.log("Program Data", data);
+      // console.log("Program Data", data);
 
-          for (let i = 0; i < data.programs.length; i++) {
-            await fetch(BatchesApis.GET_BATCH_FROM_PROGRAM(data.programs[i].id))
-              .then((res) => res.json())
-              .then((data1) => {
-                programsWithBatches.push({
-                  ...data.programs[i],
-                  batches: data1.batch,
-                });
-                allBatches = [...allBatches, ...data1.batch];
-              });
-          }
+      for (let i = 0; i < data.programs.length; i++) {
+        const data1 = await customFetch(
+          BatchesApis.GET_BATCH_FROM_PROGRAM(data.programs[i].id),
+          "GET",
+          {}
+        );
 
-          setMemberProgramsWithBatches(programsWithBatches);
-          // console.log("All batches", allBatches);
-          setMemberBatches(allBatches);
-        }
-      });
+        programsWithBatches.push({
+          ...data.programs[i],
+          batches: data1.batch,
+        });
+        allBatches = [...allBatches, ...data1.batch];
+      }
+
+      setMemberProgramsWithBatches(programsWithBatches);
+      // console.log("All batches", allBatches);
+      setMemberBatches(allBatches);
+    }
   };
 
   const getMembers = async (pageNum) => {
@@ -100,35 +104,32 @@ const Members = (props) => {
     setCurrentPagePagination(pageNum);
     setAllSelectChecked(false);
 
-    await fetch(MembersApis.GET(pageNum))
-      .then((res) => res.json())
-      .then((data) => {
-        // console.log("DATA", data);
+    const data = await customFetch(MembersApis.GET(pageNum), "GET", {});
+    // console.log("DATA", data);
 
-        setMembers(
-          data.data.members.map((item) => {
-            let selectedValue = false;
+    setMembers(
+      data.data.members.map((item) => {
+        let selectedValue = false;
 
-            for (let i = 0; i < selectedMembers.length; i++) {
-              if (selectedMembers[i].id == item.id) {
-                selectedValue = true;
-                break;
-              }
-            }
+        for (let i = 0; i < selectedMembers.length; i++) {
+          if (selectedMembers[i].id == item.id) {
+            selectedValue = true;
+            break;
+          }
+        }
 
-            return {
-              ...item,
-              isSelected: {
-                identifier: item.id,
-                value: selectedValue,
-              },
-              action: item,
-            };
-          })
-        );
-        setTotalRecords(data.data.totalRecords);
-        setLoading(false);
-      });
+        return {
+          ...item,
+          isSelected: {
+            identifier: item.id,
+            value: selectedValue,
+          },
+          action: item,
+        };
+      })
+    );
+    setTotalRecords(data.data.totalRecords);
+    setLoading(false);
   };
 
   const menuItems = [
@@ -237,7 +238,7 @@ const Members = (props) => {
     },
   ];
 
-  const memberReRegister = (memberObj) => {
+  const memberReRegister = async (memberObj) => {
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     var raw = JSON.stringify({
@@ -250,24 +251,20 @@ const Members = (props) => {
       redirect: "follow",
     };
 
-    fetch(ReRegisterApis.MEMBER(), requestOptions)
-      .then((res) => res.json())
-      .then((data) => {
-        // console.log("ReRegister DATAAAA", data);
+    const data = await customFetch(ReRegisterApis.MEMBER(), requestOptions);
 
-        if (data.status == 500) {
-          toast.error("Failed to Re-Register Member");
-        } else if (data.status == 200) {
-          toast.success(
-            `Successfully Re-Registered, message: ${data?.message}`
-          );
-        } else {
-          toast.error("Unkown Error occured");
-        }
-      });
+    // console.log("ReRegister DATAAAA", data);
+
+    if (data.status == 500) {
+      toast.error("Failed to Re-Register Member");
+    } else if (data.status == 200) {
+      toast.success(`Successfully Re-Registered, message: ${data?.message}`);
+    } else {
+      toast.error("Unkown Error occured");
+    }
   };
 
-  const resumeMembership = (actionEntity, calledFrom) => {
+  const resumeMembership = async (actionEntity, calledFrom) => {
     if (calledFrom !== "groupActions") {
       if (
         !window.confirm(
@@ -278,29 +275,24 @@ const Members = (props) => {
       }
     }
 
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    var requestOptions = {
-      method: "PATCH",
-      headers: myHeaders,
-      body: "",
-      redirect: "follow",
-    };
-    fetch(MembersApis.ACTIVATE_MEMBERSHIP(actionEntity.id), requestOptions)
-      .then((response) => response.json())
-      .then((result) => {
-        if (result.status == 500) {
-          toast.error(result?.message);
-        } else {
-          toast.success(result?.message);
-        }
-        getMembers(currentPagePagination);
-        // console.log(result);
-      })
-      .catch((error) => {
-        // toast.error(error);
-        // console.log("error", error);
-      });
+    try {
+      const result = await customFetch(
+        MembersApis.ACTIVATE_MEMBERSHIP(actionEntity.id),
+        "PATCH",
+        {}
+      );
+
+      if (result.status == 500) {
+        toast.error(result?.message);
+      } else {
+        toast.success(result?.message);
+      }
+      getMembers(currentPagePagination);
+      // console.log(result);
+    } catch (error) {
+      // toast.error(error);
+      // console.log("error", error);
+    }
   };
 
   const handleSelect = (identifier) => {
@@ -565,38 +557,39 @@ const Members = (props) => {
     },
   ];
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     setLoading(true);
     // setSelectedMembers([]);
     if (!searchTerm || !searchFor) {
       return;
     }
 
-    fetch(MembersApis.SEARCH(searchTerm, searchFor))
-      .then((res) => res.json())
-      .then((data) => {
-        // console.log("Search data", data);
-        if (data.message) {
-          toast.error(JSON.stringify(data.message));
-          setLoading(false);
-          return;
-        }
+    const data = await customFetch(
+      MembersApis.SEARCH(searchTerm, searchFor),
+      "GET",
+      {}
+    );
+    // console.log("Search data", data);
+    if (data.message) {
+      toast.error(JSON.stringify(data.message));
+      setLoading(false);
+      return;
+    }
 
-        setMembers(
-          data.data.map((item) => {
-            return {
-              ...item,
-              isSelected: {
-                identifier: item.id,
-                value: false,
-              },
-              action: item,
-            };
-          })
-        );
+    setMembers(
+      data.data.map((item) => {
+        return {
+          ...item,
+          isSelected: {
+            identifier: item.id,
+            value: false,
+          },
+          action: item,
+        };
+      })
+    );
 
-        setLoading(false);
-      });
+    setLoading(false);
   };
 
   const handleSearchCancel = () => {
@@ -706,6 +699,7 @@ const Members = (props) => {
         memberForAction={memberForAction}
         open={viewMemberInfo}
         setOpen={setViewMemberInfo}
+        customFetch={customFetch}
       />
 
       <MenuSidePanel
@@ -718,6 +712,8 @@ const Members = (props) => {
         setOpen={setShowMenuSidebar}
         // demoBatches={demoBatches}
         memberProgramsWithBatches={memberProgramsWithBatches}
+        customFetch={customFetch}
+        customFetchFile={customFetchFile}
       />
 
       <GiftMembershipModal
@@ -729,6 +725,7 @@ const Members = (props) => {
         refetchData={handleSearch}
         searchFor={searchFor}
         searchTerm={searchTerm}
+        customFetch={customFetch}
       />
 
       <StopMembership
@@ -740,6 +737,7 @@ const Members = (props) => {
         refetchData={handleSearch}
         searchFor={searchFor}
         searchTerm={searchTerm}
+        customFetch={customFetch}
       />
 
       <PauseMembership
@@ -751,6 +749,7 @@ const Members = (props) => {
         refetchData={handleSearch}
         searchFor={searchFor}
         searchTerm={searchTerm}
+        customFetch={customFetch}
       />
 
       <UpdateMemberDetails
@@ -762,6 +761,7 @@ const Members = (props) => {
         refetchData={handleSearch}
         searchFor={searchFor}
         searchTerm={searchTerm}
+        customFetch={customFetch}
       />
 
       <ChangeMemberChannel
@@ -773,12 +773,14 @@ const Members = (props) => {
         refetchData={handleSearch}
         searchFor={searchFor}
         searchTerm={searchTerm}
+        customFetch={customFetch}
       />
 
       <ViewMemberCommsModal
         memberForAction={memberForAction}
         modalOpen={viewCommsModal}
         setModalOpen={setViewCommsModal}
+        customFetch={customFetch}
       />
 
       <ChangePrefferedBatch
@@ -790,6 +792,7 @@ const Members = (props) => {
         refetchData={handleSearch}
         searchFor={searchFor}
         searchTerm={searchTerm}
+        customFetch={customFetch}
       />
 
       <SelectedMembersFloat
@@ -798,6 +801,7 @@ const Members = (props) => {
         memberProgramsWithBatches={memberProgramsWithBatches}
         memberBatches={memberBatches}
         resumeMembership={resumeMembership}
+        customFetch={customFetch}
       />
 
       <UpdateEmailModal
@@ -809,6 +813,7 @@ const Members = (props) => {
         refetchData={handleSearch}
         searchFor={searchFor}
         searchTerm={searchTerm}
+        customFetch={customFetch}
       />
     </div>
   );

@@ -13,7 +13,7 @@ const UpdateEmailModal = (props) => {
     setEmail(props.memberForAction.email);
   }, [props.memberForAction]);
 
-  const updateDetails = (e) => {
+  const updateDetails = async (e) => {
     e.preventDefault();
     setApiLoading(true);
 
@@ -23,40 +23,36 @@ const UpdateEmailModal = (props) => {
       return;
     }
 
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
     var raw = JSON.stringify({
       email,
     });
-    var requestOptions = {
-      method: "PATCH",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
-    };
-    fetch(MembersApis.UPDATE_EMAIL(props.memberForAction.id), requestOptions)
-      .then((response) => response.json())
-      .then((result) => {
-        setApiLoading(false);
-        if (!result.ok) {
-          toast.error(JSON.stringify(result.error));
-        } else {
-          toast.success("Member Updated Successfully.");
-        }
 
-        if (props.searchFor && props.searchTerm) {
-          props.refetchData();
-        } else {
-          props.getPaginatedLeads(props.currentPagePagination);
-        }
-        props.setModalOpen(false);
-        // console.log(result);
-      })
-      .catch((error) => {
-        setApiLoading(false);
-        // toast.error(error);
-        // console.log("error", error);
-      });
+    try {
+      const result = await props.customFetch(
+        MembersApis.UPDATE_EMAIL(props.memberForAction.id),
+        "PATCH",
+        raw
+      );
+
+      setApiLoading(false);
+      if (!result.ok) {
+        toast.error(JSON.stringify(result.error));
+      } else {
+        toast.success("Member Updated Successfully.");
+      }
+
+      if (props.searchFor && props.searchTerm) {
+        props.refetchData();
+      } else {
+        props.getPaginatedLeads(props.currentPagePagination);
+      }
+      props.setModalOpen(false);
+      // console.log(result);
+    } catch (error) {
+      setApiLoading(false);
+      // toast.error(error);
+      // console.log("error", error);
+    }
   };
 
   if (apiLoading) {

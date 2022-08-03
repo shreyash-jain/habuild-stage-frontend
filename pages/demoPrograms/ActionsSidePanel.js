@@ -51,21 +51,21 @@ const ActionsSidePanel = (props) => {
   // };
 
   const getDemoBatches = async () => {
-    await fetch(
-      DemoProgramsApis.GET_DEMO_BATCHES_FROM_PROGRAM(props.demoProgram.id)
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        setDemoBatches(data.data);
-      });
+    const data = await props.customFetch(
+      DemoProgramsApis.GET_DEMO_BATCHES_FROM_PROGRAM(props.demoProgram.id),
+      "GET",
+      {}
+    );
+    setDemoBatches(data.data);
   };
 
   const getDemoAds = async () => {
-    await fetch(DemoProgramsApis.GET_DEMO_PROGRAM_ADS(props.demoProgram.id))
-      .then((res) => res.json())
-      .then((data) => {
-        setDemoAds(data.data);
-      });
+    const data = await props.customFetch(
+      DemoProgramsApis.GET_DEMO_PROGRAM_ADS(props.demoProgram.id),
+      "GET",
+      {}
+    );
+    setDemoAds(data.data);
   };
 
   return (
@@ -120,6 +120,7 @@ const ActionsSidePanel = (props) => {
               getDemoBatches={getDemoBatches}
               demoBatches={demoBatches}
               demoProgram={props.demoProgram}
+              customFetch={props.customFetch}
             />
           </div>
         )}
@@ -130,6 +131,7 @@ const ActionsSidePanel = (props) => {
               demoAds={demoAds}
               getDemoAds={getDemoAds}
               demoProgram={props.demoProgram}
+              customFetch={props.customFetch}
             />
           </div>
         )}

@@ -14,6 +14,7 @@ import {
 } from "../constants/apis";
 import { remove_backslash_characters } from "../utils/stringUtility";
 import useCheckAuth from "../hooks/useCheckAuth";
+import { useFetchWrapper } from "../utils/apiCall";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -21,6 +22,8 @@ function classNames(...classes) {
 
 const PaymentApproval = () => {
   const checkAuthLoading = useCheckAuth(false);
+
+  const { customFetch } = useFetchWrapper();
 
   const [paymentsToApprove, setPaymentsToApprove] = useState([]);
 
@@ -41,74 +44,66 @@ const PaymentApproval = () => {
   const [plans, setPlans] = useState([]);
 
   useEffect(() => {
-    getAllPaymentsToApprove();
-    getMemberProgramsWithBatches();
-    getAllPlans();
+    if (!checkAuthLoading) {
+      getAllPaymentsToApprove();
+      getMemberProgramsWithBatches();
+      getAllPlans();
+    }
   }, []);
 
-  const getAllPlans = () => {
-    fetch(PlanApis.GET())
-      .then((res) => res.json())
-      .then((data) => {
-        setPlans(data);
-      });
+  const getAllPlans = async () => {
+    const data = await customFetch(PlanApis.GET(), "GET", {});
+    setPlans(data);
   };
 
   const getMemberProgramsWithBatches = async () => {
-    fetch(ProgramsApis.GET_PROGRAMS())
-      .then((res) => {
-        return res.json();
-      })
-      .then(async (data) => {
-        // console.log("Program Data", data);
+    const data = await customFetch(ProgramsApis.GET_PROGRAMS(), "GET", {});
 
-        const newArr = [];
+    const newArr = [];
 
-        for (let i = 0; i < data.programs.length; i++) {
-          await fetch(BatchesApis.GET_BATCH_FROM_PROGRAM(data.programs[i].id))
-            .then((res) => {
-              return res.json();
-            })
-            .then((data1) => {
-              const obj = {
-                ...data.programs[i],
-                batches: data1.batch,
-              };
-              newArr.push(obj);
+    for (let i = 0; i < data.programs.length; i++) {
+      const data1 = await customFetch(
+        BatchesApis.GET_BATCH_FROM_PROGRAM(data.programs[i].id),
+        "GET",
+        {}
+      );
 
-              // console.log("NEw Arr Programs with Batches", newArr);
-            });
-        }
-        setMemberProgramsWithBatches(newArr);
-      });
+      const obj = {
+        ...data.programs[i],
+        batches: data1.batch,
+      };
+      newArr.push(obj);
+
+      // console.log("NEw Arr Programs with Batches", newArr);
+    }
+    setMemberProgramsWithBatches(newArr);
   };
 
   const getAllPaymentsToApprove = async () => {
     setLoading(true);
-    await fetch(PaymentApis.GET_OFFLINE_PAYMENTS())
-      .then((res) => {
-        return res.json();
-      })
-      .then((data) => {
-        const data1 = data.payment_logs.map((item) => {
-          const planNameToShow = plans.filter((item1) => {
-            if (item.amount == item1.amount) {
-              return item1.name;
-            }
-          });
-
-          return {
-            ...item,
-            mobile_number: item.habuild_members.mobile_number,
-            email: item.habuild_members.email,
-            action: item,
-            planName: planNameToShow[0]?.name,
-          };
-        });
-
-        setPaymentsToApprove(data1);
-        setLoading(false);
+    const data = await customFetch(
+      PaymentApis.GET_OFFLINE_PAYMENTS(),
+      "GET",
+      {}
+    );
+    const data1 = data.payment_logs.map((item) => {
+      const planNameToShow = plans.filter((item1) => {
+        if (item.amount == item1.amount) {
+          return item1.name;
+        }
       });
+
+      return {
+        ...item,
+        mobile_number: item.habuild_members.mobile_number,
+        email: item.habuild_members.email,
+        action: item,
+        planName: planNameToShow[0]?.name,
+      };
+    });
+
+    setPaymentsToApprove(data1);
+    setLoading(false);
   };
 
   const denyPayment = () => {
@@ -242,28 +237,15 @@ const PaymentApproval = () => {
   };
 
   const approvePayment = async () => {
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    var raw = JSON.stringify({
+    var raw = {
       memberId: paymentToDecide.habuild_members.id,
       paymentId: paymentToDecide.id,
       utr: utr,
-    });
-    var requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
     };
 
-    await fetch(PaymentApis.APPROVE_PAYMENT(), requestOptions)
-      .then((res) => {
-        return res.json();
-      })
-      .then((data) => {
-        getAllPaymentsToApprove();
-        setShowScreenshotModal(false);
-      });
+    const data = await customFetch(PaymentApis.APPROVE_PAYMENT(), "POST", raw);
+    getAllPaymentsToApprove();
+    setShowScreenshotModal(false);
   };
 
   // console.log("PaymentTO Decide", paymentToDecide);
@@ -354,6 +336,7 @@ const PaymentApproval = () => {
         getAllPaymentsToApprove={getAllPaymentsToApprove}
         plans={plans}
         computeSelectOptions={computeSelectOptions}
+        customFetch={customFetch}
       />
     </div>
   );
@@ -489,40 +472,21 @@ const AddPaymentForApproval = (props) => {
     let API = PaymentApis.CREATE_OFFLINE_PAYMENT();
     let method = "POST";
 
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    var raw = JSON.stringify(dataObj);
-    var requestOptions = {
-      method: method,
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
-    };
-
-    // console.log(raw);
-    // console.log(API);
-    // console.log(method);
-
-    // console.log(requestOptions);
+    var raw = dataObj;
 
     try {
-      fetch(API, requestOptions)
-        .then((response) => {
-          // console.log("response", response);
-          return response.text();
-        })
-        .then((result) => {
-          if (!fromCSV) {
-            setApiLoading(false);
-            toast.success(
-              `Payment ${props.mode == "edit" ? "Updated" : "Created"}`
-            );
-            props.getAllPaymentsToApprove();
-            props.setViewModal(false);
-          }
-          props.getAllPaymentsToApprove();
-          // console.log("Api Result", result);
-        });
+      await props.customFetch(API, method, raw);
+
+      if (!fromCSV) {
+        setApiLoading(false);
+        toast.success(
+          `Payment ${props.mode == "edit" ? "Updated" : "Created"}`
+        );
+        props.getAllPaymentsToApprove();
+        props.setViewModal(false);
+      }
+      props.getAllPaymentsToApprove();
+      // console.log("Api Result", result);
     } catch {
       (error) => {
         // console.log("error", error);
@@ -536,27 +500,25 @@ const AddPaymentForApproval = (props) => {
     }
   };
 
-  const populateMemberInfoFromMobile = () => {
+  const populateMemberInfoFromMobile = async () => {
     if (!mobileNumber) {
       return;
     }
 
     setMobileSearching(true);
 
-    fetch(MembersApis.SEARCH(mobileNumber, "Mobile"))
-      .then((res) => res.json())
-      .then((data) => {
-        setMobileSearching(false);
-        if (!data.data[0]) {
-          setMobileSearching(false);
-          toast.error("No Member found for Mobile No.");
+    const data = await props.customFetch(MembersApis.SEARCH(mobileNumber, "Mobile"), "GET", {});
+    
+    setMobileSearching(false);
+    if (!data.data[0]) {
+      setMobileSearching(false);
+      toast.error("No Member found for Mobile No.");
 
-          return;
-        }
-        setName(data.data[0].name);
-        setEmail(data.data[0].email);
-        setMobileNumber(data.data[0].mobile_number);
-      });
+      return;
+    }
+    setName(data.data[0].name);
+    setEmail(data.data[0].email);
+    setMobileNumber(data.data[0].mobile_number);    
   };
 
   return (

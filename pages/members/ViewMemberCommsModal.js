@@ -14,11 +14,13 @@ const ViewMemberCommsModal = (props) => {
   }, [props.memberForAction?.id]);
 
   const getComms = async () => {
-    await fetch(MembersApis.GET_COMM_LOGS(props.memberForAction?.id))
-      .then((res) => res.json())
-      .then((data) => {
-        setMemberComms(data);
-      });
+    const data = await props.customFetch(
+      MembersApis.GET_COMM_LOGS(props.memberForAction?.id),
+      "GET",
+      {}
+    );
+
+    setMemberComms(data);
   };
 
   const columns = [
