@@ -443,7 +443,7 @@ const AddPaymentForApproval = (props) => {
     reader.readAsText(file);
   };
 
-  const formSubmit = (e, fromCSV, data) => {
+  const formSubmit = async (e, fromCSV, data) => {
     setApiLoading(true);
 
     let dataObj = {};
@@ -507,8 +507,12 @@ const AddPaymentForApproval = (props) => {
 
     setMobileSearching(true);
 
-    const data = await props.customFetch(MembersApis.SEARCH(mobileNumber, "Mobile"), "GET", {});
-    
+    const data = await props.customFetch(
+      MembersApis.SEARCH(mobileNumber, "Mobile"),
+      "GET",
+      {}
+    );
+
     setMobileSearching(false);
     if (!data.data[0]) {
       setMobileSearching(false);
@@ -518,7 +522,7 @@ const AddPaymentForApproval = (props) => {
     }
     setName(data.data[0].name);
     setEmail(data.data[0].email);
-    setMobileNumber(data.data[0].mobile_number);    
+    setMobileNumber(data.data[0].mobile_number);
   };
 
   return (
