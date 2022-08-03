@@ -1,5 +1,6 @@
 import LayoutSidebar from "../components/LayoutSidebar";
 import useCheckAuth from "../hooks/useCheckAuth";
+import { RefreshIcon } from "@heroicons/react/outline";
 
 const LeadAnalytics = () => {
   const checkAuthLoading = useCheckAuth(false);
