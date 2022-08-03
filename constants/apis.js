@@ -2,10 +2,10 @@
 // export const API_BASE_URL = "http://localhost:4000";
 
 //PROD - Uncomment before pushing to delpoy
-// export const API_BASE_URL = "https://stage.api.habuild.in";
+export const API_BASE_URL = "https://stage.api.habuild.in";
 
 //STAGE -
-const API_BASE_URL = process.env.API_BASE_URL;
+// const API_BASE_URL = process.env.API_BASE_URL;
 
 export const ProgramsApis = {
   GET_PROGRAMS: () => `${API_BASE_URL}/api/program/`,

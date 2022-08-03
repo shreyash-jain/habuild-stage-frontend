@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import LayoutSidebar from "../../components/LayoutSidebar";
 import {
   ShieldCheckIcon,
@@ -15,8 +15,14 @@ import MenuSidePanel from "./MenuSidePanel";
 import HabuildAlerts from "./HabuildAlerts";
 import SchedulerInfos from "./SchedulerInfos";
 import DayAttendance from "./DayAttendance";
+import useCheckAuth from "../../hooks/useCheckAuth";
+import { useFetchWrapper } from "../../utils/apiCall";
 
 const Dashboard = () => {
+  const checkAuthLoading = useCheckAuth(false);
+
+  const { customFetch, user } = useFetchWrapper();
+
   const [serverHealthy, setServerHealthy] = useState(false);
   const [loading, setLoading] = useState(true);
   const [currentYTUrl, setCurrentYTUrl] = useState(
@@ -38,48 +44,56 @@ const Dashboard = () => {
 
   const getMemberBatches = async () => {
     // await fetch(`https://api.habuild.in/api/program/`)
-    await fetch(ProgramsApis.GET_PROGRAMS())
-      .then((res) => res.json())
-      .then(async (data) => {
-        if (data.programs.length > 0) {
-          const programsWithBatches = [];
+    const data = await customFetch(ProgramsApis.GET_PROGRAMS(), "GET", {});
 
-          for (let i = 0; i < data.programs.length; i++) {
-            await fetch(BatchesApis.GET_BATCH_FROM_PROGRAM(data.programs[i].id))
-              .then((res) => res.json())
-              .then((data1) => {
-                programsWithBatches.push({
-                  ...data.programs[i],
-                  batches: data1.batch,
-                });
-              });
-          }
+    console.log("Member batches Data", data);
 
-          setMemberProgramsWithBatches(programsWithBatches);
-        }
-      });
+    if (data.programs.length > 0) {
+      const programsWithBatches = [];
+
+      for (let i = 0; i < data.programs.length; i++) {
+        const result1 = await customFetch(
+          BatchesApis.GET_BATCH_FROM_PROGRAM(data.programs[i].id),
+          "GET",
+          {}
+        );
+        programsWithBatches.push({
+          ...data.programs[i],
+          batches: result1.batch,
+        });
+      }
+
+      setMemberProgramsWithBatches(programsWithBatches);
+    }
   };
 
-  const apiCall = () => {
+  const apiCall = async () => {
     setLoading(true);
-    fetch(HealthCheckApis.GET())
-      // fetch("http://localhost:4000/api/health_check/")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.status == 200) {
-          setServerHealthy(true);
-        }
-        setLoading(false);
-      });
+    const result = await customFetch(HealthCheckApis.GET(), "GET", {});
+    // fetch("http://localhost:4000/api/health_check/")
+    // .then((res) => res.json())
+    // .then((data) => {
+    //   if (data.status == 200) {
+    //     setServerHealthy(true);
+    //   }
+    //   setLoading(false);
+    // });
+
+    if (result.status == 200) {
+      setServerHealthy(true);
+    }
+    setLoading(false);
   };
 
   const getCurrentYoutubeUrl = async () => {
-    fetch(ShortenerApis.GET_CURRENT_YT_LINK())
-      .then((res) => res.json())
-      .then((data) => {
-        setCurrentYTUrl(data.long_url);
-        setCurrentDbYTUrl(data.long_url);
-      });
+    const result = await customFetch(
+      ShortenerApis.GET_CURRENT_YT_LINK(),
+      "GET",
+      {}
+    );
+
+    setCurrentYTUrl(result.long_url);
+    setCurrentDbYTUrl(result.long_url);
   };
 
   const updateUrl = async () => {
@@ -92,29 +106,29 @@ const Dashboard = () => {
       return;
     }
 
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    var raw = JSON.stringify({
+    var raw = {
       newProxyUrl: currentYTUrl,
-    });
-    var requestOptions = {
-      method: "PATCH",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
     };
 
-    fetch(ShortenerApis.UPDATE_CURRENT_YT_LINK(), requestOptions)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.ok) {
-          toast.success("YT Url Updated!");
-          getCurrentYoutubeUrl();
-        } else {
-          toast.error("Failed to Update YT url.");
-        }
-      });
+    const result = await customFetch(
+      ShortenerApis.UPDATE_CURRENT_YT_LINK(),
+      "PATCH",
+      raw
+    );
+
+    if (result.ok) {
+      toast.success("YT Url Updated!");
+      getCurrentYoutubeUrl();
+    } else {
+      toast.error("Failed to Update YT url.");
+    }
   };
+
+  if (checkAuthLoading) {
+    return (
+      <RefreshIcon className="text-green-300 animate-spin h-10 w-10 mx-auto" />
+    );
+  }
 
   return (
     <div>
@@ -182,9 +196,9 @@ const Dashboard = () => {
       </div>
 
       <div className="flex sm:space-x-4 flex-col sm:flex-row ">
-        <SchedulerInfos />
+        <SchedulerInfos customFetch={customFetch} />
 
-        <HabuildAlerts />
+        <HabuildAlerts customFetch={customFetch} />
       </div>
 
       <DayAttendance />
@@ -197,6 +211,7 @@ const Dashboard = () => {
       </button>
 
       <MenuSidePanel
+        customFetch={customFetch}
         open={showMenuSidebar}
         setOpen={setShowMenuSidebar}
         memberProgramsWithBatches={memberProgramsWithBatches}

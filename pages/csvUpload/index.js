@@ -20,8 +20,11 @@ import {
   PlanApis,
 } from "../../constants/apis";
 import MemberCSVUpload from "../members/MemberCSVUpload";
+import useCheckAuth from "../../hooks/useCheckAuth";
 
 const CsvUpload = (props) => {
+  const checkAuthLoading = useCheckAuth(false);
+
   const [apiLoading, setApiLoading] = useState();
   const [csvArray, setCsvArray] = useState([]);
   const [includeInactiveMember, setIncludeInactiveMember] = useState(false);
@@ -170,6 +173,12 @@ const CsvUpload = (props) => {
         // console.log("error", error);
       });
   };
+
+  if (checkAuthLoading) {
+    return (
+      <RefreshIcon className="text-green-300 animate-spin h-12 w-12 mx-auto" />
+    );
+  }
 
   if (apiLoading) {
     return (

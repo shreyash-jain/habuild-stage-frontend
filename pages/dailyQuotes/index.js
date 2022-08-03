@@ -10,6 +10,7 @@ import {
 import AddDailyQuoteModal from "./AddDailyQuoteModal";
 import EditEverydayQuote from "./EditEverydayQuote";
 import { RefreshIcon } from "@heroicons/react/outline";
+import useCheckAuth from "../../hooks/useCheckAuth";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -21,6 +22,7 @@ const tabs = [
 ];
 
 const DailyQuotes = (props) => {
+  const checkAuthLoading = useCheckAuth(false);
   const [dailyQuotes, setDailyQuotes] = useState([]);
   const [memberDailyQuotes, setMemberDailyQuotes] = useState([]);
   const [leadDailyQuotes, setLeadDailyQuotes] = useState([]);
@@ -265,6 +267,10 @@ const DailyQuotes = (props) => {
   const handleTabChange = (newTab) => {
     setCurrentMemberTab(newTab);
   };
+
+  if (checkAuthLoading) {
+    return <RefreshIcon className="text-green-300 h-8 w-8 mx-auto" />;
+  }
 
   return (
     <div>

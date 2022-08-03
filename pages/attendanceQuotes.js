@@ -1,4 +1,4 @@
-import { useEffect, useState, Fragment } from "react";
+import { useEffect, useState, Fragment, useContext } from "react";
 import LayoutSidebar from "../components/LayoutSidebar";
 import Table from "../components/Table";
 import FlyoutMenu from "../components/FlyoutMenu";
@@ -20,12 +20,19 @@ import {
   DemoBatchesApis,
   ProgramsApis,
 } from "../constants/apis";
+import useCheckAuth from "../hooks/useCheckAuth";
+import { customFetch } from "../utils/apiCall";
+import { GlobalContext } from "../context/GlobalContextProvider";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
 const AttendanceQuotes = (props) => {
+  const checkAuthLoading = useCheckAuth(false);
+
+  const { user } = useContext(GlobalContext);
+
   const [loading, setLoading] = useState(false);
   const [attendnaceQuotes, setAttendanceQuotes] = useState([]);
   const [absentAttendanceQuotes, setAbsentAttendanceQuotes] = useState([]);
@@ -41,10 +48,12 @@ const AttendanceQuotes = (props) => {
   const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
-    getAllPrograms();
-    getDemoBatches();
-    getAttendanceQuotes();
-  }, []);
+    if (user) { 
+      getAllPrograms();
+      getDemoBatches();
+      getAttendanceQuotes();
+    }
+  }, [user?.token]);
 
   const getAttendanceQuotes = async () => {
     setLoading(true);
@@ -214,6 +223,10 @@ const AttendanceQuotes = (props) => {
       },
     },
   ];
+
+  if (checkAuthLoading) {
+    return <RefreshIcon className="text-green-300 h-8 w-8 mx-auto" />;
+  }
 
   return (
     <div>

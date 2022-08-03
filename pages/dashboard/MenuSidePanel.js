@@ -63,6 +63,7 @@ const MenuSidePanel = (props) => {
       </div>
 
       <ReRegisterBatch
+        contextUser={props.contextUser}
         memberProgramsWithBatches={props.memberProgramsWithBatches}
       />
     </SidePannel>

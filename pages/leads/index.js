@@ -32,6 +32,7 @@ import {
   LeadsApis,
   MembersApis,
 } from "../../constants/apis";
+import useCheckAuth from "../../hooks/useCheckAuth";
 
 const filters = {
   status: [
@@ -97,6 +98,8 @@ const weekDaysForAttendance = [
 ];
 
 const Leads = (props) => {
+  const checkAuthLoading = useCheckAuth(false);
+
   const [viewPaymentModal, setViewPaymentModal] = useState(false);
   const [viewCommsModal, setViewCommsModal] = useState(false);
   const [showMenuSidebar, setShowMenuSidebar] = useState(false);
@@ -563,6 +566,10 @@ const Leads = (props) => {
   //     </div>
   //   );
   // }
+
+  if (checkAuthLoading) {
+    return <RefreshIcon className="text-green-300 h-8 w-8 mx-auto" />;
+  }
 
   return (
     <div>

@@ -8,6 +8,7 @@ import {
   CheckCircleIcon,
   MenuAlt1Icon,
   ExternalLinkIcon,
+  RefreshIcon,
 } from "@heroicons/react/outline";
 import toast from "react-hot-toast";
 import MemberInfoSidePanel from "./memberInfoSidePanel";
@@ -28,8 +29,10 @@ import {
 import Image from "next/image";
 import ViewMemberCommsModal from "./ViewMemberCommsModal";
 import UpdateEmailModal from "./UpdateEmailModal";
+import useCheckAuth from "../../hooks/useCheckAuth";
 
 const Members = (props) => {
+  const checkAuthLoading = useCheckAuth(false);
   const [members, setMembers] = useState([]);
   const [viewMemberInfo, setViewMemberInfo] = useState(false);
   const [viewUpdateMemberInfo, setViewUpdateMemberInfo] = useState(false);
@@ -600,6 +603,10 @@ const Members = (props) => {
     setSearchTerm("");
     getMembers(1);
   };
+
+  if (checkAuthLoading) {
+    return <RefreshIcon className="text-green-300 h-8 w-8 mx-auto" />;
+  }
 
   return (
     <div>

@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 import { PaymentApis } from "../../constants/apis";
 import AddCommModal from "../leads/AddCommModal";
 import ViewMemberCommsModal from "../members/ViewMemberCommsModal";
+import useCheckAuth from "../../hooks/useCheckAuth";
 
 const tabs = [
   { name: "Failed Payments", href: "#", current: false },
@@ -20,6 +21,7 @@ function classNames(...classes) {
 }
 
 const Payments = (props) => {
+  const checkAuthLoading = useCheckAuth(false);
   const [currentPaymentsToShow, setCurrentPaymentsToShow] = useState([]);
   const [successfullPayments, setSuccessfullPayments] = useState([]);
   const [failedPayments, setFailedPayments] = useState([]);
@@ -524,6 +526,10 @@ const PaymentFormModal = (props) => {
       };
     }
   };
+
+  if (checkAuthLoading) {
+    return <RefreshIcon className="text-green-300 h-8 w-8 mx-auto" />;
+  }
 
   return (
     <Modal

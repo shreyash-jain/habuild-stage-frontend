@@ -10,12 +10,14 @@ import { format, parseISO } from "date-fns";
 import ActionsSidePanel from "./ActionsSidePanel";
 import AddDemoProgramModal from "./AddDemoProgramModal";
 import { DemoProgramsApis, ProgramsApis } from "../../constants/apis";
+import useCheckAuth from "../../hooks/useCheckAuth";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
 const DemoPrograms = () => {
+  const checkAuthLoading = useCheckAuth(false);
   const [viewAddModal, setViewAddModal] = useState(false);
   const [demoBatches, setDemoBatches] = useState([]);
 
@@ -170,6 +172,10 @@ const DemoPrograms = () => {
       },
     },
   ];
+
+  if (checkAuthLoading) {
+    return <RefreshIcon className="text-green-300 h-8 w-8 mx-auto" />;
+  }
 
   return (
     <div>

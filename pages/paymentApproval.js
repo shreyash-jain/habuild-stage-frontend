@@ -13,12 +13,15 @@ import {
   PlanApis,
 } from "../constants/apis";
 import { remove_backslash_characters } from "../utils/stringUtility";
+import useCheckAuth from "../hooks/useCheckAuth";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
 const PaymentApproval = () => {
+  const checkAuthLoading = useCheckAuth(false);
+
   const [paymentsToApprove, setPaymentsToApprove] = useState([]);
 
   const [loading, setLoading] = useState(false);
@@ -264,6 +267,10 @@ const PaymentApproval = () => {
   };
 
   // console.log("PaymentTO Decide", paymentToDecide);
+
+  if (checkAuthLoading) {
+    return <RefreshIcon className="text-green-300 h-8 w-8 mx-auto" />;
+  }
 
   return (
     <div>

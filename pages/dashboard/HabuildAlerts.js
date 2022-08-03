@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import Table from "../../components/Table";
 import Modal from "../../components/Modal";
 import { HabuildAlertsApis } from "../../constants/apis";
 import { RefreshIcon } from "@heroicons/react/outline";
+import { customFetch } from "../../utils/apiCall";
 
-const HabuildAlerts = () => {
+const HabuildAlerts = (props) => {
   const [numDays, setNumDays] = useState(1);
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -18,15 +19,16 @@ const HabuildAlerts = () => {
     getAlerts();
   }, [numDays]);
 
-  const getAlerts = () => {
+  const getAlerts = async () => {
     setLoading(true);
-    fetch(HabuildAlertsApis.GET(numDays))
-      .then((res) => res.json())
-      .then((data) => {
-        setLoading(false);
-        setAlerts(data.result);
-        // console.log("Alerts Data", data);
-      });
+    const data = await props.customFetch(
+      HabuildAlertsApis.GET(numDays),
+      "GET",
+      {}
+    );
+    setLoading(false);
+    setAlerts(data.result);
+    // console.log("Alerts Data", data);
   };
 
   const columns = [
