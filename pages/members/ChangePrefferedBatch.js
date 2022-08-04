@@ -14,7 +14,7 @@ const ChangePrefferedBatch = (props) => {
 
   useEffect(() => {
     computeSelectOptions();
-  }, [props.memberForAction.id, props.memberProgramsWithBatches.length]);
+  }, [props.memberForAction?.id, props.memberProgramsWithBatches?.length]);
 
   const computeSelectOptions = () => {
     const overallArr = [];
