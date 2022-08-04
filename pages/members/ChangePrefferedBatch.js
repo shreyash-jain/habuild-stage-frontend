@@ -13,16 +13,8 @@ const ChangePrefferedBatch = (props) => {
   const [batchSelectOptions, setBatchSelectOptions] = useState([]);
 
   useEffect(() => {
-    const prefferedBatch = batchSelectOptions.find(
-      (item) => item.value === props.memberForAction.preffered_batch_id
-    );
-
-    setCurrentPrefferedBatch(prefferedBatch);
-  }, [props.memberForAction, props.memberProgramsWithBatches]);
-
-  useEffect(() => {
     computeSelectOptions();
-  }, [props.memberProgramsWithBatches]);
+  }, [props.memberForAction.id, props.memberProgramsWithBatches.length]);
 
   const computeSelectOptions = () => {
     const overallArr = [];
@@ -43,6 +35,12 @@ const ChangePrefferedBatch = (props) => {
         });
       }
     }
+
+    const prefferedBatch = overallArr.find(
+      (item) => item.value === props.memberForAction.preffered_batch_id
+    );
+
+    setCurrentPrefferedBatch(prefferedBatch);
 
     setBatchSelectOptions(overallArr);
   };

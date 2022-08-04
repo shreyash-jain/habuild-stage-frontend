@@ -6,8 +6,10 @@ import { format } from "date-fns";
 
 const PauseMembership = (props) => {
   const [apiLoading, setApiLoading] = useState(false);
-  const [numDays, setNumDays] = useState(false);
-  const [pauseStartDate, setPauseStartDate] = useState(false);
+  const [numDays, setNumDays] = useState(99);
+  const [pauseStartDate, setPauseStartDate] = useState(
+    format(new Date(), "yyyy-MM-dd")
+  );
 
   const pauseMembership = async (member, calledFrom) => {
     setApiLoading(true);
@@ -26,10 +28,12 @@ const PauseMembership = (props) => {
       memberForAction = props.memberForAction;
     }
 
+    let numDaysToUse = numDays.toString();
+
     try {
       const result = await props.customFetch(
         MembersApis.PAUSE_MEMBERSHIP({
-          numDays,
+          numDays: numDaysToUse,
           memberId: memberForAction.id,
           pauseStartDate,
         }),
@@ -95,7 +99,7 @@ const PauseMembership = (props) => {
 
         <label className="mt-4 text-lg">Number of Pause days</label>
         <input
-          defaultValue={100}
+          defaultValue={99}
           className="p-2 font-medium text-gray-800 rounded-md border border-gray-500 max-w-fit"
           type={"number"}
           onChange={(e) => setNumDays(e.target.value)}
