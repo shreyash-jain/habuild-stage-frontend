@@ -74,7 +74,7 @@ const HabuildAlerts = (props) => {
             Refetch
           </button>
 
-          <span className="text-red-400">{alerts.length} Recent Alerts</span>
+          <span className="text-red-400">{alerts?.length} Recent Alerts</span>
           <button
             onClick={() => setShowAllAlerts(true)}
             className="rounded-md px-3 py-1 bg-green-300 font-medium text-green-700 hover:bg-green-600 hover:text-white"

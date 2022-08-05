@@ -10,9 +10,7 @@ export const useFetchWrapper = () => {
   const customFetch = async (api, method, body) => {
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
-    if (process.env.API_BASE_URL == "https://stage.api.habuild.in") {
-      myHeaders.append("Authorization", `Bearer ${user?.token}`);
-    }
+    myHeaders.append("Authorization", `Bearer ${user?.token}`);
 
     var requestOptions = {
       method,
