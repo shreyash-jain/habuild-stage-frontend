@@ -32,9 +32,7 @@ export const useFetchWrapper = () => {
   const customFetchFile = async (api, method, file) => {
     var myHeaders = new Headers();
 
-    if (process.env.API_BASE_URL == "https://stage.api.habuild.in") {
-      myHeaders.append("Authorization", `Bearer ${user?.token}`);
-    }
+    myHeaders.append("Authorization", `Bearer ${user?.token}`);
 
     let formData = new FormData();
     formData.append("file", file);
