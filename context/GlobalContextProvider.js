@@ -42,7 +42,6 @@ export const GlobalContextProvider = ({ children }) => {
     fetch(LoginApis.LOGIN(), requestOptions)
       .then((res) => res.json())
       .then((data) => {
-        console.log("Login APi Data", data);
 
         if (data.ok) {
           if (data.data.status == "ACTIVE") {
@@ -57,8 +56,6 @@ export const GlobalContextProvider = ({ children }) => {
         setAuthLoading(false);
       });
   };
-
-  console.log("In Context User", user);
 
   return (
     <GlobalContext.Provider

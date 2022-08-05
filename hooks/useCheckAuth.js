@@ -10,8 +10,6 @@ export default function useCheckAuth(onAuthenticated, redirectTo = "/") {
 
   const [loading, setLoading] = useState(true);
 
-  console.log("hello", user);
-
   useEffect(() => {
     if (!authLoading) {
       if (onAuthenticated) {
