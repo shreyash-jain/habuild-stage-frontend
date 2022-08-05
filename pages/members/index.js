@@ -33,7 +33,9 @@ import useCheckAuth from "../../hooks/useCheckAuth";
 import { useFetchWrapper } from "../../utils/apiCall";
 
 const Members = (props) => {
-  const checkAuthLoading = useCheckAuth(false);
+  // const checkAuthLoading = useCheckAuth(false);
+  const checkAuthLoading = false;
+
 
   const { customFetch, customFetchFile } = useFetchWrapper();
 

@@ -21,7 +21,9 @@ function classNames(...classes) {
 }
 
 const PaymentApproval = () => {
-  const checkAuthLoading = useCheckAuth(false);
+  // const checkAuthLoading = useCheckAuth(false);
+  const checkAuthLoading = false;
+
 
   const { customFetch } = useFetchWrapper();
 

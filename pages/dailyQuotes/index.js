@@ -23,7 +23,9 @@ const tabs = [
 ];
 
 const DailyQuotes = (props) => {
-  const checkAuthLoading = useCheckAuth(false);
+  // const checkAuthLoading = useCheckAuth(false);
+  const checkAuthLoading = false;
+
 
   const { customFetch } = useFetchWrapper();
 

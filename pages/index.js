@@ -10,8 +10,9 @@ import toast from "react-hot-toast";
 export default function Home() {
   const router = useRouter();
 
-  const { authLoading, login } = useContext(GlobalContext);
-  const checkAuthLoading = useCheckAuth(true, "/dashboard");
+  // const { authLoading, login } = useContext(GlobalContext);
+  // const checkAuthLoading = useCheckAuth(true, "/dashboard");
+  const checkAuthLoading = false;
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -57,14 +58,14 @@ export default function Home() {
               onSubmit={(e) => {
                 e.preventDefault();
 
-                if (email && password) {
-                  login(email, password);
-                } else {
-                  toast.error("Username or password missing");
-                  return;
-                }
+                // if (email && password) {
+                //   login(email, password);
+                // } else {
+                //   toast.error("Username or password missing");
+                //   return;
+                // }
                 // if (email == "admin@Habuild.in" && password == "admin") {
-                //   router.push("/dashboard");
+                router.push("/dashboard");
                 // } else {
                 //   alert("Wrong email / password.");
                 //   return;
@@ -139,16 +140,16 @@ export default function Home() {
               </div>
 
               <div>
-                {authLoading ? (
+                {/* {authLoading ? (
                   <RefreshIcon className="text-green-300 animate-spin h-8 w-8 mx-auto" />
-                ) : (
+                ) : ( */}
                   <button
                     type="submit"
                     className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-500 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                   >
                     Sign in
                   </button>
-                )}
+                {/* )} */}
               </div>
             </form>
 
