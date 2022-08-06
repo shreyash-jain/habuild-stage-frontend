@@ -36,7 +36,6 @@ const Members = (props) => {
   // const checkAuthLoading = useCheckAuth(false);
   const checkAuthLoading = false;
 
-
   const { customFetch, customFetchFile } = useFetchWrapper();
 
   const [members, setMembers] = useState([]);
@@ -243,17 +242,11 @@ const Members = (props) => {
   const memberReRegister = async (memberObj) => {
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
-    var raw = JSON.stringify({
+    var raw = {
       memberId: memberObj.id,
-    });
-    var requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
     };
 
-    const data = await customFetch(ReRegisterApis.MEMBER(), requestOptions);
+    const data = await customFetch(ReRegisterApis.MEMBER(), "POST", raw);
 
     // console.log("ReRegister DATAAAA", data);
 
