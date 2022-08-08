@@ -199,7 +199,6 @@ const Payments = (props) => {
       dataIndex: "latestPayment",
       key: "latestPayment",
       render: (latestPaymentArr) => {
-        console.log("Column Data", latestPaymentArr);
 
         if (latestPaymentArr?.length > 0) {
           return (

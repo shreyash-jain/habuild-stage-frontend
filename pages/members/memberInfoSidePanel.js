@@ -7,10 +7,12 @@ import { remove_backslash_characters } from "../../utils/stringUtility";
 import { RefreshIcon } from "@heroicons/react/outline";
 import toast from "react-hot-toast";
 import { addDaysToDate } from "../../utils/dateutils";
+import MemberAttendanceDetail from "./MemberAttendanceDetail";
 
 const tabs = [
   { name: "Account", href: "#", current: true },
   { name: "Performance", href: "#", current: false },
+  { name: "Attendance", href: "#", current: false },
   { name: "Subscription", href: "#", current: false },
 ];
 
@@ -230,52 +232,63 @@ const MemberInfoSidePanel = (props) => {
             </div>
           </div>
 
-          {/* Description list */}
-          <div className="mt-6 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <dl className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-4">
-              {Object.keys(profile[currentTab]).map((field) => {
-                if (field.includes("Meeting") || field.includes("Short Link")) {
+          {currentTab !== "Attendance" && (
+            <div className="mt-6 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+              <dl className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-4">
+                {Object.keys(profile[currentTab]).map((field) => {
+                  if (
+                    field.includes("Meeting") ||
+                    field.includes("Short Link")
+                  ) {
+                    return (
+                      <div key={field} className="sm:col-span-4">
+                        <dt className="text-sm font-medium text-gray-500">
+                          {field}
+                        </dt>
+                        <dd className="mt-1 text-sm text-gray-900">
+                          <Link
+                            href={
+                              profile[currentTab][field]
+                                ? profile[currentTab][field]
+                                : ""
+                            }
+                          >
+                            <a
+                              target="_blank"
+                              style={{
+                                textDecoration: "underline",
+                                color: "blue",
+                              }}
+                            >
+                              {profile[currentTab][field]}
+                            </a>
+                          </Link>
+                        </dd>
+                      </div>
+                    );
+                  }
+
                   return (
                     <div key={field} className="sm:col-span-4">
                       <dt className="text-sm font-medium text-gray-500">
                         {field}
                       </dt>
                       <dd className="mt-1 text-sm text-gray-900">
-                        <Link
-                          href={
-                            profile[currentTab][field]
-                              ? profile[currentTab][field]
-                              : ""
-                          }
-                        >
-                          <a
-                            target="_blank"
-                            style={{
-                              textDecoration: "underline",
-                              color: "blue",
-                            }}
-                          >
-                            {profile[currentTab][field]}
-                          </a>
-                        </Link>
+                        {profile[currentTab][field]}
                       </dd>
                     </div>
                   );
-                }
+                })}
+              </dl>
+            </div>
+          )}
 
-                return (
-                  <div key={field} className="sm:col-span-4">
-                    <dt className="text-sm font-medium text-gray-500">
-                      {field}
-                    </dt>
-                    <dd className="mt-1 text-sm text-gray-900">
-                      {profile[currentTab][field]}
-                    </dd>
-                  </div>
-                );
-              })}
-            </dl>
-          </div>
+          {currentTab == "Attendance" && (
+            <MemberAttendanceDetail
+              member={props.memberForAction}
+              customFetch={props.customFetch}
+            />
+          )}
 
           {/* Team member list */}
           {/* <div className="mt-8 max-w-5xl mx-auto px-4 pb-12 sm:px-6 lg:px-8">
@@ -310,73 +323,75 @@ const MemberInfoSidePanel = (props) => {
           </div> */}
         </article>
 
-        <div className="my-24 rounded-md border border-gray-100 p-3 shadow-sm">
-          <h1 className="font-medium text-gray-500 mb-4">ShortLink Info</h1>
+        {currentTab !== "Attendance" && (
+          <div className="my-24 rounded-md border border-gray-100 p-3 shadow-sm">
+            <h1 className="font-medium text-gray-500 mb-4">ShortLink Info</h1>
 
-          {shortLinkLoader ? (
-            <RefreshIcon className="text-green-300 animate-spin h-12 w-12 mx-auto" />
-          ) : (
-            <div>
-              <div className="block">
-                <label
-                  htmlFor="memberShortLink"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Member Short Link
-                </label>
-                <Link className="overflow-hidden" href={memberShortLink}>
-                  <a
-                    target="_blank"
-                    style={{
-                      textDecoration: "underline",
-                      color: "blue",
-                    }}
+            {shortLinkLoader ? (
+              <RefreshIcon className="text-green-300 animate-spin h-12 w-12 mx-auto" />
+            ) : (
+              <div>
+                <div className="block">
+                  <label
+                    htmlFor="memberShortLink"
+                    className="block text-sm font-medium text-gray-700"
                   >
-                    {memberShortLink}
-                  </a>
-                </Link>
-              </div>
-
-              <div className="mt-12">
-                <label
-                  htmlFor="longUrl"
-                  className=" block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-                >
-                  Long URL
-                </label>
-                <Link href={currentLongUrl}>
-                  <a
-                    target="_blank"
-                    style={{
-                      width: "50%",
-                      textDecoration: "underline",
-                      color: "blue",
-                    }}
-                  >
-                    {currentLongUrl}
-                  </a>
-                </Link>
-                <div className="mt-4 sm:mt-0 sm:col-span-2">
-                  <textarea
-                    rows={6}
-                    value={longUrlForShortUrl}
-                    onChange={(e) => setLongUrlForShortUrl(e.target.value)}
-                    type="text"
-                    name="longUrl"
-                    className="p-2 rounded-md border border-gray-400 w-full"
-                  />
+                    Member Short Link
+                  </label>
+                  <Link className="overflow-hidden" href={memberShortLink}>
+                    <a
+                      target="_blank"
+                      style={{
+                        textDecoration: "underline",
+                        color: "blue",
+                      }}
+                    >
+                      {memberShortLink}
+                    </a>
+                  </Link>
                 </div>
-              </div>
 
-              <button
-                onClick={updateLongUrl}
-                className="font-medium px-3 py-2 rounded-md bg-green-300 hover:bg-green-500 hover:text-white text-green-700"
-              >
-                Update Long URL
-              </button>
-            </div>
-          )}
-        </div>
+                <div className="mt-12">
+                  <label
+                    htmlFor="longUrl"
+                    className=" block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
+                  >
+                    Long URL
+                  </label>
+                  <Link href={currentLongUrl}>
+                    <a
+                      target="_blank"
+                      style={{
+                        width: "50%",
+                        textDecoration: "underline",
+                        color: "blue",
+                      }}
+                    >
+                      {currentLongUrl}
+                    </a>
+                  </Link>
+                  <div className="mt-4 sm:mt-0 sm:col-span-2">
+                    <textarea
+                      rows={6}
+                      value={longUrlForShortUrl}
+                      onChange={(e) => setLongUrlForShortUrl(e.target.value)}
+                      type="text"
+                      name="longUrl"
+                      className="p-2 rounded-md border border-gray-400 w-full"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  onClick={updateLongUrl}
+                  className="font-medium px-3 py-2 rounded-md bg-green-300 hover:bg-green-500 hover:text-white text-green-700"
+                >
+                  Update Long URL
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </main>
     </SidePannel>
   );

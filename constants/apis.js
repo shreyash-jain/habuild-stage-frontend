@@ -86,7 +86,7 @@ export const MembersApis = {
   GET: (pageNum) => `${API_BASE_URL}/api/member/?page=${pageNum}&limit=100`,
   GET_COMM_LOGS: (memberId) =>
     `${API_BASE_URL}/api/member/getCommunicationLogs/${memberId}`,
-  GET_ATTENDANCE: (params) =>
+  GET_WEEK_ATTENDANCE: (params) =>
     `${API_BASE_URL}/api/member/attended/members?batch_id=${params.batchId}&day=${params.daysAttended}`,
   GIFT_MEMBERSHIP: () => `${API_BASE_URL}/api/member/gift_membership`,
   ACTIVATE_MEMBERSHIP: (memberId) =>
@@ -105,6 +105,8 @@ export const MembersApis = {
     `${API_BASE_URL}/api/member/updatePreferredBatch`,
   UPDATE_EMAIL: (memberId) =>
     `${API_BASE_URL}/api/member/${memberId}/update_email`,
+  GET_DATE_RANGE_ATTENDANCE: (memberId, startDate, endDate) =>
+    `${API_BASE_URL}/api/member/${memberId}/attendance?start=${startDate}&end=${endDate}`,
 };
 
 export const WatiTemplatesApis = {

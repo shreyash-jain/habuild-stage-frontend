@@ -195,7 +195,7 @@ const ViewAttendance = (props) => {
     setApiLoading(true);
 
     await props.customFetch(
-      MembersApis.GET_ATTENDANCE({
+      MembersApis.GET_WEEK_ATTENDANCE({
         batchId: selectedDemoBatch,
         daysAttended,
       }),

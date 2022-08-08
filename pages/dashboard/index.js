@@ -51,7 +51,6 @@ const Dashboard = () => {
     
     const data = await customFetch(ProgramsApis.GET_PROGRAMS(), "GET", {});
 
-    console.log("Member batches Data", data);
 
       if (data?.programs?.length > 0) {
         const programsWithBatches = [];

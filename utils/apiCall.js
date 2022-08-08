@@ -23,8 +23,6 @@ export const useFetchWrapper = () => {
       requestOptions = { ...requestOptions, body: JSON.stringify(body) };
     }
 
-    console.log(requestOptions);
-
     const result = await fetch(api, requestOptions).then((res) => res.json());
 
     return result;
