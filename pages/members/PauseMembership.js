@@ -41,7 +41,6 @@ const PauseMembership = (props) => {
         {}
       );
 
-      // console.log(result);
       setApiLoading(false);
       if (result.status == 500) {
         toast.error(result.message);
@@ -55,14 +54,14 @@ const PauseMembership = (props) => {
       // console.log(result);
     } catch (error) {
       setApiLoading(false);
-      // toast.error(error);
+      toast.error(`Error ${JSON.stringify(error)}`);
       // console.log("error", error);
     }
   };
 
-  const triggerGroupAction = () => {
+  const triggerGroupAction = async () => {
     for (let i = 0; i < props.selectedMembers.length; i++) {
-      pauseMembership(props.selectedMembers[i], "groupActions");
+      await pauseMembership(props.selectedMembers[i], "groupActions");
     }
 
     props.setModalOpen(false);

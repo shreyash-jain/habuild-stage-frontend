@@ -61,12 +61,10 @@ const EditEverydayQuote = (props) => {
       toast.success(`Updated`);
       props.getQuotes();
       props.setViewModal(false);
-    } catch {
-      (error) => {
-        setApiLoading(false);
-        toast.error(`Updated Failed`);
-        // console.log("error", error);
-      };
+    } catch (error) {
+      setApiLoading(false);
+      toast.error(`Updated Failed ${JSON.stringify(error)}`);
+      // console.log("error", error);
     }
   };
 

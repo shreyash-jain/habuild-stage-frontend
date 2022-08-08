@@ -7,6 +7,7 @@ import StopMembership from "./stopMembership";
 import PauseMembership from "./PauseMembership";
 import ChangeMemberChannel from "./ChangeMemberChannel";
 import ChangePrefferedBatch from "./ChangePrefferedBatch";
+import { useFetchWrapper } from "../../utils/apiCall";
 
 const tabs = [
   { name: "Selected Members", href: "#", current: false },
@@ -18,6 +19,8 @@ function classNames(...classes) {
 }
 
 const SelectedMembersFloat = (props) => {
+  const { customFetch, customFetchFile } = useFetchWrapper();
+
   const [showModal, setShowModal] = useState(false);
   const [selectedTab, setSelectedTab] = useState("Selected Members");
   const [viewGiftMembershipModal, setViewGiftMembershipModal] = useState(false);
@@ -173,6 +176,7 @@ const SelectedMembersFloat = (props) => {
                 setModalOpen={setViewGiftMembershipModal}
                 selectedMembers={props.selectedMembers}
                 calledFrom="groupActions"
+                customFetch={customFetch}
               />
 
               <StopMembership
@@ -180,6 +184,7 @@ const SelectedMembersFloat = (props) => {
                 setModalOpen={setStopMembershipModal}
                 selectedMembers={props.selectedMembers}
                 calledFrom="groupActions"
+                customFetch={customFetch}
               />
 
               <PauseMembership
@@ -187,6 +192,7 @@ const SelectedMembersFloat = (props) => {
                 setModalOpen={setPauseMembershipModal}
                 selectedMembers={props.selectedMembers}
                 calledFrom="groupActions"
+                customFetch={customFetch}
               />
 
               <ChangeMemberChannel
@@ -194,6 +200,7 @@ const SelectedMembersFloat = (props) => {
                 setModalOpen={setChangeChannelModal}
                 selectedMembers={props.selectedMembers}
                 calledFrom="groupActions"
+                customFetch={customFetch}
               />
 
               <ChangePrefferedBatch
@@ -203,6 +210,7 @@ const SelectedMembersFloat = (props) => {
                 calledFrom="groupActions"
                 memberProgramsWithBatches={props.memberProgramsWithBatches}
                 memberBatches={props.memberBatches}
+                customFetch={customFetch}
               />
             </div>
           )}

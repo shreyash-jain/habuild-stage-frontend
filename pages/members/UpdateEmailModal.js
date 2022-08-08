@@ -23,9 +23,9 @@ const UpdateEmailModal = (props) => {
       return;
     }
 
-    var raw = JSON.stringify({
+    var raw = {
       email,
-    });
+    };
 
     try {
       const result = await props.customFetch(

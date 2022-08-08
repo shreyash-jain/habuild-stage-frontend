@@ -399,14 +399,10 @@ const AddAttendanceQuote = (props) => {
           `Attendance Quote ${props.mode == "edit" ? "Updated" : "Created"}`
         );
         // console.log(result);
-      } catch {
-        (error) => {
-          setApiLoading(false);
-          toast.error(
-            `No quote ${props.mode == "edit" ? "Updated" : "Created"}`
-          );
-          // console.log("error", error);
-        };
+      } catch (error) {
+        setApiLoading(false);
+        toast.error(`Error ${JSON.stringify(error)}`);
+        console.log("error", error);
       }
     }
 

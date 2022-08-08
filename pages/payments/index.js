@@ -25,7 +25,6 @@ const Payments = (props) => {
   // const checkAuthLoading = useCheckAuth(false);
   const checkAuthLoading = false;
 
-
   const { customFetch } = useFetchWrapper();
 
   const [currentPaymentsToShow, setCurrentPaymentsToShow] = useState([]);
@@ -515,14 +514,14 @@ const PaymentFormModal = (props) => {
       props.getPayments();
       props.setViewModal(false);
       // console.log("Api Result", result);
-    } catch {
-      (error) => {
-        setApiLoading(false);
-        toast.error(
-          `No payment ${props.mode == "edit" ? "Updated" : "Created"}`
-        );
-        // console.log("error", error);
-      };
+    } catch (error) {
+      setApiLoading(false);
+      toast.error(
+        `No payment ${
+          props.mode == "edit" ? "Updated" : "Created"
+        } - ${JSON.stringify(error)}`
+      );
+      // console.log("error", error);
     }
   };
 

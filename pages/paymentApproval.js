@@ -24,7 +24,6 @@ const PaymentApproval = () => {
   // const checkAuthLoading = useCheckAuth(false);
   const checkAuthLoading = false;
 
-
   const { customFetch } = useFetchWrapper();
 
   const [paymentsToApprove, setPaymentsToApprove] = useState([]);
@@ -451,7 +450,7 @@ const AddPaymentForApproval = (props) => {
     let dataObj = {};
 
     if (!fromCSV) {
-      e.preventDefault();
+      // e.preventDefault();
 
       if (!amount || !name || !mobileNumber || !email || !selectedBatchName) {
         alert("Please enter all details.");
@@ -477,28 +476,32 @@ const AddPaymentForApproval = (props) => {
     var raw = dataObj;
 
     try {
-      await props.customFetch(API, method, raw);
+      const result = await props.customFetch(API, method, raw);
 
-      if (!fromCSV) {
-        setApiLoading(false);
-        toast.success(
-          `Payment ${props.mode == "edit" ? "Updated" : "Created"}`
-        );
-        props.getAllPaymentsToApprove();
-        props.setViewModal(false);
-      }
-      props.getAllPaymentsToApprove();
-      // console.log("Api Result", result);
-    } catch {
-      (error) => {
-        // console.log("error", error);
+      // console.log("Add Payment Result", result);
+
+      if (result.status == 200) {
         if (!fromCSV) {
           setApiLoading(false);
-          toast.error(
-            `No payment ${props.mode == "edit" ? "Updated" : "Created"}`
+          toast.success(
+            `Payment ${props.mode == "edit" ? "Updated" : "Created"}`
           );
+          props.getAllPaymentsToApprove();
+          props.setViewModal(false);
         }
-      };
+      } else {
+        toast.error(`${JSON.stringify(result.message)}`);
+      }
+      if (fromCSV) {
+        props.getAllPaymentsToApprove();
+      }
+      // console.log("Api Result", result);
+    } catch (error) {
+      console.log("error", error);
+      if (!fromCSV) {
+        setApiLoading(false);
+        toast.error(`Error: ${JSON.stringify(error)}`);
+      }
     }
   };
 
@@ -533,13 +536,13 @@ const AddPaymentForApproval = (props) => {
       modalOpen={props.viewModal}
       setModalOpen={props.setViewModal}
       actionText="Add Payment"
-      onActionButtonClick={formSubmit}
+      onActionButtonClick={() => formSubmit({}, false, {})}
     >
       <form
         className="flex flex-col w-full space-y-5"
-        onSubmit={(e) => {
-          formSubmit(e);
-        }}
+        // onSubmit={(e) => {
+        //   formSubmit(e, false);
+        // }}
       >
         <h2 className="text-left text-xl font-bold text-gray-900">
           Payment For Approval
@@ -553,7 +556,7 @@ const AddPaymentForApproval = (props) => {
           className="mt-1 p-2 text-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
           value={mobileNumber}
           onChange={(e) => setMobileNumber(e.target.value)}
-          type="number"
+          type="tel"
           name="mobileNumber"
           placeholder="Mobile Number"
         />

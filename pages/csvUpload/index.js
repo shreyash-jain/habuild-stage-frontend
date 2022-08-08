@@ -27,7 +27,6 @@ const CsvUpload = (props) => {
   // const checkAuthLoading = useCheckAuth(false);
   const checkAuthLoading = false;
 
-
   const { customFetch, customFetchFile } = useFetchWrapper();
 
   const [apiLoading, setApiLoading] = useState();
@@ -112,14 +111,12 @@ const CsvUpload = (props) => {
       toast.success(`Payment Created`);
 
       // console.log("Api Result", result);
-    } catch {
-      (error) => {
-        // console.log("error", error);
-        if (!fromCSV) {
-          setApiLoading(false);
-          toast.error(`No payment Created`);
-        }
-      };
+    } catch (error) {
+      console.log("error", error);
+      if (!fromCSV) {
+        setApiLoading(false);
+        toast.error(`No payment Created`);
+      }
     }
   };
 

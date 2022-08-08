@@ -13,7 +13,23 @@ const ChangePrefferedBatch = (props) => {
   const [batchSelectOptions, setBatchSelectOptions] = useState([]);
 
   useEffect(() => {
-    computeSelectOptions();
+    if (props.calledFrom !== "groupActions") {
+      computeSelectOptions();
+    } else {
+      const overallArr = [];
+      for (let i = 0; i < props.memberProgramsWithBatches.length; i++) {
+        props.memberProgramsWithBatches[i].batches.map((item1) => {
+          const obj = {
+            label:
+              props.memberProgramsWithBatches[i].title + " - " + item1.name,
+            value: item1.id,
+          };
+          overallArr.push(obj);
+        });
+      }
+
+      setBatchSelectOptions(overallArr);
+    }
   }, [props.memberForAction?.id, props.memberProgramsWithBatches?.length]);
 
   const computeSelectOptions = () => {
@@ -22,7 +38,7 @@ const ChangePrefferedBatch = (props) => {
     for (let i = 0; i < props.memberProgramsWithBatches.length; i++) {
       if (
         props.memberProgramsWithBatches[i].batches.some(
-          (item) => item.id === props.memberForAction.preffered_batch_id
+          (item) => item.id === props.memberForAction?.preffered_batch_id
         )
       ) {
         props.memberProgramsWithBatches[i].batches.map((item1) => {
