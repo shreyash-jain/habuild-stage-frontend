@@ -44,7 +44,7 @@ export default function Home() {
             style={{ color: "#6E6E6E" }}
             className="mt-6 text-center text-3xl font-bold"
           >
-            CRM
+            Stage Version CRM
           </h2>
           <h2 className="mt-6 text-center text-3xl font-bold text-gray-800">
             Sign <span onClick={() => router.push("/dashboard")}>in </span>
@@ -143,12 +143,12 @@ export default function Home() {
                 {/* {authLoading ? (
                   <RefreshIcon className="text-green-300 animate-spin h-8 w-8 mx-auto" />
                 ) : ( */}
-                  <button
-                    type="submit"
-                    className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-500 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                  >
-                    Sign in
-                  </button>
+                <button
+                  type="submit"
+                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-500 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                >
+                  Sign in
+                </button>
                 {/* )} */}
               </div>
             </form>
