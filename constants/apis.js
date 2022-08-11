@@ -107,6 +107,8 @@ export const MembersApis = {
     `${API_BASE_URL}/api/member/${memberId}/update_email`,
   GET_DATE_RANGE_ATTENDANCE: (memberId, startDate, endDate) =>
     `${API_BASE_URL}/api/member/${memberId}/attendance?start=${startDate}&end=${endDate}`,
+  UPDATE_SHORT_ROUTE: (memberId) =>
+    `${API_BASE_URL}/api/member/exact_shortroute/${memberId}`,
 };
 
 export const WatiTemplatesApis = {

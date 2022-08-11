@@ -29,6 +29,7 @@ import {
 import Image from "next/image";
 import ViewMemberCommsModal from "./ViewMemberCommsModal";
 import UpdateEmailModal from "./UpdateEmailModal";
+import UpdateSlashtagModal from "./UpdateSlashtagModal";
 import useCheckAuth from "../../hooks/useCheckAuth";
 import { useFetchWrapper } from "../../utils/apiCall";
 
@@ -64,6 +65,7 @@ const Members = (props) => {
 
   const [allSelectChecked, setAllSelectChecked] = useState(false);
   const [viewUpdateEmailModal, setViewUpdateEmailModal] = useState(false);
+  const [viewUpdateSlashtagModal, setViewUpdateSlashtagModal] = useState(false);
 
   useEffect(() => {
     if (!checkAuthLoading) {
@@ -235,6 +237,13 @@ const Members = (props) => {
       onClick: (actionEntity) => {
         setMemberForAction(actionEntity);
         setViewUpdateEmailModal(true);
+      },
+    },
+    {
+      name: "Change Slashtag",
+      onClick: (actionEntity) => {
+        setMemberForAction(actionEntity);
+        setViewUpdateSlashtagModal(true);
       },
     },
   ];
@@ -808,6 +817,18 @@ const Members = (props) => {
         refetchData={handleSearch}
         searchFor={searchFor}
         searchTerm={searchTerm}
+        customFetch={customFetch}
+      />
+
+      <UpdateSlashtagModal
+        currentPagePagination={currentPagePagination}
+        getPaginatedLeads={getMembers}
+        refetchData={handleSearch}
+        searchFor={searchFor}
+        searchTerm={searchTerm}
+        memberForAction={memberForAction}
+        modalOpen={viewUpdateSlashtagModal}
+        setModalOpen={setViewUpdateSlashtagModal}
         customFetch={customFetch}
       />
     </div>
