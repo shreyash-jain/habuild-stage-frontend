@@ -1,3 +1,4 @@
+import { RefreshIcon } from "@heroicons/react/outline";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import Modal from "../../components/Modal";
@@ -55,6 +56,11 @@ const UpdateSlashtagModal = (props) => {
             {props?.memberForAction?.name}
           </h1>
         </div>
+
+        {apiLoading && (
+          <RefreshIcon className="text-green-300 animate-spin h-12 w-12 mx-auto" />
+        )}
+
         <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
           <div className="sm:col-span-3">
             <label
