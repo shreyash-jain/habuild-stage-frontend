@@ -467,32 +467,32 @@ const Members = (props) => {
         }
       },
     },
-    {
-      title: "Current Week Attendance",
-      dataIndex: "current_week_attendance",
-      key: "current_week_attendance",
-      render: (attendance) => {
-        return (
-          <div className="flex relative -z-1 overflow-hidden">
-            {attendance?.map((item) => {
-              if (item) {
-                return (
-                  <span key={item.day} title={item.day}>
-                    <CheckCircleIcon className="text-green-400 h-6" />
-                  </span>
-                );
-              } else {
-                return (
-                  <span key={item.day} title={item.day}>
-                    <XCircleIcon className="text-red-400 h-6" />
-                  </span>
-                );
-              }
-            })}
-          </div>
-        );
-      },
-    },
+    // {
+    //   title: "Current Week Attendance",
+    //   dataIndex: "current_week_attendance",
+    //   key: "current_week_attendance",
+    //   render: (attendance) => {
+    //     return (
+    //       <div className="flex relative -z-1 overflow-hidden">
+    //         {attendance?.map((item) => {
+    //           if (item) {
+    //             return (
+    //               <span key={item.day} title={item.day}>
+    //                 <CheckCircleIcon className="text-green-400 h-6" />
+    //               </span>
+    //             );
+    //           } else {
+    //             return (
+    //               <span key={item.day} title={item.day}>
+    //                 <XCircleIcon className="text-red-400 h-6" />
+    //               </span>
+    //             );
+    //           }
+    //         })}
+    //       </div>
+    //     );
+    //   },
+    // },
     {
       title: "Channel",
       dataIndex: "channel",
