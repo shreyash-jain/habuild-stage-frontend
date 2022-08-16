@@ -89,10 +89,10 @@ const SelectedMembersFloat = (props) => {
       actionName: "Resume Membership",
       viewSetter: triggerResumeMembershipAction,
     },
-    {
-      actionName: "Change Member Channel",
-      viewSetter: setChangeChannelModal,
-    },
+    // {
+    //   actionName: "Change Member Channel",
+    //   viewSetter: setChangeChannelModal,
+    // },
     {
       actionName: "Change Preffered Batch",
       viewSetter: setViewChangePrefferedBatchModal,
@@ -195,13 +195,13 @@ const SelectedMembersFloat = (props) => {
                 customFetch={customFetch}
               />
 
-              <ChangeMemberChannel
+              {/* <ChangeMemberChannel
                 modalOpen={changeChannelModal}
                 setModalOpen={setChangeChannelModal}
                 selectedMembers={props.selectedMembers}
                 calledFrom="groupActions"
                 customFetch={customFetch}
-              />
+              /> */}
 
               <ChangePrefferedBatch
                 modalOpen={viewChangePrefferedBatchModal}

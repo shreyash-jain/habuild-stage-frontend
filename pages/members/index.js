@@ -159,17 +159,17 @@ const Members = (props) => {
         setViewCommsModal(true);
       },
     },
-    {
-      name: "Change Preffered Channel",
-      onClick: (actionEntity) => {
-        if (actionEntity.status !== "INACTIVE") {
-          setMemberForAction(actionEntity);
-          setChangeChannelModal(true);
-        } else {
-          toast.error("Can only change channel for ACTIVE/PAUSED Members");
-        }
-      },
-    },
+    // {
+    //   name: "Change Preffered Channel",
+    //   onClick: (actionEntity) => {
+    //     if (actionEntity.status !== "INACTIVE") {
+    //       setMemberForAction(actionEntity);
+    //       setChangeChannelModal(true);
+    //     } else {
+    //       toast.error("Can only change channel for ACTIVE/PAUSED Members");
+    //     }
+    //   },
+    // },
     {
       name: "Update Member Details",
       onClick: (actionEntity) => {
