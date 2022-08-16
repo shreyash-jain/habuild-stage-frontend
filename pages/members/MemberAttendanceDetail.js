@@ -34,7 +34,6 @@ const MemberAttendanceDetail = (props) => {
       setCurrentMonthAttendance(attendedDates);
     }
 
-    console.log("------Get Att Result------", result);
   };
 
   const handleDateClick = (day) => {

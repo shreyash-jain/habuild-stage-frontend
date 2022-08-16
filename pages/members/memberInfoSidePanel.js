@@ -1,10 +1,13 @@
 import SidePannel from "../../components/SidePannel";
 import { Fragment, useEffect, useState } from "react";
-
 import Link from "next/link";
-import { ShortenerApis } from "../../constants/apis";
+import { ShortenerApis, MembersApis } from "../../constants/apis";
 import { remove_backslash_characters } from "../../utils/stringUtility";
-import { RefreshIcon } from "@heroicons/react/outline";
+import {
+  RefreshIcon,
+  XCircleIcon,
+  CheckCircleIcon,
+} from "@heroicons/react/outline";
 import toast from "react-hot-toast";
 import { addDaysToDate } from "../../utils/dateutils";
 import MemberAttendanceDetail from "./MemberAttendanceDetail";
@@ -14,6 +17,16 @@ const tabs = [
   { name: "Performance", href: "#", current: false },
   { name: "Attendance", href: "#", current: false },
   { name: "Subscription", href: "#", current: false },
+];
+
+const weekDays = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
 ];
 
 // const profile = {
@@ -61,6 +74,7 @@ const MemberInfoSidePanel = (props) => {
   const [shortLinkLoader, setShortLinkLoader] = useState(false);
   const [longUrlForShortUrl, setLongUrlForShortUrl] = useState("");
   const [currentLongUrl, setCurrentLongUrl] = useState("");
+  const [currentWeekAttendance, setCurrentWeekAttendance] = useState([]);
 
   useEffect(() => {
     const memberPerformance =
@@ -127,7 +141,19 @@ const MemberInfoSidePanel = (props) => {
         "https://" + props.memberForAction.short_meeting_link
       );
     }
+
+    getCurrentWeekAttendance();
   }, [props.memberForAction]);
+
+  const getCurrentWeekAttendance = async () => {
+    const result = await props.customFetch(
+      MembersApis.GET_CURRENT_ATTENDANCE(props.memberForAction.id),
+      "GET",
+      {}
+    );
+
+    setCurrentWeekAttendance(result.result);
+  };
 
   const getMemberShortlinks = async (shortLink) => {
     if (!shortLink) {
@@ -179,6 +205,7 @@ const MemberInfoSidePanel = (props) => {
     setShortLinkLoader(false);
   };
 
+
   return (
     <SidePannel
       width="max-w-2xl"
@@ -204,6 +231,24 @@ const MemberInfoSidePanel = (props) => {
                 <h1 className="text-2xl font-bold text-gray-900 truncate">
                   {profile.name}
                 </h1>
+              </div>
+
+              <div className="flex relative -z-1 overflow-hidden">
+                {currentWeekAttendance?.map((item, index) => {
+                  if (item) {
+                    return (
+                      <span key={weekDays[index]} title={weekDays[index]}>
+                        <CheckCircleIcon className="text-green-400 h-6" />
+                      </span>
+                    );
+                  } else {
+                    return (
+                      <span key={weekDays[index]} title={weekDays[index]}>
+                        <XCircleIcon className="text-red-400 h-6" />
+                      </span>
+                    );
+                  }
+                })}
               </div>
             </div>
           </div>

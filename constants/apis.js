@@ -2,10 +2,10 @@
 // export const API_BASE_URL = "http://localhost:4000";
 
 //PROD - Uncomment before pushing to delpoy
-// export const API_BASE_URL = "https://stage.api.habuild.in";
+export const API_BASE_URL = "https://stage.api.habuild.in";
 
 //STAGE -
-const API_BASE_URL = process.env.API_BASE_URL;
+// const API_BASE_URL = process.env.API_BASE_URL;
 
 export const ProgramsApis = {
   GET_PROGRAMS: () => `${API_BASE_URL}/api/program/`,
@@ -14,6 +14,10 @@ export const ProgramsApis = {
 export const BatchesApis = {
   GET_BATCH_FROM_PROGRAM: (programId) =>
     `${API_BASE_URL}/api/batch/program/${programId}`,
+  UPDATE_MEMBERS_CURRENT_CHANNEL: (batchId) =>
+    `${API_BASE_URL}/api/channel/batches/${batchId}`,
+  FALL_BACK_PREF_CHANNEL: (batchId) =>
+    `${API_BASE_URL}/api/channel/batches/${batchId}/fall_to_pref`,
 };
 
 export const AttendanceQuotesApis = {
@@ -109,6 +113,10 @@ export const MembersApis = {
     `${API_BASE_URL}/api/member/${memberId}/attendance?start=${startDate}&end=${endDate}`,
   UPDATE_SHORT_ROUTE: (memberId) =>
     `${API_BASE_URL}/api/member/exact_shortroute/${memberId}`,
+  GET_CURRENT_ATTENDANCE: (memberId) =>
+    `${API_BASE_URL}/api/member/getMemberZoomAttendance/${memberId}`,
+  CHANGE_CURRENT_CHANNEL: (memberId) =>
+    `${API_BASE_URL}/api/channel/members/${memberId}`,
 };
 
 export const WatiTemplatesApis = {

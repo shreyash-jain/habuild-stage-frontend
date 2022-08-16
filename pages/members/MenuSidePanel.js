@@ -5,10 +5,12 @@ import StopWACommMember from "./StopWACommMember";
 import MemberSendWAModal from "./MemberSendWAModal";
 import MemberCSVUpload from "./MemberCSVUpload";
 import { DemoProgramsApis, WatiTemplatesApis } from "../../constants/apis";
+import BatchUpdateCurrentChannel from "./BatchUpdateCurrentChannel";
 
 const tabs = [
+  { name: "Update Current Channel", current: true },
   { name: "Send WA Message", current: false },
-  { name: "Start/Stop WA Communication", current: true },
+  { name: "Start/Stop WA Communication", current: false },
   { name: "CSV Data Upload", current: false },
 ];
 
@@ -17,7 +19,7 @@ function classNames(...classes) {
 }
 
 const MenuSidePanel = (props) => {
-  const [currentTab, setCurrentTab] = useState("Send WA Message");
+  const [currentTab, setCurrentTab] = useState("Update Current Channel");
   const [watiTemplates, setWatiTemplates] = useState([]);
   const [refetchLoading, setRefetchLoading] = useState(false);
 
@@ -44,6 +46,7 @@ const MenuSidePanel = (props) => {
 
   return (
     <SidePannel
+      width="max-w-3xl"
       title="Manage"
       isOpen={props.open || false}
       setIsOpen={props.setOpen}
@@ -120,6 +123,16 @@ const MenuSidePanel = (props) => {
 
         {currentTab == "CSV Data Upload" && (
           <MemberCSVUpload customFetchFile={props.customFetchFile} />
+        )}
+
+        {currentTab == "Update Current Channel" && (
+          <BatchUpdateCurrentChannel
+            customFetch={props.customFetch}
+            memberProgramsWithBatches={props.memberProgramsWithBatches}
+            getPaginatedLeads={() =>
+              props.getPaginatedLeads(props.currentPagePagination)
+            }
+          />
         )}
       </div>
     </SidePannel>

@@ -6,15 +6,13 @@ import { MembersApis } from "../../constants/apis";
 import { Select } from "react-select";
 import Image from "next/image";
 
-const ChangeMemberChannel = (props) => {
-  // console.log("Change Member Channel Props", props);
-
+const ChangeMemberCurrentChannel = (props) => {
   const [apiLoading, setApiLoading] = useState(false);
   const [channel, setChannel] = useState({});
 
   useEffect(() => {
     if (props.calledFrom !== "groupActions") {
-      setChannel(props.memberForAction.channel);
+      setChannel(props.memberForAction.current_channel);
     }
   }, [props.memberForAction]);
 
@@ -35,11 +33,12 @@ const ChangeMemberChannel = (props) => {
     }
 
     var raw = {
-      channel: channelToUpdate,
+      currentChannel: channelToUpdate,
     };
+
     try {
       const result = await props.customFetch(
-        MembersApis.UPDATE_CHANNEL(memberForAction.id),
+        MembersApis.CHANGE_CURRENT_CHANNEL(memberForAction.id),
         "PATCH",
         raw
       );
@@ -75,12 +74,14 @@ const ChangeMemberChannel = (props) => {
       apiLoading={apiLoading}
       modalOpen={props.modalOpen || false}
       setModalOpen={props.setModalOpen}
-      actionText="Update Channel"
+      actionText="Update Current Channel"
       hideActionButtons
     >
       <div className="space-y-4">
         <div className="flex flex-row">
-          <h2 className="text-xl text-gray-700 mr-2">Update Channel for - </h2>
+          <h2 className="text-xl text-gray-700 mr-2">
+            Update Current Channel for -{" "}
+          </h2>
           <h1 className="font-bold text-xl text-gray-800">
             {props?.memberForAction?.name}
           </h1>
@@ -88,7 +89,7 @@ const ChangeMemberChannel = (props) => {
         {props.calledFrom !== "groupActions" && (
           <div className="flex flex-row">
             <h2 className="text-xl text-gray-700 mr-2">
-              Existing Preffered Channel -{" "}
+              Existing Current Channel -{" "}
             </h2>
             <h1 className="font-bold text-xl text-gray-800">{channel}</h1>
           </div>
@@ -146,4 +147,4 @@ const ChangeMemberChannel = (props) => {
   );
 };
 
-export default ChangeMemberChannel;
+export default ChangeMemberCurrentChannel;

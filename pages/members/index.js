@@ -32,6 +32,7 @@ import UpdateEmailModal from "./UpdateEmailModal";
 import UpdateSlashtagModal from "./UpdateSlashtagModal";
 import useCheckAuth from "../../hooks/useCheckAuth";
 import { useFetchWrapper } from "../../utils/apiCall";
+import ChangeMemberCurrentChannel from "./ChangeMemberCurrentChannel";
 
 const Members = (props) => {
   // const checkAuthLoading = useCheckAuth(false);
@@ -46,6 +47,8 @@ const Members = (props) => {
   const [stopMembershipModal, setStopMembershipModal] = useState(false);
   const [pauseMembershipModal, setPauseMembershipModal] = useState(false);
   const [changeChannelModal, setChangeChannelModal] = useState(false);
+  const [changeCurrentChannelModal, setChangeCurrentChannelModal] =
+    useState(false);
   const [memberForAction, setMemberForAction] = useState({});
   const [showMenuSidebar, setShowMenuSidebar] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -137,6 +140,19 @@ const Members = (props) => {
 
   const menuItems = [
     {
+      name: "Change Current Channel",
+      onClick: (actionEntity) => {
+        if (actionEntity.status !== "INACTIVE") {
+          setMemberForAction(actionEntity);
+          setChangeCurrentChannelModal(true);
+        } else {
+          toast.error(
+            "Can only change current channel for ACTIVE/PAUSED Members"
+          );
+        }
+      },
+    },
+    {
       name: "View Member Comms",
       onClick: (actionEntity) => {
         setMemberForAction(actionEntity);
@@ -144,7 +160,7 @@ const Members = (props) => {
       },
     },
     {
-      name: "Change Member Channel",
+      name: "Change Preffered Channel",
       onClick: (actionEntity) => {
         if (actionEntity.status !== "INACTIVE") {
           setMemberForAction(actionEntity);
@@ -494,9 +510,38 @@ const Members = (props) => {
     //   },
     // },
     {
-      title: "Channel",
+      title: "Preffered Channel",
       dataIndex: "channel",
       key: "channel",
+      render: (channel) => {
+        if (channel === "ZOOM") {
+          return (
+            <Image
+              layout="responsive"
+              width={20}
+              height={8}
+              src="/assets/zoom_logo.png"
+            />
+          );
+        }
+        if (channel === "YOUTUBE") {
+          return (
+            <Image
+              layout="responsive"
+              width={30}
+              height={7}
+              src="/assets/youtube_logo.jpg"
+            />
+          );
+        }
+
+        return "-";
+      },
+    },
+    {
+      title: "Current Channel",
+      dataIndex: "current_channel",
+      key: "current_channel",
       render: (channel) => {
         if (channel === "ZOOM") {
           return (
@@ -829,6 +874,18 @@ const Members = (props) => {
         memberForAction={memberForAction}
         modalOpen={viewUpdateSlashtagModal}
         setModalOpen={setViewUpdateSlashtagModal}
+        customFetch={customFetch}
+      />
+
+      <ChangeMemberCurrentChannel
+        modalOpen={changeCurrentChannelModal}
+        setModalOpen={setChangeCurrentChannelModal}
+        memberForAction={memberForAction}
+        getPaginatedLeads={getMembers}
+        currentPagePagination={currentPagePagination}
+        refetchData={handleSearch}
+        searchFor={searchFor}
+        searchTerm={searchTerm}
         customFetch={customFetch}
       />
     </div>
