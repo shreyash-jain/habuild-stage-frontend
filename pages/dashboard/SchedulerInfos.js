@@ -5,14 +5,14 @@ import Modal from "../../components/Modal";
 import { SchedulerApis } from "../../constants/apis";
 
 const SchedulerInfos = (props) => {
-  const [schedulersInfoLoading, setSchedulersInfoLoading] = useState(true);
+  const [schedulersInfoLoading, setSchedulersInfoLoading] = useState(false);
   const [showSchedulerInfoModal, setShowSchedulerInfoModal] = useState(false);
   const [unsuccessfullSchedulers, setUnsuccessfullSchedulers] = useState([]);
   const [schedulerInfos, setSchedulerInfos] = useState([]);
 
-  useEffect(() => {
-    getSchedulersInfos();
-  }, []);
+  // useEffect(() => {
+  //   getSchedulersInfos();
+  // }, []);
 
   const getSchedulersInfos = async () => {
     setSchedulersInfoLoading(true);
@@ -28,6 +28,8 @@ const SchedulerInfos = (props) => {
     });
 
     setUnsuccessfullSchedulers(notSuccessfulSchedulers);
+
+    setShowSchedulerInfoModal(true);
 
     setSchedulersInfoLoading(false);
   };
@@ -126,7 +128,7 @@ const SchedulerInfos = (props) => {
           </div>
 
           <button
-            onClick={() => setShowSchedulerInfoModal(true)}
+            onClick={() => getSchedulersInfos()}
             className="hover:text-white hover:bg-green-600 mt-2 rounded-md px-3 py-1 font-medium text-green-700 bg-green-300"
           >
             View All
