@@ -18,7 +18,7 @@ import {
   ServerIcon,
   CashIcon,
   TableIcon,
-} from "@heroicons/react/outline";
+} from "@heroicons/react/solid";
 import { loadGetInitialProps } from "next/dist/shared/lib/utils";
 
 const navigation = [
@@ -64,6 +64,11 @@ const navigation = [
     name: "CSV Upload",
     href: "/csvUpload",
     icon: TableIcon,
+  },
+  {
+    name: "Scheduler Management",
+    href: "/schedulerManagement",
+    icon: ServerIcon,
   },
 ];
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import CustomCalendar from "../../components/CustomCalendar";
 import { MembersApis } from "../../constants/apis";
-import { format, isFuture } from "date-fns";
+import { format, isFuture, isSunday } from "date-fns";
 import toast from "react-hot-toast";
 
 const MemberAttendanceDetail = (props) => {
@@ -53,8 +53,8 @@ const MemberAttendanceDetail = (props) => {
       return;
     }
 
-    if (isFuture(day.dateObj)) {
-      toast.error("Cannot update future dates.");
+    if (isFuture(day.dateObj) || isSunday(day.dateObj)) {
+      toast.error("Cannot update future/sunday dates.");
       setApiLoading(false);
       return;
     }
