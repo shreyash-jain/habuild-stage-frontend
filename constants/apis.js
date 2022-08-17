@@ -1,4 +1,3 @@
-
 const API_BASE_URL = process.env.API_BASE_URL;
 
 export const ProgramsApis = {
@@ -111,6 +110,8 @@ export const MembersApis = {
     `${API_BASE_URL}/api/member/getMemberZoomAttendance/${memberId}`,
   CHANGE_CURRENT_CHANNEL: (memberId) =>
     `${API_BASE_URL}/api/channel/members/${memberId}`,
+  UPDATE_ATTENDANCE: (memberId) =>
+    `${API_BASE_URL}/api/member/${memberId}/attendance`,
 };
 
 export const WatiTemplatesApis = {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import CustomCalendar from "../../components/CustomCalendar";
 import { MembersApis } from "../../constants/apis";
-import { format } from "date-fns";
+import { format, isFuture } from "date-fns";
 import toast from "react-hot-toast";
 
 const MemberAttendanceDetail = (props) => {
@@ -33,11 +33,50 @@ const MemberAttendanceDetail = (props) => {
 
       setCurrentMonthAttendance(attendedDates);
     }
-
   };
 
-  const handleDateClick = (day) => {
-    console.log("day Clicked ", day);
+  const handleDateClick = async (
+    day,
+    dayPresence,
+    monthStartDate,
+    monthEndDate
+  ) => {
+    if (
+      !window.confirm("Are you sure you want to change member's attendance?")
+    ) {
+      return;
+    }
+
+    setApiLoading(true);
+
+    if (apiLoading) {
+      return;
+    }
+
+    if (isFuture(day.dateObj)) {
+      toast.error("Cannot update future dates.");
+      setApiLoading(false);
+      return;
+    }
+
+    const result = await props.customFetch(
+      MembersApis.UPDATE_ATTENDANCE(props.member.id),
+      "PATCH",
+      {
+        dates: [day.formatedDate],
+        attendanceStatus: !dayPresence ? "PRESENT" : "ABSENT",
+      }
+    );
+
+    if (!result.ok) {
+      toast.error("Failed to update attendance");
+    } else {
+      toast.success("Updated attendance successfully");
+      getAttendance(props.member.id, monthStartDate, monthEndDate);
+      props.getCurrentWeekAttendance();
+    }
+
+    setApiLoading(false);
   };
 
   return (

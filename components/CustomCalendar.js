@@ -177,7 +177,14 @@ const CustomCalendar = (props) => {
                 <button
                   disabled={props.disableClick}
                   // onClick={() => handleDateSelect(day)}
-                  onClick={() => props.handleDateClick(day)}
+                  onClick={() =>
+                    props.handleDateClick(
+                      day,
+                      dayPresent,
+                      days[0].dateObj,
+                      days[days.length - 1].dateObj
+                    )
+                  }
                   type="button"
                   className={classNames(
                     dayPresent ? "bg-green-300" : "bg-red-300",

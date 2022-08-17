@@ -205,7 +205,6 @@ const MemberInfoSidePanel = (props) => {
     setShortLinkLoader(false);
   };
 
-
   return (
     <SidePannel
       width="max-w-2xl"
@@ -330,6 +329,7 @@ const MemberInfoSidePanel = (props) => {
 
           {currentTab == "Attendance" && (
             <MemberAttendanceDetail
+              getCurrentWeekAttendance={getCurrentWeekAttendance}
               member={props.memberForAction}
               customFetch={props.customFetch}
             />
