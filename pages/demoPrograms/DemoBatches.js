@@ -132,6 +132,7 @@ const DemoBatches = (props) => {
         programs={programs}
         modalOpen={viewAddModal}
         setModalOpen={setViewAddModal}
+        customFetch={props.customFetch}
       />
     </div>
   );
@@ -175,7 +176,7 @@ const AddDemoBatchModal = (props) => {
     } catch (err) {
       setApiLoading(false);
       toast.error("Error");
-      // console.log("error", error);
+      console.log("error", err);
     }
   };
 

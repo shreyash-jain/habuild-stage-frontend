@@ -108,6 +108,7 @@ const DemoAds = (props) => {
         demoProgram={props.demoProgram}
         modalOpen={viewAddModal}
         setModalOpen={setViewAddModal}
+        customFetch={props.customFetch}
       />
     </div>
   );

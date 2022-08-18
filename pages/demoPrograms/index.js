@@ -21,7 +21,6 @@ const DemoPrograms = () => {
   // const checkAuthLoading = useCheckAuth(false);
   const checkAuthLoading = false;
 
-
   const { customFetch } = useFetchWrapper();
 
   const [viewAddModal, setViewAddModal] = useState(false);
