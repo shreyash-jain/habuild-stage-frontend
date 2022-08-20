@@ -17,7 +17,11 @@ const SchedulerInfos = (props) => {
   const getSchedulersInfos = async () => {
     setSchedulersInfoLoading(true);
 
-    const data = await props.customFetch(SchedulerApis.GET(), "GET", {});
+    const data = await props.customFetch(
+      SchedulerApis.GET_STATUSES(),
+      "GET",
+      {}
+    );
     // console.log(data);
     setSchedulerInfos(data.message);
 

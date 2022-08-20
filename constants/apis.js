@@ -135,7 +135,13 @@ export const ShortenerApis = {
 };
 
 export const SchedulerApis = {
-  GET: () => `${API_BASE_URL}/api/schedulerHandler/getSchedulerStatus`,
+  GET_STATUSES: () => `${API_BASE_URL}/api/schedulerHandler/getSchedulerStatus`,
+  GET_SCHEDULERS: () => `${API_BASE_URL}/api/schedulerManager/getSchedulers`,
+  GET_TIMINGS: () =>
+    `${API_BASE_URL}/api/schedulerManager/getSchedulersTimings`,
+  GET_USED_WATI_TEMPLATES: () =>
+    `${API_BASE_URL}/api/schedulerManager/getSchedulersTemplates`,
+  UPDATE_TIMING: () => `${API_BASE_URL}/api/schedulerManager/updateTiming`,
 };
 
 export const ReRegisterApis = {
