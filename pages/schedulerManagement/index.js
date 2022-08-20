@@ -145,7 +145,10 @@ const SchedulerManagement = (props) => {
           const status = sch.scheduler_status == "ACTIVE" ? true : false;
 
           return (
-            <div className="bg-white overflow-hidden shadow border border-gray-100 rounded-lg divide-y divide-gray-200">
+            <div
+              key={sch.id}
+              className="bg-white overflow-hidden shadow border border-gray-100 rounded-lg divide-y divide-gray-200"
+            >
               <div className="px-4 py-5 sm:p-6">
                 <div className="space-x-4 sm:space-x-1 grid grid-cols-3 ">
                   <div>
@@ -190,6 +193,7 @@ const SchedulerManagement = (props) => {
 
                       return (
                         <div
+                          key={item}
                           title={`Make ${
                             active ? "Inactive" : "Active"
                           } for day`}
