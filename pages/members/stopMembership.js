@@ -47,10 +47,9 @@ const StopMembership = (props) => {
       } else {
         toast.success(result.message);
       }
-      if (calledFrom !== "groupActions") {
-        props.getPaginatedLeads(props.currentPagePagination);
-        props.setModalOpen(false);
-      }
+      props.getPaginatedLeads(props.currentPagePagination);
+      props.setModalOpen(false);
+
       setRefundCheck(false);
     } catch (error) {
       setApiLoading(false);

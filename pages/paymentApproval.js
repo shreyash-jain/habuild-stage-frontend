@@ -245,6 +245,13 @@ const PaymentApproval = () => {
     };
 
     const data = await customFetch(PaymentApis.APPROVE_PAYMENT(), "POST", raw);
+
+    if (data.status == 500) {
+      toast.error("Error: " + data.message);
+    } else {
+      toast.success("Succesfully approved");
+    }
+
     getAllPaymentsToApprove();
     setShowScreenshotModal(false);
   };

@@ -14,6 +14,7 @@ import { useFetchWrapper } from "../../utils/apiCall";
 
 const tabs = [
   { name: "Failed Payments", href: "#", current: false },
+  { name: "Eventually Successfull Payments", href: "#", current: false },
   { name: "Successfull Payments", href: "#", current: false },
 ];
 
@@ -30,6 +31,7 @@ const Payments = (props) => {
   const [currentPaymentsToShow, setCurrentPaymentsToShow] = useState([]);
   const [successfullPayments, setSuccessfullPayments] = useState([]);
   const [failedPayments, setFailedPayments] = useState([]);
+  const [eventualSuccessPayments, setEventualSuccessPayments] = useState([]);
   const [editPayment, setEditPayment] = useState([]);
   const [viewEditModal, setViewEditModal] = useState(false);
   const [viewAddModal, setViewAddModal] = useState(false);
@@ -61,6 +63,7 @@ const Payments = (props) => {
 
     let successfullPayments = [];
     let failedPayments = [];
+    let eventualSuccessPayments = [];
     let allPayments = [];
 
     for (let i = 0; i < data.data.paymentDataArr.length; i++) {
@@ -70,6 +73,20 @@ const Payments = (props) => {
           action: data.data.paymentDataArr[i],
         };
         successfullPayments.push(obj);
+      } else if (data.data.paymentDataArr[i].latestPayment) {
+        if (data.data.paymentDataArr[i].latestPayment[0]?.status == "SUCCESS") {
+          const obj = {
+            ...data.data.paymentDataArr[i],
+            action: data.data.paymentDataArr[i],
+          };
+          eventualSuccessPayments.push(obj);
+        } else {
+          const obj = {
+            ...data.data.paymentDataArr[i],
+            action: data.data.paymentDataArr[i],
+          };
+          failedPayments.push(obj);
+        }
       } else {
         const obj = {
           ...data.data.paymentDataArr[i],
@@ -79,10 +96,13 @@ const Payments = (props) => {
       }
     }
 
+    setEventualSuccessPayments(eventualSuccessPayments);
     setSuccessfullPayments(successfullPayments);
     setFailedPayments(failedPayments);
     if (currentTab == "Failed Payments") {
       setCurrentPaymentsToShow(failedPayments);
+    } else if (currentTab == "Eventually Successfull Payments") {
+      setCurrentPaymentsToShow(eventualSuccessPayments);
     } else {
       setCurrentPaymentsToShow(successfullPayments);
     }
@@ -194,12 +214,12 @@ const Payments = (props) => {
       dataIndex: "status",
       key: "status",
     },
-    currentTab == "Failed Payments" && {
+    (currentTab == "Failed Payments" ||
+      currentTab == "Eventually Successfull Payments") && {
       title: "Latest Status",
       dataIndex: "latestPayment",
       key: "latestPayment",
       render: (latestPaymentArr) => {
-
         if (latestPaymentArr?.length > 0) {
           return (
             <div className="flex flex-row">
@@ -244,6 +264,8 @@ const Payments = (props) => {
   const handleTabChange = (newTab) => {
     if (newTab == "Failed Payments") {
       setCurrentPaymentsToShow(failedPayments);
+    } else if (newTab == "Eventually Successfull Payments") {
+      setCurrentPaymentsToShow(eventualSuccessPayments);
     } else {
       setCurrentPaymentsToShow(successfullPayments);
     }
