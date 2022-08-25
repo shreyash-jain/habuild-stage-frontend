@@ -107,11 +107,23 @@ const PaymentApproval = () => {
     setLoading(false);
   };
 
-  const denyPayment = () => {
+  const denyPayment = async (payment) => {
     if (!window.confirm("Are you sure?")) {
-      setPaymentToDecide({});
       return;
     }
+
+    const result = await customFetch(
+      PaymentApis.DENY_PAYMENT(payment.member_id, payment.id),
+      "POST",
+      {}
+    );
+
+    if (result.message == "SUCCESS") {
+      toast.success("Denied Payment");
+    } else {
+      toast.error("Failed to deny payment");
+    }
+    getAllPaymentsToApprove();
   };
 
   // const beforeOpenActionPanel = (actionEntity) => {
@@ -206,8 +218,7 @@ const PaymentApproval = () => {
             <button
               type="button"
               onClick={() => {
-                setPaymentToDecide(actionEntity);
-                denyPayment();
+                denyPayment(actionEntity);
               }}
               className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-grey-800 hover:text-white bg-red-400 hover:bg-red-600 focus:outline-none "
             >
