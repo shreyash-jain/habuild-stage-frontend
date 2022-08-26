@@ -517,9 +517,9 @@ const Members = (props) => {
         if (channel === "ZOOM") {
           return (
             <Image
-              layout="responsive"
-              width={20}
-              height={8}
+              layout="fixed"
+              width={60}
+              height={24}
               src="/assets/zoom_logo.png"
             />
           );
@@ -527,9 +527,9 @@ const Members = (props) => {
         if (channel === "YOUTUBE") {
           return (
             <Image
-              layout="responsive"
-              width={30}
-              height={7}
+              layout="fixed"
+              width={60}
+              height={14}
               src="/assets/youtube_logo.jpg"
             />
           );
@@ -546,9 +546,9 @@ const Members = (props) => {
         if (channel === "ZOOM") {
           return (
             <Image
-              layout="responsive"
-              width={20}
-              height={8}
+              layout="fixed"
+              width={60}
+              height={24}
               src="/assets/zoom_logo.png"
             />
           );
@@ -556,9 +556,9 @@ const Members = (props) => {
         if (channel === "YOUTUBE") {
           return (
             <Image
-              layout="responsive"
-              width={30}
-              height={7}
+              layout="fixed"
+              width={60}
+              height={14}
               src="/assets/youtube_logo.jpg"
             />
           );

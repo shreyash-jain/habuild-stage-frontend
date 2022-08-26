@@ -193,7 +193,7 @@ const SchedulerManagement = (props) => {
 
                       return (
                         <div
-                          key={item}
+                          key={index}
                           title={`Make ${
                             active ? "Inactive" : "Active"
                           } for day`}
