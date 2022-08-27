@@ -35,7 +35,6 @@ const EditEverydayQuote = (props) => {
       morning_message: quoteObj?.morning_message,
     };
 
-
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 
@@ -60,7 +59,6 @@ const EditEverydayQuote = (props) => {
     } else {
       toast.error(`Failed`);
     }
-  
   };
 
   if (props?.currentMemberTab == "Morning Quotes") {
@@ -81,9 +79,9 @@ const EditEverydayQuote = (props) => {
               </label>
               <input
                 value={quoteObj.day_id}
-                //   onChange={(e) =>
-                //     handleQuoteFormChange("highlight", index, e.target.value)
-                //   }
+                onChange={(e) =>
+                  setQuoteObj({ ...quoteObj, day_id: e.target.value })
+                }
                 name="day_id"
                 id="day_id"
                 type="number"
@@ -99,9 +97,9 @@ const EditEverydayQuote = (props) => {
               </label>
               <textarea
                 value={quoteObj.morning_message}
-                // onChange={(e) =>
-                //   handleQuoteFormChange("quote_1", index, e.target.value)
-                // }
+                onChange={(e) =>
+                  setQuoteObj({ ...quoteObj, morning_message: e.target.value })
+                }
                 rows={4}
                 type="text"
                 placeholder="Morning Message"
