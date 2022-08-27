@@ -19,21 +19,6 @@ const EditEverydayQuote = (props) => {
 
     e.preventDefault();
     setApiLoading(true);
-    // if (
-    //   !item.day_id ||
-    //   !item.highlight ||
-    //   !item.highlight_2 ||
-    //   !item.quote_1 ||
-    //   !item.quote_2 ||
-    //   !item.quote_3 ||
-    //   !item.status ||
-    //   !item.tip ||
-    //   !item.morning_message
-    // ) {
-    //   alert("Please enter all details.");
-    //   setApiLoading(false);
-    //   return;
-    // }
 
     var raw = {
       day_id: quoteObj?.day_id,
@@ -50,22 +35,32 @@ const EditEverydayQuote = (props) => {
       morning_message: quoteObj?.morning_message,
     };
 
-    // console.log(raw);
-    // console.log(API);
-    // console.log(method);
 
-    try {
-      await props
-        .customFetch(DailyQuotesApis.UPDATE(quoteObj?.id), method, raw)
-        .setApiLoading(false);
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    var requestOptions = {
+      method,
+      headers: myHeaders,
+      redirect: "follow",
+      body: JSON.stringify(raw),
+    };
+
+    const result = await fetch(
+      DailyQuotesApis.UPDATE(quoteObj?.id),
+      requestOptions
+    );
+
+    setApiLoading(false);
+
+    if (result.status == 200) {
       toast.success(`Updated`);
       props.getQuotes();
       props.setViewModal(false);
-    } catch (error) {
-      setApiLoading(false);
-      toast.error(`Updated Failed ${JSON.stringify(error)}`);
-      // console.log("error", error);
+    } else {
+      toast.error(`Failed`);
     }
+  
   };
 
   if (props?.currentMemberTab == "Morning Quotes") {
