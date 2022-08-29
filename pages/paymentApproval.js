@@ -49,7 +49,7 @@ const PaymentApproval = () => {
       getMemberProgramsWithBatches();
       getAllPlans();
     }
-  }, []);
+  }, [checkAuthLoading]);
 
   const getAllPlans = async () => {
     const data = await customFetch(PlanApis.GET(), "GET", {});
