@@ -43,7 +43,8 @@ const people = [
 const weekDays = ["S", "M", "T", "W", "T", "F", "S"];
 
 const SchedulerManagement = (props) => {
-  const checkAuthLoading = false;
+  const checkAuthLoading = useCheckAuth(false);
+
   const { customFetch, user } = useFetchWrapper();
 
   const [apiLoading, setApiLoading] = useState(false);

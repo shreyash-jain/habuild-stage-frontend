@@ -19,9 +19,7 @@ import useCheckAuth from "../../hooks/useCheckAuth";
 import { useFetchWrapper } from "../../utils/apiCall";
 
 const Dashboard = () => {
-  // const checkAuthLoading = useCheckAuth(false);
-  const checkAuthLoading = false;
-
+  const checkAuthLoading = useCheckAuth(false);
 
   const { customFetch, user } = useFetchWrapper();
 
@@ -48,28 +46,26 @@ const Dashboard = () => {
 
   const getMemberBatches = async () => {
     // await fetch(`https://api.habuild.in/api/program/`)
-    
+
     const data = await customFetch(ProgramsApis.GET_PROGRAMS(), "GET", {});
 
+    if (data?.programs?.length > 0) {
+      const programsWithBatches = [];
 
-      if (data?.programs?.length > 0) {
-        const programsWithBatches = [];
-
-        for (let i = 0; i < data.programs.length; i++) {
-          const result1 = await customFetch(
-            BatchesApis.GET_BATCH_FROM_PROGRAM(data.programs[i].id),
-            "GET",
-            {}
-          );
-          programsWithBatches.push({
-            ...data.programs[i],
-            batches: result1.batch,
-          });
-        }
-
-        setMemberProgramsWithBatches(programsWithBatches);
+      for (let i = 0; i < data.programs.length; i++) {
+        const result1 = await customFetch(
+          BatchesApis.GET_BATCH_FROM_PROGRAM(data.programs[i].id),
+          "GET",
+          {}
+        );
+        programsWithBatches.push({
+          ...data.programs[i],
+          batches: result1.batch,
+        });
       }
-    
+
+      setMemberProgramsWithBatches(programsWithBatches);
+    }
   };
 
   const apiCall = async () => {

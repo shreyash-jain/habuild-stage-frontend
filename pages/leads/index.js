@@ -99,9 +99,7 @@ const weekDaysForAttendance = [
 ];
 
 const Leads = (props) => {
-  // const checkAuthLoading = useCheckAuth(false);
-  const checkAuthLoading = false;
-
+  const checkAuthLoading = useCheckAuth(false);
 
   const { customFetch } = useFetchWrapper();
 

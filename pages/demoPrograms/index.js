@@ -18,8 +18,7 @@ function classNames(...classes) {
 }
 
 const DemoPrograms = () => {
-  // const checkAuthLoading = useCheckAuth(false);
-  const checkAuthLoading = false;
+  const checkAuthLoading = useCheckAuth(false);
 
   const { customFetch } = useFetchWrapper();
 

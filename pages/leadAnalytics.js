@@ -3,9 +3,7 @@ import useCheckAuth from "../hooks/useCheckAuth";
 import { RefreshIcon } from "@heroicons/react/outline";
 
 const LeadAnalytics = () => {
-  // const checkAuthLoading = useCheckAuth(false);
-  const checkAuthLoading = false;
-
+  const checkAuthLoading = useCheckAuth(false);
 
   if (checkAuthLoading) {
     return <RefreshIcon className="text-green-300 h-8 w-8 mx-auto" />;

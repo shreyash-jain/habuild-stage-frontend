@@ -35,8 +35,7 @@ import { useFetchWrapper } from "../../utils/apiCall";
 import ChangeMemberCurrentChannel from "./ChangeMemberCurrentChannel";
 
 const Members = (props) => {
-  // const checkAuthLoading = useCheckAuth(false);
-  const checkAuthLoading = false;
+  const checkAuthLoading = useCheckAuth(false);
 
   const { customFetch, customFetchFile } = useFetchWrapper();
 

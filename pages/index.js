@@ -10,9 +10,8 @@ import toast from "react-hot-toast";
 export default function Home() {
   const router = useRouter();
 
-  // const { authLoading, login } = useContext(GlobalContext);
-  // const checkAuthLoading = useCheckAuth(true, "/dashboard");
-  const checkAuthLoading = false;
+  const { authLoading, login } = useContext(GlobalContext);
+  const checkAuthLoading = useCheckAuth(true, "/dashboard");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -47,7 +46,8 @@ export default function Home() {
             CRM
           </h2>
           <h2 className="mt-6 text-center text-3xl font-bold text-gray-800">
-            Sign <span onClick={() => router.push("/dashboard")}>in </span>
+            Sign in
+            {/* <span onClick={() => router.push("/dashboard")}>in </span> */}
             to your account
           </h2>
         </div>
@@ -58,14 +58,14 @@ export default function Home() {
               onSubmit={(e) => {
                 e.preventDefault();
 
-                // if (email && password) {
-                //   login(email, password);
-                // } else {
-                //   toast.error("Username or password missing");
-                //   return;
-                // }
+                if (email && password) {
+                  login(email, password);
+                } else {
+                  toast.error("Username or password missing");
+                  return;
+                }
                 // if (email == "admin@Habuild.in" && password == "admin") {
-                router.push("/dashboard");
+                // router.push("/dashboard");
                 // } else {
                 //   alert("Wrong email / password.");
                 //   return;
@@ -154,8 +154,6 @@ export default function Home() {
             </form>
 
             <div className="mt-6">
-             
-
               <div className="mt-6 grid grid-cols-3 gap-3"></div>
             </div>
           </div>
