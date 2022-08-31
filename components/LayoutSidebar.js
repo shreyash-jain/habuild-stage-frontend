@@ -18,6 +18,7 @@ import {
   ServerIcon,
   CashIcon,
   TableIcon,
+  LinkIcon,
 } from "@heroicons/react/solid";
 import { loadGetInitialProps } from "next/dist/shared/lib/utils";
 
@@ -69,6 +70,11 @@ const navigation = [
     name: "Scheduler Management",
     href: "/schedulerManagement",
     icon: ServerIcon,
+  },
+  {
+    name: "Custom Short Links",
+    href: "/customShortlinks",
+    icon: LinkIcon,
   },
 ];
 
