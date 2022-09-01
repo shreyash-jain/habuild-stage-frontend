@@ -55,8 +55,10 @@ const SchedulerManagement = (props) => {
   const [changeTemplateOpen, setChangeTemplateOpen] = useState(false);
 
   useEffect(() => {
-    getSchedulers();
-  }, []);
+    if (!checkAuthLoading) {
+      getSchedulers();
+    }
+  }, [checkAuthLoading]);
 
   const getSchedulers = async () => {
     setApiLoading(true);
