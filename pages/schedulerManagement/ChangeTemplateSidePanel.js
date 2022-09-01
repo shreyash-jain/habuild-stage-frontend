@@ -2,12 +2,13 @@ import { useEffect, useState, Fragment } from "react";
 import { RefreshIcon } from "@heroicons/react/outline";
 import toast from "react-hot-toast";
 import Select from "react-select";
-import { WatiTemplatesApis } from "../../constants/apis";
+import { SchedulerApis, WatiTemplatesApis } from "../../constants/apis";
 import SidePannel from "../../components/SidePannel";
 
 const ChangeTemplateSidePanel = (props) => {
   const [watiTemplates, setWatiTemplates] = useState([]);
   const [refetchLoading, setRefetchLoading] = useState(false);
+  const [updateLoading, setUpdateLoading] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState({});
   const [message, setMessage] = useState("");
 
@@ -30,18 +31,50 @@ const ChangeTemplateSidePanel = (props) => {
     fetchTemplates("fromRefetch");
   };
 
+  const changeTemplate = async () => {
+    setUpdateLoading(true);
+
+    if (!window.confirm("Are you sure?")) {
+      setUpdateLoading(false);
+      return;
+    }
+
+    const result = await props.customFetch(
+      SchedulerApis.UPDATE_USED_WATI_TEMPLATE(),
+      "POST",
+      {
+        id: props.schedulerToUpdate.id,
+        newTemplateId: props?.templateToUpdate?.template.id,
+      }
+    );
+
+    console.log("wati temp change result", result);
+
+    if (result.ok) {
+      props.setOpen(false);
+      props.refetchData();
+      toast.success("Successfully changed wati template");
+    } else {
+      toast.error("Failed to change wati template");
+    }
+    setUpdateLoading(false);
+  };
+
   return (
     <SidePannel
       width="max-w-2xl"
-      title="Change Template"
+      title={`Change Template for ${props.schedulerToUpdate.scheduler_name}`}
       isOpen={props.open || false}
       setIsOpen={props.setOpen}
     >
       <div className="bg-white overflow-hidden shadow rounded-lg mt-4">
         <div className="px-4 py-5 sm:p-6">
           <div className="flex flex-col space-y-4">
-            <h1 className="text-xl font-bold text-gray-700">
-              Select Wati Template
+            <h1 className="text-xl font-normal text-gray-700">
+              Select wati template to replace{" "}
+              <span className="font-bold">
+                {props.templateToUpdate?.template?.identifier}
+              </span>
             </h1>
 
             <div className="w-full">
@@ -59,7 +92,7 @@ const ChangeTemplateSidePanel = (props) => {
                 })}
               ></Select>
 
-              {props.refetchLoading ? (
+              {refetchLoading ? (
                 <RefreshIcon className="text-green-300 animate-spin h-6 w-6 mx-auto" />
               ) : (
                 <button
@@ -88,6 +121,17 @@ const ChangeTemplateSidePanel = (props) => {
                 className="p-2 mt-1 block w-full shadow-sm border border-gray-200 rounded-md"
               />
             </div>
+
+            {updateLoading ? (
+              <RefreshIcon className="text-green-300 animate-spin h-6 w-6 mx-auto" />
+            ) : (
+              <button
+                className="px-4 py-2 font-medium rounded-md bg-white mt-2 text-green-500 hover:bg-green-500 hover:text-white"
+                onClick={changeTemplate}
+              >
+                Change Template
+              </button>
+            )}
           </div>
         </div>
       </div>

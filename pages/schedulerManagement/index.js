@@ -1,46 +1,24 @@
 import LayoutSidebar from "../../components/LayoutSidebar";
 import useCheckAuth from "../../hooks/useCheckAuth";
-import { CheckIcon, RefreshIcon } from "@heroicons/react/outline";
+import {
+  CheckIcon,
+  RefreshIcon,
+  ArrowPathRounded,
+} from "@heroicons/react/outline";
 import { Fragment, useEffect, useState } from "react";
 import { useFetchWrapper } from "../../utils/apiCall";
 import { SchedulerApis } from "../../constants/apis";
-import { CheckCircleIcon, XCircleIcon, XIcon } from "@heroicons/react/solid";
+import {
+  CheckCircleIcon,
+  XCircleIcon,
+  XIcon,
+  RefreshIcon as RefreshSolid,
+} from "@heroicons/react/solid";
 import { format } from "date-fns";
 import toast from "react-hot-toast";
 import ChangeTemplateSidePanel from "./ChangeTemplateSidePanel";
 
-function classNames(...classes) {
-  return classes.filter(Boolean).join(" ");
-}
-
-const people = [
-  {
-    name: "Leonard Krasner",
-    handle: "leonardkrasner",
-    imageUrl:
-      "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-  },
-  {
-    name: "Floyd Miles",
-    handle: "floydmiles",
-    imageUrl:
-      "https://images.unsplash.com/photo-1463453091185-61582044d556?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-  },
-  {
-    name: "Emily Selman",
-    handle: "emilyselman",
-    imageUrl:
-      "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-  },
-  {
-    name: "Kristin Watson",
-    handle: "kristinwatson",
-    imageUrl:
-      "https://images.unsplash.com/photo-1500917293891-ef795e70e1f6?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-  },
-];
-
-const weekDays = ["S", "M", "T", "W", "T", "F", "S"];
+const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 const SchedulerManagement = (props) => {
   const checkAuthLoading = useCheckAuth(false);
@@ -48,11 +26,15 @@ const SchedulerManagement = (props) => {
   const { customFetch, user } = useFetchWrapper();
 
   const [apiLoading, setApiLoading] = useState(false);
+  const [rerunLoading, setRerunLoading] = useState(false);
   const [schedulers, setSchedulers] = useState([]);
   const [timeVal, setTimeVal] = useState({});
   const [tempVal, setTempVal] = useState("");
   const [editing, setEditing] = useState(false);
   const [changeTemplateOpen, setChangeTemplateOpen] = useState(false);
+  const [templateToUpdate, setTemplateToUpdate] = useState({});
+  const [schedulerToUpdate, setSchedulerToUpdate] = useState({});
+  const [schedulerIdForLoader, setSchedulerIdForLoader] = useState("");
 
   useEffect(() => {
     if (!checkAuthLoading) {
@@ -103,6 +85,8 @@ const SchedulerManagement = (props) => {
       newSchedulers.push(obj);
     }
 
+    // newSchedulers.sort((a, b) => a.id - b.id);
+
     setSchedulers(newSchedulers);
     setApiLoading(false);
   };
@@ -113,7 +97,6 @@ const SchedulerManagement = (props) => {
       newTime: timeVal.time + ":00",
     });
 
-    console.log("result", result);
 
     setTempVal("");
     setTimeVal({});
@@ -127,11 +110,113 @@ const SchedulerManagement = (props) => {
     setEditing(false);
   };
 
+  const changeSchedulerStatus = async (scheduler, calledFrom) => {
+    setApiLoading(true);
+
+    if (!window.confirm("Are you sure?")) {
+      setApiLoading(false);
+      return;
+    }
+
+    const API =
+      calledFrom == "activate"
+        ? SchedulerApis.ACTIVATE()
+        : SchedulerApis.STOP();
+
+    const result = await customFetch(API, "POST", {
+      scheduler_id: scheduler.id,
+    });
+
+    if (result.ok) {
+      toast.success("Updated scheduler status successfully");
+      getSchedulers();
+    } else {
+      toast.error("Failed to updated scheduler status");
+    }
+    setApiLoading(false);
+  };
+
+  const rerunScheduler = async (scheduler) => {
+    setRerunLoading(true);
+    if (!window.confirm("Are you sure?")) {
+      setRerunLoading(false);
+      return;
+    }
+
+    const result = await customFetch(SchedulerApis.RERUN(), "POST", {
+      scheduler_id: scheduler.id,
+    });
+
+    if (result.ok) {
+      toast.success("Succesfully re-ran scheduler");
+    } else {
+      toast.error("Failed to rerun scheduler");
+    }
+
+    setRerunLoading(false);
+  };
+
+  const changeWatiTemplateStatus = async (scheduler, template, calledFrom) => {
+    setApiLoading(true);
+
+    if (!window.confirm("Are you sure?")) {
+      setApiLoading(false);
+      return;
+    }
+
+    const API =
+      calledFrom == "enable"
+        ? SchedulerApis.ACTIVATE_WATI_TEMPLATE()
+        : SchedulerApis.DISABLE_WATI_TEMPLATE();
+
+    const result = await customFetch(API, "POST", {
+      scheduler_id: scheduler.id,
+      template_id: template.wati_template_id,
+    });
+
+    if (result.ok) {
+      toast.success("Succesfull");
+      getSchedulers();
+    } else {
+      toast.error("Failed");
+    }
+
+    setApiLoading(false);
+  };
+
+  const changeDayStatus = async (scheduler_id, dayNum) => {
+    setApiLoading(true);
+
+    if (!window.confirm("Are you sure?")) {
+      setApiLoading(false);
+      return;
+    }
+
+    const result = await customFetch(
+      SchedulerApis.CHANGE_DAY_STATUS(),
+      "POST",
+      {
+        scheduler_id,
+        day: dayNum,
+      }
+    );
+
+    if (result.ok) {
+      toast.success("Succesfully changed status for day");
+      getSchedulers();
+    } else {
+      toast.error("Failed");
+    }
+
+    setApiLoading(false);
+  };
+
   if (checkAuthLoading) {
     return (
       <RefreshIcon className="text-green-300 animate-spin  h-8 w-8 mx-auto" />
     );
   }
+
 
   return (
     <div>
@@ -143,7 +228,7 @@ const SchedulerManagement = (props) => {
         <RefreshIcon className="text-green-300 animate-spin  h-8 w-8" />
       )}
 
-      <div className="space-y-6 mt-8">
+      <div className="space-y-12 mt-8">
         {schedulers.map((sch) => {
           const status = sch.scheduler_status == "ACTIVE" ? true : false;
 
@@ -196,6 +281,7 @@ const SchedulerManagement = (props) => {
 
                       return (
                         <div
+                          onClick={() => changeDayStatus(sch.id, index)}
                           key={index}
                           title={`Make ${
                             active ? "Inactive" : "Active"
@@ -303,57 +389,99 @@ const SchedulerManagement = (props) => {
 
                 <div className="flow-root mt-6 max-w-4xl mx-auto">
                   <ul role="list" className="-my-5 divide-y divide-gray-200">
-                    {/* {people.map((person) => ( */}
-                    <li className="py-2">
-                      <div className="flex items-center space-x-4">
-                        <div className="flex-1 min-w-0">
-                          <p className="text-md font-medium text-gray-900 truncate">
-                            Wati Template 1
-                          </p>
-                          <button
-                            onClick={() => setChangeTemplateOpen(true)}
-                            className="rounded-md text-sm text-gray-400 hover:text-gray-500 truncate"
-                          >
-                            Change Template
-                          </button>
-                        </div>
-                        <div>
-                          <button className="inline-flex items-center shadow-sm px-2.5 py-0.5 text-sm leading-5 font-medium rounded-full text-white bg-red-500 hover:bg-red-600">
-                            Disable
-                          </button>
-                        </div>
-                      </div>
-                    </li>
-                    <li className="py-2">
-                      <div className="flex items-center space-x-4">
-                        <div className="flex-1 min-w-0">
-                          <p className="text-md font-medium text-gray-900 truncate">
-                            Wati Template 1
-                          </p>
-                          <button
-                            onClick={() => setChangeTemplateOpen(true)}
-                            className="rounded-md text-sm text-gray-400 hover:text-gray-500 truncate"
-                          >
-                            Change Template
-                          </button>
-                        </div>
-                        <div>
-                          <button className="inline-flex items-center shadow-sm px-2.5 py-0.5 text-sm leading-5 font-medium rounded-full text-white bg-green-500 hover:bg-green-600">
-                            Activate
-                          </button>
-                        </div>
-                      </div>
-                    </li>
-                    {/* ))} */}
+                    {sch.templates.map((item) => {
+                      return (
+                        <>
+                          <li className="py-2">
+                            <div className="flex items-center space-x-4">
+                              <div className="flex-1 min-w-0">
+                                <p className="text-md font-medium text-gray-900 truncate">
+                                  {item.template.identifier}
+                                </p>
+                                <button
+                                  onClick={() => {
+                                    setSchedulerToUpdate(sch);
+                                    setTemplateToUpdate(item);
+                                    setChangeTemplateOpen(true);
+                                  }}
+                                  className="rounded-md text-sm text-gray-400 hover:text-gray-500 truncate"
+                                >
+                                  Change Template
+                                </button>
+                              </div>
+                              <div>
+                                {item.status ? (
+                                  <button
+                                    onClick={() =>
+                                      changeWatiTemplateStatus(
+                                        sch,
+                                        item,
+                                        "disable"
+                                      )
+                                    }
+                                    type="button"
+                                    className="inline-flex items-center shadow-sm px-2.5 py-0.5 text-sm leading-5 font-medium rounded-full text-white bg-red-500 hover:bg-red-600"
+                                  >
+                                    Disable
+                                  </button>
+                                ) : (
+                                  <button
+                                    onClick={() =>
+                                      changeWatiTemplateStatus(
+                                        sch,
+                                        item,
+                                        "enable"
+                                      )
+                                    }
+                                    type="button"
+                                    className="inline-flex items-center shadow-sm px-2.5 py-0.5 text-sm leading-5 font-medium rounded-full text-white bg-green-500 hover:bg-green-600"
+                                  >
+                                    Enable
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          </li>
+                        </>
+                      );
+                    })}
                   </ul>
                 </div>
               </div>
               <div className="flex flex-row justify-between px-4 py-4 sm:px-6">
+                {status ? (
+                  <button
+                    onClick={() => changeSchedulerStatus(sch, "stop")}
+                    type="button"
+                    className="inline-flex items-center px-8 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                  >
+                    Stop
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => changeSchedulerStatus(sch, "activate")}
+                    type="button"
+                    className="inline-flex items-center px-5 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-green-500 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                  >
+                    Activate
+                  </button>
+                )}
                 <button
+                  onClick={() => {
+                    setSchedulerIdForLoader(sch.id);
+                    rerunScheduler(sch);
+                  }}
                   type="button"
-                  className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                  className="inline-flex items-center px-3 py-2 border border-green-400 text-sm leading-4 font-medium rounded-md shadow-sm text-green-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                 >
-                  Make Inactive
+                  <RefreshSolid
+                    className={`h-5 w-5 ${
+                      rerunLoading && schedulerIdForLoader == sch.id
+                        ? "animate-spin"
+                        : ""
+                    }`}
+                  />{" "}
+                  Rerun Scheduler
                 </button>
               </div>
             </div>
@@ -365,6 +493,9 @@ const SchedulerManagement = (props) => {
         open={changeTemplateOpen}
         setOpen={setChangeTemplateOpen}
         customFetch={customFetch}
+        templateToUpdate={templateToUpdate}
+        schedulerToUpdate={schedulerToUpdate}
+        refetchData={getSchedulers}
       />
     </div>
   );

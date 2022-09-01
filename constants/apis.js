@@ -144,6 +144,17 @@ export const SchedulerApis = {
   GET_USED_WATI_TEMPLATES: () =>
     `${API_BASE_URL}/api/schedulerManager/getSchedulersTemplates`,
   UPDATE_TIMING: () => `${API_BASE_URL}/api/schedulerManager/updateTiming`,
+  STOP: () => `${API_BASE_URL}/api/schedulerManager/stopScheduler`,
+  ACTIVATE: () => `${API_BASE_URL}/api/schedulerManager/activateScheduler`,
+  RERUN: () => `${API_BASE_URL}/api/schedulerManager/rerun`,
+  DISABLE_WATI_TEMPLATE: () =>
+    `${API_BASE_URL}/api/schedulerManager/disableWaTemplate`,
+  ACTIVATE_WATI_TEMPLATE: () =>
+    `${API_BASE_URL}/api/schedulerManager/activateWaTemplate`,
+  UPDATE_USED_WATI_TEMPLATE: () =>
+    `${API_BASE_URL}/api/schedulerManager/updateTemplate`,
+  CHANGE_DAY_STATUS: () =>
+    `${API_BASE_URL}/api/schedulerManager/updateDayStatus`,
 };
 
 export const ReRegisterApis = {
