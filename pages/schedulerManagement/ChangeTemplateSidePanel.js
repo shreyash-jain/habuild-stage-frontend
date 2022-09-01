@@ -43,7 +43,7 @@ const ChangeTemplateSidePanel = (props) => {
       SchedulerApis.UPDATE_USED_WATI_TEMPLATE(),
       "POST",
       {
-        id: props.schedulerToUpdate.id,
+        id: props.schedulerToUpdate?.id,
         newTemplateId: props?.templateToUpdate?.template.id,
       }
     );
@@ -63,7 +63,7 @@ const ChangeTemplateSidePanel = (props) => {
   return (
     <SidePannel
       width="max-w-2xl"
-      title={`Change Template for ${props.schedulerToUpdate.scheduler_name}`}
+      title={`Change Template for ${props.schedulerToUpdate?.scheduler_name}`}
       isOpen={props.open || false}
       setIsOpen={props.setOpen}
     >
