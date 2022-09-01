@@ -43,8 +43,8 @@ const ChangeTemplateSidePanel = (props) => {
       SchedulerApis.UPDATE_USED_WATI_TEMPLATE(),
       "POST",
       {
-        id: props.schedulerToUpdate?.id,
-        newTemplateId: props?.templateToUpdate?.template.id,
+        id: props?.templateToUpdate?.id,
+        newTemplateId: selectedTemplate.id,
       }
     );
 
