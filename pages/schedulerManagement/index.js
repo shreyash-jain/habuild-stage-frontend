@@ -97,7 +97,6 @@ const SchedulerManagement = (props) => {
       newTime: timeVal.time + ":00",
     });
 
-
     setTempVal("");
     setTimeVal({});
     setEditing(false);
@@ -217,7 +216,6 @@ const SchedulerManagement = (props) => {
     );
   }
 
-
   return (
     <div>
       <h1 className="text-2xl font-semibold text-gray-700">
@@ -314,7 +312,7 @@ const SchedulerManagement = (props) => {
                         : false;
 
                     return (
-                      <>
+                      <div key={item.id}>
                         {!editing && timeVal.id !== item.id ? (
                           <input
                             onClick={() => {
@@ -382,7 +380,7 @@ const SchedulerManagement = (props) => {
                             </button>
                           </>
                         )}
-                      </>
+                      </div>
                     );
                   })}
                 </div>
@@ -391,7 +389,7 @@ const SchedulerManagement = (props) => {
                   <ul role="list" className="-my-5 divide-y divide-gray-200">
                     {sch.templates.map((item) => {
                       return (
-                        <>
+                        <div key={item.template.id}>
                           <li className="py-2">
                             <div className="flex items-center space-x-4">
                               <div className="flex-1 min-w-0">
@@ -442,7 +440,7 @@ const SchedulerManagement = (props) => {
                               </div>
                             </div>
                           </li>
-                        </>
+                        </div>
                       );
                     })}
                   </ul>
