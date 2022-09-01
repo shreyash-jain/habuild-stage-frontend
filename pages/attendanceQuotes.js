@@ -52,7 +52,7 @@ const AttendanceQuotes = (props) => {
       getDemoBatches();
       getAttendanceQuotes();
     }
-  }, []);
+  }, [checkAuthLoading]);
 
   const getAttendanceQuotes = async () => {
     setLoading(true);
