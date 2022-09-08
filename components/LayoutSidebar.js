@@ -19,6 +19,7 @@ import {
   CashIcon,
   TableIcon,
   LinkIcon,
+  UserCircleIcon,
 } from "@heroicons/react/solid";
 import { loadGetInitialProps } from "next/dist/shared/lib/utils";
 
@@ -75,6 +76,11 @@ const navigation = [
     name: "Custom Short Links",
     href: "/customShortlinks",
     icon: LinkIcon,
+  },
+  {
+    name: "User Actions",
+    href: "/userActions",
+    icon: UserCircleIcon,
   },
 ];
 

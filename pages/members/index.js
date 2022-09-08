@@ -35,9 +35,9 @@ import { useFetchWrapper } from "../../utils/apiCall";
 import ChangeMemberCurrentChannel from "./ChangeMemberCurrentChannel";
 
 const Members = (props) => {
-  const checkAuthLoading = useCheckAuth(false);
+  // const checkAuthLoading = useCheckAuth(false);
 
-  const { customFetch, customFetchFile } = useFetchWrapper();
+  const {checkAuthLoading, customFetch, customFetchFile } = useFetchWrapper();
 
   const [members, setMembers] = useState([]);
   const [viewMemberInfo, setViewMemberInfo] = useState(false);
@@ -75,6 +75,7 @@ const Members = (props) => {
       getMemberBatches();
     }
   }, [checkAuthLoading]);
+  // }, []);
 
   const getMemberBatches = async () => {
     const data = await customFetch(ProgramsApis.GET_PROGRAMS(), "GET", {});

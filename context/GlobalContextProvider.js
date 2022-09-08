@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 export const GlobalContext = React.createContext();
 
 export const GlobalContextProvider = ({ children }) => {
-  const [authLoading, setAuthLoading] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -16,9 +16,13 @@ export const GlobalContextProvider = ({ children }) => {
 
       // console.log("Session Storage ", sessionUser);
 
-      if (sessionUser?.token) setUser(sessionUser);
+      if (sessionUser?.token) {
+        setUser(sessionUser);
+        setAuthLoading(false);
+      } else {
+        router.push("/");
+      }
     }
-    setAuthLoading(false);
   }, []);
 
   const login = async (username, password) => {
@@ -42,7 +46,6 @@ export const GlobalContextProvider = ({ children }) => {
     fetch(LoginApis.LOGIN(), requestOptions)
       .then((res) => res.json())
       .then((data) => {
-
         if (data.ok) {
           if (data.data.status == "ACTIVE") {
             router.push("/dashboard");

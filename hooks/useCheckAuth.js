@@ -11,19 +11,17 @@ export default function useCheckAuth(onAuthenticated, redirectTo = "/") {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!authLoading) {
-      if (onAuthenticated) {
-        if (user?.token) {
-          router.push(redirectTo);
-        } else {
-          setLoading(false);
-        }
+    if (onAuthenticated) {
+      if (user?.token) {
+        router.push(redirectTo);
       } else {
-        if (user?.token) {
-          setLoading(false);
-        } else {
-          router.push(redirectTo);
-        }
+        setLoading(false);
+      }
+    } else {
+      if (user?.token) {
+        setLoading(false);
+      } else {
+        router.push(redirectTo);
       }
     }
   }, [user?.token]);

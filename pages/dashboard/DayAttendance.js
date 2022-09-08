@@ -87,7 +87,6 @@ const DayAttendance = (props) => {
           <input
             className="p-2 border rounded-md bprder-gray-200"
             type={"date"}
-            pattern=""
             onChange={(e) => {
               setEndDate(e.target.value);
             }}

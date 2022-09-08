@@ -188,3 +188,8 @@ export const HabuildAttendance = {
 export const LoginApis = {
   LOGIN: () => `${API_BASE_URL}/api/user/login`,
 };
+
+export const UserApis = {
+  GET_ALL_ACTIONS: (startDate, endDate) =>
+    `${API_BASE_URL}/api/userLogs/getAll?startDate=${startDate}&endDate=${endDate}`,
+};

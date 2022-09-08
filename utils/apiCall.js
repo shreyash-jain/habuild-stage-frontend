@@ -1,11 +1,8 @@
 import { useContext } from "react";
 import { GlobalContext } from "../context/GlobalContextProvider";
-import useCheckAuth from "../hooks/useCheckAuth";
 
 export const useFetchWrapper = () => {
-  const checkAuthLoading = useCheckAuth(false);
-
-  const { user } = useContext(GlobalContext);
+  const { user, authLoading } = useContext(GlobalContext);
 
   const customFetch = async (api, method, body) => {
     var myHeaders = new Headers();
@@ -47,11 +44,8 @@ export const useFetchWrapper = () => {
     return result;
   };
 
-  if (checkAuthLoading) {
-    return false;
-  }
-
   return {
+    checkAuthLoading: authLoading,
     customFetch,
     user,
     customFetchFile,

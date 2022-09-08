@@ -192,6 +192,9 @@ const Dashboard = () => {
         <SchedulerInfos customFetch={customFetch} />
 
         <HabuildAlerts customFetch={customFetch} />
+
+              
+
       </div>
 
       <DayAttendance customFetch={customFetch} />
