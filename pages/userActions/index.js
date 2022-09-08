@@ -7,7 +7,7 @@ import { useFetchWrapper } from "../../utils/apiCall";
 import { startOfWeek, isFuture } from "date-fns";
 import toast from "react-hot-toast";
 
-const userActions = () => {
+const UserActions = () => {
   const checkAuthLoading = useCheckAuth(false);
 
   const { customFetch, customFetchFile } = useFetchWrapper();
@@ -122,6 +122,6 @@ const userActions = () => {
   );
 };
 
-userActions.getLayout = LayoutSidebar;
+UserActions.getLayout = LayoutSidebar;
 
-export default userActions;
+export default UserActions;
