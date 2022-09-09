@@ -14,9 +14,9 @@ const UserActions = () => {
 
   const [userActions, setUserActions] = useState([]);
   const [startDate, setStartDate] = useState(
-    startOfWeek(new Date(), { weekStartsOn: 1 })
+    format(startOfWeek(new Date(), { weekStartsOn: 1 }), "yyyy-MM-dd")
   );
-  const [endDate, setEndDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(format(new Date(), "yyyy-MM-dd"));
 
   useEffect(() => {
     if (!checkAuthLoading) {
@@ -77,7 +77,7 @@ const UserActions = () => {
             Start Date
           </label>
           <input
-            value={format(startDate, "yyyy-MM-dd")}
+            value={startDate}
             className="p-2 border rounded-md bprder-gray-200"
             type={"date"}
             onChange={(e) => {
@@ -95,7 +95,7 @@ const UserActions = () => {
             End Date
           </label>
           <input
-            value={format(endDate, "yyyy-MM-dd")}
+            value={endDate}
             className="p-2 border rounded-md bprder-gray-200"
             type={"date"}
             onChange={(e) => {
