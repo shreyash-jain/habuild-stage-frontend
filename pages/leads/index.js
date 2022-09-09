@@ -1137,7 +1137,7 @@ const AddLeadModal = (props) => {
           <input
             // value={email}
             // onChange={(e) => setEmail(e.target.value)}
-            required
+
             type="file"
             placeholder="Leads CSV File"
             className="mt-1 p-2 text-lg focus:ring-green-500 focus:border-green-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"

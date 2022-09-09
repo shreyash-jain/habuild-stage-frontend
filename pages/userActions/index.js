@@ -4,7 +4,7 @@ import Table from "../../components/Table";
 import { UserApis } from "../../constants/apis";
 import useCheckAuth from "../../hooks/useCheckAuth";
 import { useFetchWrapper } from "../../utils/apiCall";
-import { startOfWeek, isFuture } from "date-fns";
+import { startOfWeek, isFuture, format } from "date-fns";
 import toast from "react-hot-toast";
 
 const UserActions = () => {
@@ -13,7 +13,9 @@ const UserActions = () => {
   const { customFetch, customFetchFile } = useFetchWrapper();
 
   const [userActions, setUserActions] = useState([]);
-  const [startDate, setStartDate] = useState(startOfWeek(new Date()));
+  const [startDate, setStartDate] = useState(
+    startOfWeek(new Date(), { weekStartsOn: 1 })
+  );
   const [endDate, setEndDate] = useState(new Date());
 
   useEffect(() => {
@@ -29,7 +31,6 @@ const UserActions = () => {
       {}
     );
 
-    console.log("Result", result);
     setUserActions(result.result);
   };
 
@@ -76,7 +77,7 @@ const UserActions = () => {
             Start Date
           </label>
           <input
-            value={startDate}
+            value={format(startDate, "yyyy-MM-dd")}
             className="p-2 border rounded-md bprder-gray-200"
             type={"date"}
             onChange={(e) => {
@@ -94,7 +95,7 @@ const UserActions = () => {
             End Date
           </label>
           <input
-            value={endDate}
+            value={format(endDate, "yyyy-MM-dd")}
             className="p-2 border rounded-md bprder-gray-200"
             type={"date"}
             onChange={(e) => {
