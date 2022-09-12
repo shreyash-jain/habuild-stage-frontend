@@ -482,7 +482,7 @@ const Leads = (props) => {
       return;
     }
 
-    const data = await fetch(LeadsApis.SEARCH(searchTerm), "GET", {});
+    const data = await customFetch(LeadsApis.SEARCH(searchTerm), "GET", {});
     if (data.message) {
       toast.error(data.message);
       setLoading(false);
