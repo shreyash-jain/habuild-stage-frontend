@@ -23,9 +23,7 @@ function classNames(...classes) {
 }
 
 const Payments = (props) => {
-  const checkAuthLoading = useCheckAuth(false);
-
-  const { customFetch } = useFetchWrapper();
+  const { checkAuthLoading, customFetch } = useFetchWrapper();
 
   const [currentPaymentsToShow, setCurrentPaymentsToShow] = useState([]);
   const [successfullPayments, setSuccessfullPayments] = useState([]);

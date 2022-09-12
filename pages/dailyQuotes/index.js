@@ -23,9 +23,7 @@ const tabs = [
 ];
 
 const DailyQuotes = (props) => {
-  const checkAuthLoading = useCheckAuth(false);
-
-  const { customFetch } = useFetchWrapper();
+  const { checkAuthLoading, customFetch } = useFetchWrapper();
 
   const [dailyQuotes, setDailyQuotes] = useState([]);
   const [memberDailyQuotes, setMemberDailyQuotes] = useState([]);

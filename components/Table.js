@@ -48,7 +48,7 @@ export default function Table(props) {
             ) : (
               props.dataSource.map((dataSource, index) => {
                 return (
-                  <tr key={index} className={`duration-200 hover:bg-gray-100 `}>
+                  <tr key={index} className={`duration-200 hover:bg-gray-100`}>
                     {props.columns.map((column, index) => {
                       if (column.render) {
                         return (

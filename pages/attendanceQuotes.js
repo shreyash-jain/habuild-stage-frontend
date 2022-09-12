@@ -28,9 +28,7 @@ function classNames(...classes) {
 }
 
 const AttendanceQuotes = (props) => {
-  const checkAuthLoading = useCheckAuth(false);
-
-  const { customFetch, user } = useFetchWrapper();
+  const { checkAuthLoading, customFetch, user } = useFetchWrapper();
 
   const [loading, setLoading] = useState(false);
   const [attendnaceQuotes, setAttendanceQuotes] = useState([]);

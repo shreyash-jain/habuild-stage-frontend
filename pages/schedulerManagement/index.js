@@ -21,9 +21,7 @@ import ChangeTemplateSidePanel from "./ChangeTemplateSidePanel";
 const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 const SchedulerManagement = (props) => {
-  const checkAuthLoading = useCheckAuth(false);
-
-  const { customFetch, user } = useFetchWrapper();
+  const { checkAuthLoading, customFetch, user } = useFetchWrapper();
 
   const [apiLoading, setApiLoading] = useState(false);
   const [rerunLoading, setRerunLoading] = useState(false);

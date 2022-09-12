@@ -37,7 +37,7 @@ import ChangeMemberCurrentChannel from "./ChangeMemberCurrentChannel";
 const Members = (props) => {
   // const checkAuthLoading = useCheckAuth(false);
 
-  const {checkAuthLoading, customFetch, customFetchFile } = useFetchWrapper();
+  const { checkAuthLoading, customFetch, customFetchFile } = useFetchWrapper();
 
   const [members, setMembers] = useState([]);
   const [viewMemberInfo, setViewMemberInfo] = useState(false);

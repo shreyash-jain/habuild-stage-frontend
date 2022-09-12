@@ -9,9 +9,7 @@ import { ShortenerApis } from "../../constants/apis";
 import Table from "../../components/Table";
 
 const CustomShortlinks = () => {
-  const checkAuthLoading = useCheckAuth(false);
-
-  const { customFetch, user } = useFetchWrapper();
+  const { checkAuthLoading, customFetch, user } = useFetchWrapper();
 
   const [createShortLinkLoading, setCreateShortLinkLoading] = useState(false);
   const [shortRouteName, setShortRouteName] = useState("");

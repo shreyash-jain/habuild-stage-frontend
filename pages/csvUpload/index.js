@@ -24,9 +24,7 @@ import useCheckAuth from "../../hooks/useCheckAuth";
 import { useFetchWrapper } from "../../utils/apiCall";
 
 const CsvUpload = (props) => {
-  const checkAuthLoading = useCheckAuth(false);
-
-  const { customFetch, customFetchFile } = useFetchWrapper();
+  const { checkAuthLoading, customFetch, customFetchFile } = useFetchWrapper();
 
   const [apiLoading, setApiLoading] = useState();
   const [csvArray, setCsvArray] = useState([]);

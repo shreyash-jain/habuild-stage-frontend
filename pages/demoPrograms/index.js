@@ -18,9 +18,7 @@ function classNames(...classes) {
 }
 
 const DemoPrograms = () => {
-  const checkAuthLoading = useCheckAuth(false);
-
-  const { customFetch } = useFetchWrapper();
+  const { checkAuthLoading, customFetch } = useFetchWrapper();
 
   const [viewAddModal, setViewAddModal] = useState(false);
   const [demoBatches, setDemoBatches] = useState([]);

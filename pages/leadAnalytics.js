@@ -1,9 +1,10 @@
 import LayoutSidebar from "../components/LayoutSidebar";
 import useCheckAuth from "../hooks/useCheckAuth";
 import { RefreshIcon } from "@heroicons/react/outline";
+import { useFetchWrapper } from "../utils/apiCall";
 
 const LeadAnalytics = () => {
-  const checkAuthLoading = useCheckAuth(false);
+  const { checkAuthLoading } = useFetchWrapper();
 
   if (checkAuthLoading) {
     return <RefreshIcon className="text-green-300 h-8 w-8 mx-auto" />;

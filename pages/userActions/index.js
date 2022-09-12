@@ -8,9 +8,7 @@ import { startOfWeek, isFuture, format } from "date-fns";
 import toast from "react-hot-toast";
 
 const UserActions = () => {
-  const checkAuthLoading = useCheckAuth(false);
-
-  const { customFetch, customFetchFile } = useFetchWrapper();
+  const { checkAuthLoading, customFetch, customFetchFile } = useFetchWrapper();
 
   const [userActions, setUserActions] = useState([]);
   const [startDate, setStartDate] = useState(
