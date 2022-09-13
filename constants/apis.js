@@ -63,6 +63,8 @@ export const PaymentApis = {
   CREATE: () => `${API_BASE_URL}/api/payment/`,
   CREATE_OFFLINE_PAYMENT: () =>
     `${API_BASE_URL}/api/payment/createScreenshotPayment`,
+  GET_PAYMENTS_BY_DATE_RANGE: (startDate, endDate) =>
+    `${API_BASE_URL}/api/payment/fetch_payment_logs?startDate=${startDate}&endDate=${endDate}`,
 };
 
 export const HabuildAdsApis = {
@@ -192,4 +194,11 @@ export const LoginApis = {
 export const UserApis = {
   GET_ALL_ACTIONS: (startDate, endDate) =>
     `${API_BASE_URL}/api/userLogs/getAll?startDate=${startDate}&endDate=${endDate}`,
+};
+
+export const StaticDataApis = {
+  GET_REGISTRATION_CHANNEL: () =>
+    `${API_BASE_URL}/api/static_data/registeration_channel`,
+  UPDATE_REGISTRATION_CHANNEL: () =>
+    `${API_BASE_URL}/api/static_data/registeration_channel`,
 };

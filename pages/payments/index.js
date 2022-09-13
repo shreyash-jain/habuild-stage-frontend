@@ -4,13 +4,20 @@ import Table from "../../components/Table";
 import FlyoutMenu from "../../components/FlyoutMenu";
 import Modal from "../../components/Modal";
 import { RefreshIcon, ExternalLinkIcon } from "@heroicons/react/outline";
-import { format, parseISO } from "date-fns";
+import {
+  format,
+  parseISO,
+  startOfWeek,
+  differenceInDays,
+  isFuture,
+} from "date-fns";
 import toast from "react-hot-toast";
 import { PaymentApis } from "../../constants/apis";
 import AddCommModal from "../leads/AddCommModal";
 import ViewMemberCommsModal from "../members/ViewMemberCommsModal";
 import useCheckAuth from "../../hooks/useCheckAuth";
 import { useFetchWrapper } from "../../utils/apiCall";
+import { CreateCsvFromArray } from "../../utils/csvUtils";
 
 const tabs = [
   { name: "Failed Payments", href: "#", current: false },
@@ -32,6 +39,7 @@ const Payments = (props) => {
   const [editPayment, setEditPayment] = useState([]);
   const [viewEditModal, setViewEditModal] = useState(false);
   const [viewAddModal, setViewAddModal] = useState(false);
+  const [viewExportModal, setViewExportModal] = useState(false);
   const [totalRecords, setTotalRecords] = useState(0);
   const [currentPagePagination, setCurrentPagePagination] = useState(1);
   const [currentTab, setCurrentTab] = useState("Failed Payments");
@@ -333,6 +341,13 @@ const Payments = (props) => {
         Add Payment +
       </button>
 
+      <button
+        onClick={() => setViewExportModal(true)}
+        className="font-medium px-4 py-2 rounded-md bg-green-300 hover:bg-green-500 text-green-700 hover:text-white fixed bottom-2 right-44"
+      >
+        Export Payments
+      </button>
+
       <PaymentFormModal
         getPayments={getPayments}
         viewModal={viewAddModal}
@@ -353,6 +368,12 @@ const Payments = (props) => {
         viewModal={viewExistingModal}
         setViewModal={setViewExistingModal}
         columns={columns}
+      />
+
+      <ExportPaymentModal
+        viewModal={viewExportModal}
+        setViewModal={setViewExportModal}
+        customFetch={customFetch}
       />
 
       <AddCommModal
@@ -589,6 +610,85 @@ const PaymentFormModal = (props) => {
           )}
         </button>
       </form>
+    </Modal>
+  );
+};
+
+const ExportPaymentModal = (props) => {
+  const [loading, setLoading] = useState(false);
+  const [startDate, setStartDate] = useState(
+    format(startOfWeek(new Date(), { weekStartsOn: 1 }), "yyyy-MM-dd")
+  );
+  const [endDate, setEndDate] = useState(format(new Date(), "yyyy-MM-dd"));
+
+  const exportPayments = async () => {
+    if (differenceInDays(new Date(startDate), new Date(endDate)) * -1 > 31) {
+      toast.error("Date difference cannot be greater than 31 days");
+      return;
+    }
+
+    setLoading(true);
+
+    const result = await props.customFetch(
+      PaymentApis.GET_PAYMENTS_BY_DATE_RANGE(startDate, endDate),
+      "GET",
+      {}
+    );
+
+    await CreateCsvFromArray(result.result);
+
+    setLoading(false);
+  };
+
+  return (
+    <Modal
+      apiLoading={loading}
+      modalOpen={props.viewModal}
+      setModalOpen={props.setViewModal}
+      actionText="Export"
+      onActionButtonClick={exportPayments}
+    >
+      {loading && (
+        <RefreshIcon className="text-green-300 animate-spin h-8 w-8 mx-auto" />
+      )}
+
+      <div className="flex flex-row space-x-4 mt-8">
+        <div>
+          <label className="block text-xs font-medium text-gray-700">
+            Start Date
+          </label>
+          <input
+            value={startDate}
+            className="p-2 border rounded-md bprder-gray-200"
+            type={"date"}
+            onChange={(e) => {
+              if (!isFuture(new Date(e.target.value))) {
+                setStartDate(e.target.value);
+              } else {
+                toast.error("Cannot select future date");
+              }
+            }}
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-medium text-gray-700">
+            End Date
+          </label>
+          <input
+            value={endDate}
+            className="p-2 border rounded-md bprder-gray-200"
+            type={"date"}
+            onChange={(e) => {
+              if (!isFuture(new Date(e.target.value))) {
+                setEndDate(e.target.value);
+              } else {
+                toast.error("Cannot select future date");
+              }
+            }}
+          />
+        </div>
+      </div>
     </Modal>
   );
 };

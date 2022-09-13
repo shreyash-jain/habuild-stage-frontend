@@ -15,6 +15,7 @@ import MenuSidePanel from "./MenuSidePanel";
 import HabuildAlerts from "./HabuildAlerts";
 import SchedulerInfos from "./SchedulerInfos";
 import DayAttendance from "./DayAttendance";
+import DefaultRegistration from "./DefaultRegistration";
 import useCheckAuth from "../../hooks/useCheckAuth";
 import { useFetchWrapper } from "../../utils/apiCall";
 
@@ -193,8 +194,7 @@ const Dashboard = () => {
 
         <HabuildAlerts customFetch={customFetch} />
 
-              
-
+        <DefaultRegistration customFetch={customFetch} />
       </div>
 
       <DayAttendance customFetch={customFetch} />
