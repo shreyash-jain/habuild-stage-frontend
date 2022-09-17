@@ -364,6 +364,7 @@ const PaymentApproval = () => {
         plans={plans}
         computeSelectOptions={computeSelectOptions}
         customFetch={customFetch}
+        memberProgramsWithBatches={memberProgramsWithBatches}
       />
     </div>
   );
@@ -544,6 +545,27 @@ const AddPaymentForApproval = (props) => {
       {}
     );
 
+    for (let i = 0; i < props.memberProgramsWithBatches.length; i++) {
+      for (
+        let j = 0;
+        j < props.memberProgramsWithBatches[i].batches.length;
+        j++
+      ) {
+        if (
+          data.data[0].preffered_batch_id ==
+          props.memberProgramsWithBatches[i].batches[j].id
+        ) {
+          setSelectedBatchName(
+            props.memberProgramsWithBatches[i].title +
+              " - " +
+              props.memberProgramsWithBatches[i].batches[j].name
+          );
+
+          break;
+        }
+      }
+    }
+
     setMobileSearching(false);
     if (!data.data[0]) {
       setMobileSearching(false);
@@ -642,6 +664,13 @@ const AddPaymentForApproval = (props) => {
         })}
 
         <Select
+          value={props.computeSelectOptions().filter((option) => {
+            if (selectedBatchName) {
+              return option.label === selectedBatchName;
+            } else {
+              return option.label;
+            }
+          })}
           onChange={(option) => {
             setSelectedBatchName(option.label);
           }}

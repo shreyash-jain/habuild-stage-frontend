@@ -11,6 +11,8 @@ const SendWAModal = (props) => {
 
   const [sendMessageToAll, setSendMessageToAll] = useState(false);
 
+  const [sendToInactiveBoolean, setSendToInactiveBoolean] = useState(false);
+
   useEffect(() => {
     setMessage("");
   }, [props.open]);
@@ -39,6 +41,7 @@ const SendWAModal = (props) => {
         // batch_ids: ["2", "3", "4"],
         // batch_ids: ["4"],
         template_name: selectedTemplate.identifier,
+        sendToInactiveMembers: sendToInactiveBoolean,
       };
       api = NotificationApis.MEMBERS_SEND_TO_BATCH();
     } else {
@@ -143,6 +146,18 @@ const SendWAModal = (props) => {
               id="message"
               autoComplete="message"
               className="p-2 mt-1 block w-full shadow-sm border border-gray-200 rounded-md"
+            />
+          </div>
+
+          <div className="space-x-2">
+            <label htmlFor="sendToInactiveBoolean">
+              Send Message to Inactive Members Also
+            </label>
+            <input
+              name="sendToInactiveBoolean"
+              type="checkbox"
+              checked={sendToInactiveBoolean}
+              onChange={(e) => setSendToInactiveBoolean(e.target.checked)}
             />
           </div>
 
