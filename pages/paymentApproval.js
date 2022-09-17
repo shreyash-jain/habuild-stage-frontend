@@ -246,10 +246,21 @@ const PaymentApproval = () => {
   };
 
   const approvePayment = async () => {
+    let selectedPlan;
+
+    for (let i = 0; i < plans.length; i++) {
+      if (plans[i].id == paymentToDecide.plan_id) {
+        selectedPlan = plans[i];
+        break;
+      }
+    }
+
     var raw = {
       memberId: paymentToDecide.habuild_members.id,
       paymentId: paymentToDecide.id,
       utr: utr,
+      plan_id: selectedPlan.id,
+      duration: selectedPlan.duration,
     };
 
     const data = await customFetch(PaymentApis.APPROVE_PAYMENT(), "POST", raw);
