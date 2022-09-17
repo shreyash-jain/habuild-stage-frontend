@@ -1043,7 +1043,7 @@ const AddLeadModal = (props) => {
     };
 
     try {
-      await customFetch(LeadsApis.CREATE(), "POST", raw);
+      await props.customFetch(LeadsApis.CREATE(), "POST", raw);
       setApiLoading(false);
       toast.success("Lead Created");
       props.getPaginatedLeads(1);
@@ -1051,7 +1051,7 @@ const AddLeadModal = (props) => {
     } catch (error) {
       setApiLoading(false);
       toast.error("No lead created");
-      // console.log("error", error);
+      console.log("error", error);
     }
   };
 
