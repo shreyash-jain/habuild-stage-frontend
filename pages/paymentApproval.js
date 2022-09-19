@@ -540,7 +540,7 @@ const AddPaymentForApproval = (props) => {
     setMobileSearching(true);
 
     const data = await props.customFetch(
-      MembersApis.SEARCH(mobileNumber, "Mobile"),
+      MembersApis.SEARCH(mobileNumber, "Mobile", "paymentApproval"),
       "GET",
       {}
     );

@@ -172,8 +172,8 @@ const MemberInfoSidePanel = (props) => {
     );
 
     setShortLinkLoader(false);
-    setCurrentLongUrl(data.long_url);
-    setLongUrlForShortUrl(data.long_url);
+    setCurrentLongUrl(data?.long_url);
+    setLongUrlForShortUrl(data?.long_url);
     // console.log("Short URL Data", data);
   };
 
@@ -335,7 +335,7 @@ const MemberInfoSidePanel = (props) => {
             />
           )}
 
-          {/* Team member list */}
+         {/* Team member list */}
           {/* <div className="mt-8 max-w-5xl mx-auto px-4 pb-12 sm:px-6 lg:px-8">
             <h2 className="text-sm font-medium text-gray-500">Team members</h2>
             <div className="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -383,7 +383,10 @@ const MemberInfoSidePanel = (props) => {
                   >
                     Member Short Link
                   </label>
-                  <Link className="overflow-hidden" href={memberShortLink}>
+                  <Link
+                    className="overflow-hidden"
+                    href={memberShortLink || ""}
+                  >
                     <a
                       target="_blank"
                       style={{
@@ -403,7 +406,7 @@ const MemberInfoSidePanel = (props) => {
                   >
                     Long URL
                   </label>
-                  <Link href={currentLongUrl}>
+                  <Link href={currentLongUrl || ""}>
                     <a
                       target="_blank"
                       style={{

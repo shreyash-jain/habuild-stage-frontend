@@ -65,6 +65,8 @@ export const PaymentApis = {
     `${API_BASE_URL}/api/payment/createScreenshotPayment`,
   GET_PAYMENTS_BY_DATE_RANGE: (startDate, endDate) =>
     `${API_BASE_URL}/api/payment/fetch_payment_logs?startDate=${startDate}&endDate=${endDate}`,
+  GET_USER_PAYMENT_HISTORY: (memberId) =>
+    `${API_BASE_URL}/api/payment/user_payment_history/${memberId}`,
 };
 
 export const HabuildAdsApis = {
@@ -90,8 +92,8 @@ export const MembersApis = {
   GIFT_MEMBERSHIP: () => `${API_BASE_URL}/api/member/gift_membership`,
   ACTIVATE_MEMBERSHIP: (memberId) =>
     `${API_BASE_URL}/api/member/activate_membership?memberId=${memberId}`,
-  SEARCH: (searchTerm, searchFor) =>
-    `${API_BASE_URL}/api/member/searchMember/${searchTerm}/${searchFor}`,
+  SEARCH: (searchTerm, searchFor, calledFrom) =>
+    `${API_BASE_URL}/api/member/searchMember?memberInfo=${searchTerm}&searchFor=${searchFor}&calledFrom=${calledFrom}`,
   PAUSE_MEMBERSHIP: (params) =>
     `${API_BASE_URL}/api/member/pause_membership?noOfDaysAsked=${params.numDays}&memberId=${params.memberId}&startDate=${params.pauseStartDate}`,
   STOP_MEMBERSHIP: (memberId) =>
