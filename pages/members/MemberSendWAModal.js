@@ -149,18 +149,6 @@ const SendWAModal = (props) => {
             />
           </div>
 
-          <div className="space-x-2">
-            <label htmlFor="sendToInactiveBoolean">
-              Send Message to Inactive Members Also
-            </label>
-            <input
-              name="sendToInactiveBoolean"
-              type="checkbox"
-              checked={sendToInactiveBoolean}
-              onChange={(e) => setSendToInactiveBoolean(e.target.checked)}
-            />
-          </div>
-
           {apiLoading ? (
             <RefreshIcon className="text-green-300 animate-spin h-6 w-6 mx-auto" />
           ) : (
@@ -180,6 +168,8 @@ const SendWAModal = (props) => {
                 apiLoading={apiLoading}
                 sendMessageApi={sendMessageApi}
                 memberProgramsWithBatches={props.memberProgramsWithBatches}
+                setSendToInactiveBoolean={setSendToInactiveBoolean}
+                sendToInactiveBoolean={sendToInactiveBoolean}
               />
 
               {/* <button
@@ -236,7 +226,7 @@ const SendMessageToAllLeads = (props) => {
   };
 
   return (
-    <div className="flex flex-col space-y-4">
+    <div className="flex flex-col space-y-4 overflow-y-scroll p-4">
       {props.memberProgramsWithBatches?.map((program, personIdx) => (
         <fieldset key={program.id} className="rounded-md p-4 shadow-md">
           <div className="relative flex items-start py-4">
@@ -291,6 +281,28 @@ const SendMessageToAllLeads = (props) => {
           })}
         </fieldset>
       ))}
+
+      <div className="flex flex-col">
+        <label htmlFor="statuses">Select Statuses to send to </label>
+        <Select
+          isMulti
+          name="statuses"
+          options={[
+            {
+              label: "ACTIVE",
+              value: "ACTIVE",
+            },
+            {
+              label: "INACTIVE",
+              value: "INACTIVE",
+            },
+            {
+              label: "PAUSED",
+              value: "PAUSED",
+            },
+          ]}
+        />
+      </div>
 
       <button
         onClick={() => {

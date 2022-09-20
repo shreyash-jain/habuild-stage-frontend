@@ -369,8 +369,6 @@ const AddPaymentForApproval = (props) => {
     computeSelectOptions();
   }, [props.memberProgramsWithBatches]);
 
-  console.log(selectOptions);
-
   const paymentFormFields = [
     // {
     //   label: "Mobile Number",

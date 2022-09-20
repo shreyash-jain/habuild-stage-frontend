@@ -6,12 +6,19 @@ import { format } from "date-fns";
 
 const PauseMembership = (props) => {
   const [apiLoading, setApiLoading] = useState(false);
-  const [numDays, setNumDays] = useState(99);
+  const [numDays, setNumDays] = useState(9);
   const [pauseStartDate, setPauseStartDate] = useState(
     format(new Date(), "yyyy-MM-dd")
   );
 
   const pauseMembership = async (member, calledFrom) => {
+    if (numDays > props.memberForAction.total_pause_days) {
+      toast.error(
+        "Number of pause days should be less than total pause days available."
+      );
+      return;
+    }
+
     setApiLoading(true);
 
     if (!numDays || !pauseStartDate) {
@@ -87,6 +94,12 @@ const PauseMembership = (props) => {
             {props?.memberForAction?.name}
           </h1>
         </div>
+        <h1 className="font-bold text-lg text-gray-800">
+          Pause Days - {props.memberForAction.pause_days}
+        </h1>
+        <h1 className="font-bold text-lg text-gray-800">
+          Total Pause Days - {props.memberForAction.total_pause_days}
+        </h1>
 
         <label className="text-lg">Start Date</label>
         <input
@@ -98,7 +111,7 @@ const PauseMembership = (props) => {
 
         <label className="mt-4 text-lg">Number of Pause days</label>
         <input
-          defaultValue={99}
+          defaultValue={9}
           className="p-2 font-medium text-gray-800 rounded-md border border-gray-500 max-w-fit"
           type={"number"}
           onChange={(e) => setNumDays(e.target.value)}

@@ -251,7 +251,6 @@ export default function LayoutSidebar(props) {
             <div className="flex-shrink-0 flex border-t border-gray-200 p-4">
               <div
                 onClick={() => {
-                  console.log("asdasdasdasd");
                   window.sessionStorage.removeItem("user");
                   router.reload("/dashboard");
                 }}

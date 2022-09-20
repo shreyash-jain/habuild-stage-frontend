@@ -48,8 +48,6 @@ const ChangeTemplateSidePanel = (props) => {
       }
     );
 
-    console.log("wati temp change result", result);
-
     if (result.ok) {
       props.setOpen(false);
       props.refetchData();
