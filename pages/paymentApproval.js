@@ -229,22 +229,6 @@ const PaymentApproval = () => {
 
   // console.log("member Batches ", memberProgramsWithBatches);
 
-  const computeSelectOptions = () => {
-    const overallArr = [];
-
-    for (let i = 0; i < memberProgramsWithBatches.length; i++) {
-      memberProgramsWithBatches[i].batches.map((item1) => {
-        const obj = {
-          label: memberProgramsWithBatches[i].title + " - " + item1.name,
-          value: item1.id,
-        };
-        overallArr.push(obj);
-      });
-    }
-
-    return overallArr;
-  };
-
   const approvePayment = async () => {
     let selectedPlan;
 
@@ -257,6 +241,7 @@ const PaymentApproval = () => {
 
     var raw = {
       memberId: paymentToDecide.habuild_members.id,
+      batchId: paymentToDecide.habuild_members.preffered_batch_id,
       paymentId: paymentToDecide.id,
       utr: utr,
       plan_id: selectedPlan.id,
@@ -362,7 +347,6 @@ const PaymentApproval = () => {
         setViewModal={setViewAddModal}
         getAllPaymentsToApprove={getAllPaymentsToApprove}
         plans={plans}
-        computeSelectOptions={computeSelectOptions}
         customFetch={customFetch}
         memberProgramsWithBatches={memberProgramsWithBatches}
       />
@@ -378,7 +362,14 @@ const AddPaymentForApproval = (props) => {
   const [email, setEmail] = useState("");
   const [amount, setAmount] = useState("");
   const [mobileSearching, setMobileSearching] = useState(false);
-  const [selectedBatchName, setSelectedBatchName] = useState("");
+  const [selectedBatch, setSelectedBatch] = useState("");
+  const [selectOptions, setSelectOptions] = useState();
+
+  useEffect(() => {
+    computeSelectOptions();
+  }, [props.memberProgramsWithBatches]);
+
+  console.log(selectOptions);
 
   const paymentFormFields = [
     // {
@@ -479,7 +470,7 @@ const AddPaymentForApproval = (props) => {
     if (!fromCSV) {
       // e.preventDefault();
 
-      if (!amount || !name || !mobileNumber || !email || !selectedBatchName) {
+      if (!amount || !name || !mobileNumber || !email || !selectedBatch) {
         alert("Please enter all details.");
         setApiLoading(false);
         return;
@@ -491,7 +482,7 @@ const AddPaymentForApproval = (props) => {
         Amount: amount,
         "Payment App ": "NA",
         Name: name,
-        selectedBatch: selectedBatchName,
+        selectedBatch: selectedBatch.label,
       };
     } else {
       dataObj = data;
@@ -545,25 +536,16 @@ const AddPaymentForApproval = (props) => {
       {}
     );
 
-    for (let i = 0; i < props.memberProgramsWithBatches.length; i++) {
-      for (
-        let j = 0;
-        j < props.memberProgramsWithBatches[i].batches.length;
-        j++
-      ) {
-        if (
-          data.data[0].preffered_batch_id ==
-          props.memberProgramsWithBatches[i].batches[j].id
-        ) {
-          setSelectedBatchName(
-            props.memberProgramsWithBatches[i].title +
-              " - " +
-              props.memberProgramsWithBatches[i].batches[j].name
-          );
-
-          break;
+    if (data.data[0]) {
+      const defaultSelectedBatch = selectOptions.filter((item) => {
+        if (data.data[0].preffered_batch_id == item.value) {
+          return true;
+        } else {
+          return false;
         }
-      }
+      });
+
+      setSelectedBatch(defaultSelectedBatch[0]);
     }
 
     setMobileSearching(false);
@@ -576,6 +558,22 @@ const AddPaymentForApproval = (props) => {
     setName(data.data[0].name);
     setEmail(data.data[0].email);
     setMobileNumber(data.data[0].mobile_number);
+  };
+
+  const computeSelectOptions = () => {
+    const overallArr = [];
+
+    for (let i = 0; i < props.memberProgramsWithBatches.length; i++) {
+      props.memberProgramsWithBatches[i].batches.map((item1) => {
+        const obj = {
+          label: props.memberProgramsWithBatches[i].title + " - " + item1.name,
+          value: item1.id,
+        };
+        overallArr.push(obj);
+      });
+    }
+
+    setSelectOptions(overallArr);
   };
 
   return (
@@ -664,17 +662,11 @@ const AddPaymentForApproval = (props) => {
         })}
 
         <Select
-          value={props.computeSelectOptions().filter((option) => {
-            if (selectedBatchName) {
-              return option.label === selectedBatchName;
-            } else {
-              return option.label;
-            }
-          })}
+          value={selectedBatch}
           onChange={(option) => {
-            setSelectedBatchName(option.label);
+            setSelectedBatch(option);
           }}
-          options={props.computeSelectOptions()}
+          options={selectOptions}
           placeholder="Select Batch"
         ></Select>
 

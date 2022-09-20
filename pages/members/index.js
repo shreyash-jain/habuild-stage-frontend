@@ -478,9 +478,7 @@ const Members = (props) => {
       dataIndex: "total_remaining_days",
       key: "total_remaining_days",
       render: (days) => {
-        if (days) {
-          return days;
-        }
+        return days;
       },
     },
     // {
