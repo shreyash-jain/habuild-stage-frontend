@@ -43,7 +43,7 @@ export default function Home() {
             style={{ color: "#6E6E6E" }}
             className="mt-6 text-center text-3xl font-bold"
           >
-            CRM
+            Stage CRM
           </h2>
           <h2 className="mt-6 text-center text-3xl font-bold text-gray-800">
             Sign in
