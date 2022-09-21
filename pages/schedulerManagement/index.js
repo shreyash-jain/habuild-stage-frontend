@@ -14,7 +14,7 @@ import {
   XIcon,
   RefreshIcon as RefreshSolid,
 } from "@heroicons/react/solid";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import toast from "react-hot-toast";
 import ChangeTemplateSidePanel from "./ChangeTemplateSidePanel";
 
@@ -394,6 +394,25 @@ const SchedulerManagement = (props) => {
                                 <p className="text-md font-medium text-gray-900 truncate">
                                   {item.template.identifier}
                                 </p>
+                                {item.lastRecord && (
+                                  <>
+                                    <p className="text-md font-light text-gray-900 truncate">
+                                      sent to
+                                      <span className="font-medium">
+                                        {" "}
+                                        {item.lastRecord.description}{" "}
+                                      </span>
+                                      people
+                                    </p>
+                                    <p className="text-md font-light text-gray-900 truncate">
+                                      at -{" "}
+                                      {format(
+                                        parseISO(item.lastRecord.updated_at),
+                                        "pp"
+                                      )}
+                                    </p>
+                                  </>
+                                )}
                                 <button
                                   onClick={() => {
                                     setSchedulerToUpdate(sch);
