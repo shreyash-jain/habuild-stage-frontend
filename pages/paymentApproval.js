@@ -254,6 +254,7 @@ const PaymentApproval = () => {
       toast.error("Error: " + data.message);
     } else {
       toast.success("Succesfully approved");
+      setUtr("");
     }
 
     getAllPaymentsToApprove();
@@ -502,6 +503,11 @@ const AddPaymentForApproval = (props) => {
           toast.success(
             `Payment ${props.mode == "edit" ? "Updated" : "Created"}`
           );
+          setName("");
+          setMobileNumber("");
+          setEmail("");
+          setAmount("");
+          setSelectedBatch("");
           props.getAllPaymentsToApprove();
           props.setViewModal(false);
         }
