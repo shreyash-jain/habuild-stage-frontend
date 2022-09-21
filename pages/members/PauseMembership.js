@@ -95,10 +95,10 @@ const PauseMembership = (props) => {
           </h1>
         </div>
         <h1 className="font-bold text-lg text-gray-800">
-          Pause Days - {props.memberForAction.pause_days}
+          Pause Days - {props.memberForAction?.pause_days}
         </h1>
         <h1 className="font-bold text-lg text-gray-800">
-          Total Pause Days - {props.memberForAction.total_pause_days}
+          Total Pause Days - {props.memberForAction?.total_pause_days}
         </h1>
 
         <label className="text-lg">Start Date</label>
