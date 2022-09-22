@@ -89,12 +89,12 @@ const ChangePrefferedBatch = (props) => {
       } else {
         toast.success("Member Updated Successfully.");
       }
-      // props.getPaginatedLeads(props.currentPagePagination);
-      // props.setModalOpen(false);
-      console.log(result);
+      props.getPaginatedLeads(props.currentPagePagination);
+      props.setModalOpen(false);
+      // console.log(result);
     } catch (error) {
       setApiLoading(false);
-      // toast.error(error);
+      toast.error(error);
       // console.log("error", error);
     }
   };
