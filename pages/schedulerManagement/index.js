@@ -408,7 +408,7 @@ const SchedulerManagement = (props) => {
                                       at -{" "}
                                       {format(
                                         parseISO(item.lastRecord.updated_at),
-                                        "pp"
+                                        "PPpp"
                                       )}
                                     </p>
                                   </>
