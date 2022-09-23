@@ -17,7 +17,11 @@ const SendWAModal = (props) => {
     setMessage("");
   }, [props.open]);
 
-  const sendMessageApi = async (mode, selectedDemoBatches) => {
+  const sendMessageApi = async (
+    mode,
+    selectedDemoBatches,
+    selectedStatuses
+  ) => {
     setApiLoading(true);
     let vars = {};
     let api = "";
@@ -42,6 +46,7 @@ const SendWAModal = (props) => {
         // batch_ids: ["4"],
         template_name: selectedTemplate.identifier,
         sendToInactiveMembers: sendToInactiveBoolean,
+        selectedStatus: selectedStatuses.map((item) => item.value),
       };
       api = NotificationApis.MEMBERS_SEND_TO_BATCH();
     } else {
@@ -196,6 +201,12 @@ const SendWAModal = (props) => {
 
 const SendMessageToAllLeads = (props) => {
   const [selectedDemoBatches, setSelectedDemobatches] = useState([]);
+  const [selectedStatuses, setSelectedStatuses] = useState([
+    {
+      label: "ACTIVE",
+      value: "ACTIVE",
+    },
+  ]);
 
   const selectBatches = (checked, id) => {
     // console.log("OnChange Called");
@@ -285,6 +296,8 @@ const SendMessageToAllLeads = (props) => {
       <div className="flex flex-col">
         <label htmlFor="statuses">Select Statuses to send to </label>
         <Select
+          value={selectedStatuses}
+          onChange={(options) => setSelectedStatuses(options)}
           isMulti
           name="statuses"
           options={[
@@ -300,6 +313,10 @@ const SendMessageToAllLeads = (props) => {
               label: "PAUSED",
               value: "PAUSED",
             },
+            {
+              label: "LEAD",
+              value: "LEAD",
+            },
           ]}
         />
       </div>
@@ -308,7 +325,11 @@ const SendMessageToAllLeads = (props) => {
         onClick={() => {
           if (!props.apiLoading) {
             if (window.confirm("Are you sure you want to do this?")) {
-              props.sendMessageApi("all", selectedDemoBatches);
+              props.sendMessageApi(
+                "all",
+                selectedDemoBatches,
+                selectedStatuses
+              );
             }
           }
         }}
