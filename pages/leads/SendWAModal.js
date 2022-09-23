@@ -280,7 +280,7 @@ const SendMessageToAllLeads = (props) => {
         onClick={() => {
           if (!props.apiLoading) {
             if (window.confirm("Are you sure you want to do this?")) {
-              props.sendMessageApi("all", selectedDemoBatches);
+              props.sendMessageApi("all", selectedDemoBatches, []);
             }
           }
         }}
