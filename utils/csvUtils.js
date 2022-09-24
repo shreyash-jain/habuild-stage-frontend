@@ -9,8 +9,8 @@ export async function CreateCsvFromArray(arr) {
         return item;
       } else {
         try {
-          JSON.parse(item);
-          return "";
+          const result = JSON.parse(item);
+          return result;
         } catch {
           return item;
         }

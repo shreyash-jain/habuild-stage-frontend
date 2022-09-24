@@ -635,7 +635,14 @@ const ExportPaymentModal = (props) => {
       {}
     );
 
-    await CreateCsvFromArray(result.result);
+    const newResult = [];
+
+    for (let i = 0; i < result.result.length; i++) {
+      const obj = { ...result.result[i].habuild_members, ...result.result[i] };
+      newResult.push(obj);
+    }
+
+    await CreateCsvFromArray(newResult);
 
     setLoading(false);
   };

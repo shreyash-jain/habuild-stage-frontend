@@ -98,7 +98,7 @@ const StopMembership = (props) => {
         toast.success(result.message);
       }
       props.getPaginatedLeads(props.currentPagePagination);
-      props.setModalOpen(false);
+      // props.setModalOpen(false);
 
       setRefundCheck(false);
     } catch (error) {
@@ -121,6 +121,24 @@ const StopMembership = (props) => {
       title: "Amount",
       dataIndex: "amount",
       key: "amount",
+    },
+    {
+      title: "Subscription Info",
+      dataIndex: "habuild_member_batches",
+      key: "habuild_member_batches",
+      render: (batches) => {
+        return (
+          <>
+            <span className="font-medium">
+              {format(parseISO(batches[0].sub_start_date), "PP")}
+            </span>{" "}
+            to{" "}
+            <span className="font-medium">
+              {format(parseISO(batches[0].sub_end_date), "PP")}{" "}
+            </span>
+          </>
+        );
+      },
     },
     {
       title: "Created at",
