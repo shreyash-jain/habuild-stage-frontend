@@ -12,11 +12,13 @@ const PauseMembership = (props) => {
   );
 
   const pauseMembership = async (member, calledFrom) => {
-    if (numDays > props.memberForAction.total_pause_days) {
-      toast.error(
-        "Number of pause days should be less than total pause days available."
-      );
-      return;
+    if (calledFrom !== "groupActions") {
+      if (numDays > props.memberForAction.total_pause_days) {
+        toast.error(
+          "Number of pause days should be less than total pause days available."
+        );
+        return;
+      }
     }
 
     setApiLoading(true);
