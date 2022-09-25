@@ -638,8 +638,13 @@ const ExportPaymentModal = (props) => {
     const newResult = [];
 
     for (let i = 0; i < result.result.length; i++) {
-      const obj = { ...result.result[i].habuild_members, ...result.result[i] };
-      newResult.push(obj);
+      if (result.result[i].status == "SUCCESS") {
+        const obj = {
+          ...result.result[i].habuild_members,
+          ...result.result[i],
+        };
+        newResult.push(obj);
+      }
     }
 
     await CreateCsvFromArray(newResult);
