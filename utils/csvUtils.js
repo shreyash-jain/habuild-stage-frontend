@@ -1,4 +1,4 @@
-export async function CreateCsvFromArray(arr) {
+export async function CreateCsvFromArray(arr, downloadedFileName) {
   let csvContent = "data:text/csv;charset=utf-8,";
 
   arr[0] = Object.keys(arr[0]).map((item) => item);
@@ -22,5 +22,16 @@ export async function CreateCsvFromArray(arr) {
   }
 
   var encodedUri = encodeURI(csvContent);
-  return window.open(encodedUri);
+
+  if (typeof window !== "undefined") {
+    const downloadLink = document.createElement("a");
+    const a = document.createAttribute("href");
+    const b = document.createAttribute("download");
+    a.value = encodedUri;
+    b.value = downloadedFileName || "CSV Export";
+    downloadLink.setAttributeNode(a);
+    downloadLink.setAttributeNode(b);
+
+    downloadLink.click();
+  }
 }

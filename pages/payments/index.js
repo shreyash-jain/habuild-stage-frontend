@@ -647,7 +647,7 @@ const ExportPaymentModal = (props) => {
       }
     }
 
-    await CreateCsvFromArray(newResult);
+    await CreateCsvFromArray(newResult, "Successfull Payments Export");
 
     setLoading(false);
   };
