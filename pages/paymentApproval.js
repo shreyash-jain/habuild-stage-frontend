@@ -15,6 +15,7 @@ import {
 import { remove_backslash_characters } from "../utils/stringUtility";
 import useCheckAuth from "../hooks/useCheckAuth";
 import { useFetchWrapper } from "../utils/apiCall";
+import { format, parseISO } from "date-fns";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -365,6 +366,11 @@ const AddPaymentForApproval = (props) => {
   const [mobileSearching, setMobileSearching] = useState(false);
   const [selectedBatch, setSelectedBatch] = useState("");
   const [selectOptions, setSelectOptions] = useState();
+  const [selectedMember, setSelectedMember] = useState({});
+  const [viewSelectMemberModal, setViewSelectMemberModal] = useState(false);
+  const [membersToSelectFrom, setMembersToSelectFrom] = useState([]);
+  const [showMemberSelectModalButton, setShowMemberSelectModalButton] =
+    useState(false);
 
   useEffect(() => {
     computeSelectOptions();
@@ -540,16 +546,23 @@ const AddPaymentForApproval = (props) => {
       {}
     );
 
-    if (data.data[0]) {
-      const defaultSelectedBatch = selectOptions.filter((item) => {
-        if (data.data[0].preffered_batch_id == item.value) {
-          return true;
-        } else {
-          return false;
-        }
-      });
+    if (data.data.length > 1) {
+      setViewSelectMemberModal(true);
+      setMembersToSelectFrom(data.data);
+      setShowMemberSelectModalButton(true);
+    } else {
+      if (data.data[0]) {
+        const defaultSelectedBatch = selectOptions.filter((item) => {
+          if (data.data[0].preffered_batch_id == item.value) {
+            return true;
+          } else {
+            return false;
+          }
+        });
 
-      setSelectedBatch(defaultSelectedBatch[0]);
+        setSelectedBatch(defaultSelectedBatch[0]);
+        setSelectedMember(data.data[0]);
+      }
     }
 
     setMobileSearching(false);
@@ -578,6 +591,25 @@ const AddPaymentForApproval = (props) => {
     }
 
     setSelectOptions(overallArr);
+  };
+
+  const handleMemberSelect = (member) => {
+    setSelectedMember(member);
+
+    setName(member.name);
+    setEmail(member.email);
+    setMobileNumber(member.mobile_number);
+
+    const defaultSelectedBatch = selectOptions.filter((item) => {
+      if (member.preffered_batch_id == item.value) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+
+    setSelectedBatch(defaultSelectedBatch[0]);
+    setViewSelectMemberModal(false);
   };
 
   return (
@@ -618,6 +650,16 @@ const AddPaymentForApproval = (props) => {
         >
           Populate Info by Mobile Number
         </button>
+
+        {showMemberSelectModalButton && (
+          <button
+            type="button"
+            onClick={() => setViewSelectMemberModal(true)}
+            className="px-4 py-2 text-white rounded-md bg-green-500 hover:bg-green-700 max-w-fit"
+          >
+            Show Members
+          </button>
+        )}
 
         {paymentFormFields.map((item) => {
           if (item.type == "radio") {
@@ -700,6 +742,94 @@ const AddPaymentForApproval = (props) => {
 
         {csvArray.length > 0 && <p>{csvArray.length} Rows read from CSV.</p>}
       </form>
+
+      <SelectMemberModal
+        viewModal={viewSelectMemberModal}
+        setViewModal={setViewSelectMemberModal}
+        selectedMember={selectedMember}
+        membersToSelectFrom={membersToSelectFrom}
+        handleMemberSelect={handleMemberSelect}
+      />
+    </Modal>
+  );
+};
+
+const SelectMemberModal = (props) => {
+  const columns = [
+    {
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+    },
+    {
+      title: "Phone",
+      dataIndex: "mobile_number",
+      key: "mobile_number",
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+    },
+    {
+      title: "Member_batches",
+      dataIndex: "habuild_member_batches",
+      key: "habuild_member_batches",
+      render: (batches) => {
+        return (
+          <div className="flex flex-col space-y-1">
+            {batches.map((item) => {
+              return (
+                <>
+                  <span>
+                    {format(parseISO(item.sub_start_date), "yyyy-MM-dd")} -{" "}
+                    {format(parseISO(item.sub_end_date), "yyyy-MM-dd")}
+                  </span>
+                </>
+              );
+            })}
+          </div>
+        );
+      },
+    },
+    {
+      title: "Actions",
+      dataIndex: "action",
+      key: "action",
+      render: (obj) => {
+        return (
+          <button
+            onClick={() => props.handleMemberSelect(obj)}
+            className="px-4 py-1 font-medium text-white rounded-md bg-green-400 hover:bg-green-600"
+          >
+            Select
+          </button>
+        );
+      },
+    },
+  ];
+
+  return (
+    <Modal
+      hideActionButtons
+      apiLoading={true}
+      modalOpen={props.viewModal}
+      setModalOpen={props.setViewModal}
+    >
+      <Table
+        columns={columns}
+        dataSource={props.membersToSelectFrom.map((item) => {
+          return {
+            ...item,
+            action: item,
+          };
+        })}
+      />
     </Modal>
   );
 };
