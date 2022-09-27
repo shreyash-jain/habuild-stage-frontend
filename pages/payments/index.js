@@ -636,6 +636,7 @@ const ExportPaymentModal = (props) => {
     );
 
     const newResult = [];
+    const failedPayments = [];
 
     for (let i = 0; i < result.result.length; i++) {
       if (result.result[i].status == "SUCCESS") {
@@ -644,10 +645,19 @@ const ExportPaymentModal = (props) => {
           ...result.result[i],
         };
         newResult.push(obj);
+      } else if (result.result[i].status == "FAILED") {
+        const obj = {
+          ...result.result[i].habuild_members,
+          ...result.result[i],
+        };
+        failedPayments.push(obj);
       }
     }
 
     await CreateCsvFromArray(newResult, "Successfull Payments Export");
+    if (failedPayments.length > 0) {
+      await CreateCsvFromArray(failedPayments, "Failed Payments Export");
+    }
 
     setLoading(false);
   };
