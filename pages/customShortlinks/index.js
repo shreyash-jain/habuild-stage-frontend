@@ -7,6 +7,7 @@ import { RefreshIcon } from "@heroicons/react/outline";
 import toast from "react-hot-toast";
 import { ShortenerApis } from "../../constants/apis";
 import Table from "../../components/Table";
+import UpdateCustomShortlinkModal from "./UpdateCustomShortlinkModal";
 
 const CustomShortlinks = () => {
   const { checkAuthLoading, customFetch, user } = useFetchWrapper();
@@ -16,6 +17,10 @@ const CustomShortlinks = () => {
   const [longUrl, setLongUrl] = useState("");
   const [shortLinks, setShortLinks] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [viewUpdateModal, setViewUpdateModal] = useState(false);
+  const [customShortlinkObjToUpdate, setCustomShortlinkObjToUpdate] = useState(
+    {}
+  );
 
   useEffect(() => {
     if (!checkAuthLoading) {
@@ -35,7 +40,14 @@ const CustomShortlinks = () => {
     if (!result.ok) {
       toast.error("Failed to fetch Custom Urls");
     } else {
-      setShortLinks(result.result);
+      setShortLinks(
+        result.result.map((item) => {
+          return {
+            ...item,
+            action: item,
+          };
+        })
+      );
     }
 
     setLoading(false);
@@ -103,6 +115,24 @@ const CustomShortlinks = () => {
       dataIndex: "last_redirected_at",
       key: "last_redirected_at",
     },
+    {
+      title: "Actions",
+      dataIndex: "action",
+      key: "action",
+      render: (obj) => {
+        return (
+          <button
+            onClick={() => {
+              setCustomShortlinkObjToUpdate(obj);
+              setViewUpdateModal(true);
+            }}
+            className="px-3 py-1 rounded-md text-white font-medium bg-green-400 hover:bg-green-500"
+          >
+            Update
+          </button>
+        );
+      },
+    },
   ];
 
   return (
@@ -146,6 +176,14 @@ const CustomShortlinks = () => {
       </div>
 
       <Table dataLoading={loading} columns={columns} dataSource={shortLinks} />
+
+      <UpdateCustomShortlinkModal
+        viewModal={viewUpdateModal}
+        setViewModal={setViewUpdateModal}
+        customFetch={customFetch}
+        customShortlinkToUpdate={customShortlinkObjToUpdate}
+        refetchData={getAllCustomShortlinks}
+      />
     </div>
   );
 };

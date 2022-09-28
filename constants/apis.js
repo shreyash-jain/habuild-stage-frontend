@@ -138,6 +138,7 @@ export const ShortenerApis = {
   UPDATE_CURRENT_YT_LINK: () => `${API_BASE_URL}/api/shortener/updateProxyUrl`,
   CREATE_SHORT_LINK: () => `${API_BASE_URL}/api/shortener/create`,
   GET_CUSTOM_SHORT_LINKS: () => `${API_BASE_URL}/api/shortener/getCustomUrls`,
+  UPDATE_CUSTOM_SHORT_LINKS: () => `${API_BASE_URL}/api/shortener/update`,
 };
 
 export const SchedulerApis = {
