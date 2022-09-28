@@ -6,16 +6,12 @@ import toast from "react-hot-toast";
 
 const UpdateCustomShortlinkModal = (props) => {
   const [apiLoading, setApiLoading] = useState(false);
-  const [newShortRoute, setNewShortRoute] = useState(
-    props.customShortlinkToUpdate.short_route
-  );
-  const [newLongUrl, setNewLongUrl] = useState(
-    props.customShortlinkToUpdate.long_url
-  );
+  const [newShortRoute, setNewShortRoute] = useState("");
+  const [newLongUrl, setNewLongUrl] = useState("");
 
   useEffect(() => {
-    setNewShortRoute(props.customShortlinkToUpdate.short_route);
-    setNewLongUrl(props.customShortlinkToUpdate.long_url);
+    setNewShortRoute(props.customShortlinkToUpdate?.short_route);
+    setNewLongUrl(props.customShortlinkToUpdate?.long_url);
   }, [props.customShortlinkToUpdate]);
 
   const formFields = [
@@ -49,7 +45,7 @@ const UpdateCustomShortlinkModal = (props) => {
       {
         shortRoute: newShortRoute,
         newLongUrl: newLongUrl,
-        shortRouteId: props.customShortlinkToUpdate.id,
+        shortRouteId: props.customShortlinkToUpdate?.id,
       }
     );
 
@@ -61,7 +57,7 @@ const UpdateCustomShortlinkModal = (props) => {
   return (
     <Modal
       apiLoading={apiLoading}
-      modalOpen={props.viewModal}
+      modalOpen={props.viewModal || false}
       setModalOpen={props.setViewModal}
       actionText="Update"
       onActionButtonClick={updateShortLink}
@@ -73,8 +69,8 @@ const UpdateCustomShortlinkModal = (props) => {
       {apiLoading ? <RefreshIcon className="w-6 h-6 animate-spin" /> : null}
 
       <div className="flex flex-col space-y-2 text-lg my-8">
-        <span>{props.customShortlinkToUpdate.short_route}</span>
-        <span>{props.customShortlinkToUpdate.long_url}</span>
+        <span>{props.customShortlinkToUpdate?.short_route}</span>
+        <span>{props.customShortlinkToUpdate?.long_url}</span>
       </div>
 
       {formFields.map((item) => {
