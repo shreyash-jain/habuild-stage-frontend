@@ -231,6 +231,8 @@ const PaymentApproval = () => {
   // console.log("member Batches ", memberProgramsWithBatches);
 
   const approvePayment = async () => {
+    setLoading(true);
+
     let selectedPlan;
 
     for (let i = 0; i < plans.length; i++) {
@@ -260,12 +262,16 @@ const PaymentApproval = () => {
 
     getAllPaymentsToApprove();
     setShowScreenshotModal(false);
+
+    setLoading(false);
   };
 
   // console.log("PaymentTO Decide", paymentToDecide);
 
   if (checkAuthLoading) {
-    return <RefreshIcon className="text-green-300 h-8 w-8 mx-auto" />;
+    return (
+      <RefreshIcon className="text-green-300 h-8 w-8 mx-auto animate-spin" />
+    );
   }
 
   return (
@@ -311,13 +317,17 @@ const PaymentApproval = () => {
       )}
 
       <Modal
-        // apiLoading={apiLoading}
+        apiLoading={loading}
         modalOpen={showScreenshotModal}
         setModalOpen={setShowScreenshotModal}
         actionText="Approve"
         onActionButtonClick={approvePayment}
       >
         <img src={imageToShow} />
+
+        {loading && (
+          <RefreshIcon className="text-green-300 h-8 w-8 mx-auto animate-spin" />
+        )}
 
         <h2>Amount - {paymentToDecide.amount}</h2>
 
