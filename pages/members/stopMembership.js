@@ -127,17 +127,19 @@ const StopMembership = (props) => {
       dataIndex: "habuild_member_batches",
       key: "habuild_member_batches",
       render: (batches) => {
-        return (
-          <>
-            <span className="font-medium">
-              {format(parseISO(batches[0].sub_start_date), "PP")}
-            </span>{" "}
-            to{" "}
-            <span className="font-medium">
-              {format(parseISO(batches[0].sub_end_date), "PP")}{" "}
-            </span>
-          </>
-        );
+        if (batches[0]?.sub_start_date) {
+          return (
+            <>
+              <span className="font-medium">
+                {format(parseISO(batches[0]?.sub_start_date), "PP")}
+              </span>{" "}
+              to{" "}
+              <span className="font-medium">
+                {format(parseISO(batches[0]?.sub_end_date), "PP")}{" "}
+              </span>
+            </>
+          );
+        }
       },
     },
     {
